@@ -182,10 +182,12 @@
         width: 100% !important;
       }
       .header-right-actions {
-        justify-content: flex-start;
+        justify-content: space-between;
         margin-right: 0;
-        gap: 30%;
         padding: 0;
+      }
+      .header-action-text {
+        white-space: nowrap;
       }
       .logo-desktop {
         width: 280px;
