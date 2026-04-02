@@ -186,8 +186,11 @@
         margin-right: 0;
         padding: 0;
       }
-      .header-action-text {
+      .header-action-text strong {
         white-space: nowrap;
+      }
+      .header-action-item {
+        max-width: 48%;
       }
       .logo-desktop {
         width: 280px;
