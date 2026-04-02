@@ -154,6 +154,15 @@
       .header-top-bar {
         display: none;
       }
+      .header-top .container {
+        padding: 0 15px;
+      }
+      .header-top .col-md-8 {
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        flex: 0 0 100% !important;
+      }
       .header-right {
         margin-top: 0;
       }
