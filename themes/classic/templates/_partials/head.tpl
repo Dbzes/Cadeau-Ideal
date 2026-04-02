@@ -158,10 +158,11 @@
         padding: 0 15px;
       }
       .header-top .col-md-8 {
-        padding: 0 !important;
+        padding: 0 15px !important;
         width: 100% !important;
         max-width: 100% !important;
         flex: 0 0 100% !important;
+        box-sizing: border-box;
       }
       .header-right {
         margin-top: 0;
