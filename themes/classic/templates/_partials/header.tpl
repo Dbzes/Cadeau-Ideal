@@ -23,23 +23,13 @@
  * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License 3.0 (AFL-3.0)
  *}
 {block name='header_banner'}
-  <div class="header-banner">
-    {hook h='displayBanner'}
-  </div>
+  <div class="header-top-bar"></div>
 {/block}
 
 {block name='header_nav'}
   <nav class="header-nav">
     <div class="container">
       <div class="row">
-        <div class="hidden-sm-down">
-          <div class="col-md-5 col-xs-12">
-            {hook h='displayNav1'}
-          </div>
-          <div class="col-md-7 right-nav">
-              {hook h='displayNav2'}
-          </div>
-        </div>
         <div class="hidden-md-up text-sm-center mobile">
           <div class="float-xs-left" id="menu-icon">
             <i class="material-icons d-inline">&#xE5D2;</i>
@@ -57,7 +47,7 @@
 {block name='header_top'}
   <div class="header-top">
     <div class="container">
-       <div class="row">
+      <div class="row align-items-center">
         <div class="col-md-4 hidden-sm-down" id="_desktop_logo">
           {if $page.page_name == 'index'}
             <h1>
@@ -71,8 +61,32 @@
             </a>
           {/if}
         </div>
-        <div class="header-top-right col-md-8 col-sm-12 position-static">
-          {hook h='displayTop'}
+        <div class="col-md-8 col-sm-12 position-static">
+          <div class="header-right">
+            <div class="header-right-search">
+              {hook h='displayTop'}
+            </div>
+            <div class="header-right-actions">
+              <a class="header-action-item" href="{$urls.pages.my_account}" rel="nofollow">
+                <img src="/img/template/icon-account.png" alt="Mon compte" class="header-action-icon" />
+                <span class="header-action-text">
+                  <strong>Mon compte</strong><br/>
+                  {if $customer.is_logged}
+                    {$customerName}
+                  {else}
+                    {l s='Sign in' d='Shop.Theme.Actions'}
+                  {/if}
+                </span>
+              </a>
+              <a class="header-action-item" href="{$urls.pages.cart}" rel="nofollow">
+                <img src="/img/template/icon-basket.png" alt="Mon panier" class="header-action-icon" />
+                <span class="header-action-text">
+                  <strong>Mon panier</strong><br/>
+                  {$cart.products_count} {if $cart.products_count > 1}produits{else}produit{/if}
+                </span>
+              </a>
+            </div>
+          </div>
         </div>
       </div>
       <div id="mobile_top_menu_wrapper" class="row hidden-md-up" style="display:none;">

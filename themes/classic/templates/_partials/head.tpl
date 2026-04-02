@@ -92,10 +92,61 @@
 
 {block name='custom_css'}
   <style>
+    .header-top-bar {
+      width: 100%;
+      height: 6px;
+      background-color: #1a3c6e;
+    }
     .logo-desktop {
       width: 420px;
       height: auto;
       display: block;
+    }
+    .header-right {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .header-right-search {
+      width: 100%;
+    }
+    .header-right-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 30px;
+    }
+    .header-action-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      color: #333;
+    }
+    .header-action-item:hover {
+      text-decoration: none;
+      color: #ee7a03;
+    }
+    .header-action-icon {
+      width: 35px;
+      height: 35px;
+    }
+    .header-action-text {
+      font-family: 'Open Sans', sans-serif;
+      font-size: 0.8rem;
+      line-height: 1.3;
+      color: #333;
+    }
+    .header-action-text strong {
+      font-weight: 600;
+      color: #333;
+    }
+    @media (max-width: 767px) {
+      .header-right-actions {
+        justify-content: center;
+      }
+      .logo-desktop {
+        width: 280px;
+      }
     }
   </style>
 {/block}
