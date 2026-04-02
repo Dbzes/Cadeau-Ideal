@@ -1,12 +1,12 @@
 #search_widget {
   margin-bottom: .625rem;
-  overflow: auto;
+  overflow: visible;
 }
 #search_widget form {
   position: relative;
   display: flex;
-  align-items: stretch;
-  height: 40px;
+  align-items: center;
+  height: 38px;
 }
 #search_widget form i.search {
   position: absolute;
@@ -29,7 +29,7 @@
 }
 #search_widget form input[type="text"] {
   flex: 1;
-  height: 100%;
+  height: 38px;
   padding: 0 40px 0 38px;
   outline: none;
   background-color: #fff;
@@ -45,8 +45,9 @@
   color: #b9b9b9;
 }
 #search_widget form .search-btn {
-  height: 100%;
-  width: 40px;
+  height: 38px;
+  width: 38px;
+  flex-shrink: 0;
   border: 1px solid #ee7a03;
   border-left: none;
   background: url('/img/template/bt-rechercher.png') no-repeat center center;
