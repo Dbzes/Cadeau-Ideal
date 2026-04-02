@@ -158,14 +158,21 @@
         margin-top: 0;
       }
       .header-right-search {
-        width: 100%;
+        width: 100% !important;
         margin-left: 0;
-        padding: 0 15px;
+        padding: 0;
         box-sizing: border-box;
       }
+      #search_widget {
+        float: none !important;
+        min-width: 100% !important;
+        width: 100% !important;
+      }
       .header-right-actions {
-        justify-content: center;
+        justify-content: flex-start;
         margin-right: 0;
+        gap: 20%;
+        padding: 0;
       }
       .logo-desktop {
         width: 280px;
