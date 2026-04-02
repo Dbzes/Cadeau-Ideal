@@ -181,7 +181,7 @@
       .header-right-actions {
         justify-content: flex-start;
         margin-right: 0;
-        gap: 20%;
+        gap: 30%;
         padding: 0;
       }
       .logo-desktop {
