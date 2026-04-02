@@ -151,8 +151,21 @@
       color: #ee7a03;
     }
     @media (max-width: 767px) {
+      .header-top-bar {
+        display: none;
+      }
+      .header-right {
+        margin-top: 0;
+      }
+      .header-right-search {
+        width: 100%;
+        margin-left: 0;
+        padding: 0 15px;
+        box-sizing: border-box;
+      }
       .header-right-actions {
         justify-content: center;
+        margin-right: 0;
       }
       .logo-desktop {
         width: 280px;
