@@ -194,11 +194,12 @@
         width: 48%;
       }
       .header-action-block--cart {
-        text-align: right;
+        text-align: left;
         margin-right: 5%;
+        margin-left: auto;
       }
       .header-action-block--cart .header-action-item {
-        justify-content: flex-end;
+        justify-content: flex-start;
       }
       .header-action-item {
         max-width: 100%;
