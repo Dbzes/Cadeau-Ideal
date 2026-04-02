@@ -195,6 +195,7 @@
       }
       .header-action-block--cart {
         text-align: right;
+        margin-right: 5%;
       }
       .header-action-block--cart .header-action-item {
         justify-content: flex-end;
