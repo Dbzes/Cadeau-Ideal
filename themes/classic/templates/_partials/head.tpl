@@ -94,7 +94,7 @@
   <style>
     .header-top-bar {
       width: 100%;
-      height: 12px;
+      height: 18px;
       background-color: #1a3c6e;
     }
     .logo-desktop {
@@ -113,6 +113,7 @@
     }
     .header-right-search {
       width: 70%;
+      margin-left: auto;
     }
     #search_widget {
       min-width: 100% !important;
