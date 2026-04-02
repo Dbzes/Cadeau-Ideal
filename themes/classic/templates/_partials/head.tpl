@@ -93,8 +93,9 @@
 {block name='custom_css'}
   <style>
     .header-top-bar {
-      width: 100%;
-      height: 6px;
+      width: 100vw;
+      margin-left: calc(-50vw + 50%);
+      height: 12px;
       background-color: #1a3c6e;
     }
     .logo-desktop {
@@ -102,10 +103,13 @@
       height: auto;
       display: block;
     }
+    .header-top .row {
+      align-items: flex-start;
+    }
     .header-right {
       display: flex;
       flex-direction: column;
-      gap: 15px;
+      gap: 10px;
     }
     .header-right-search {
       width: 100%;
@@ -138,7 +142,7 @@
     }
     .header-action-text strong {
       font-weight: 600;
-      color: #333;
+      color: #ee7a03;
     }
     @media (max-width: 767px) {
       .header-right-actions {

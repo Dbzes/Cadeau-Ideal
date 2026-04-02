@@ -47,7 +47,7 @@
 {block name='header_top'}
   <div class="header-top">
     <div class="container">
-      <div class="row align-items-center">
+      <div class="row align-items-start">
         <div class="col-md-4 hidden-sm-down" id="_desktop_logo">
           {if $page.page_name == 'index'}
             <h1>
