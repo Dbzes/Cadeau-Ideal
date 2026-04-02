@@ -196,7 +196,7 @@
       .header-action-block--cart {
         text-align: left;
         margin-right: 5%;
-        margin-left: 25%;
+        margin-left: 15%;
       }
       .header-action-block--cart .header-action-item {
         justify-content: flex-start;
