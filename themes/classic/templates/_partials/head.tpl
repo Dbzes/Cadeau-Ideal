@@ -109,7 +109,7 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
-      margin-top: -80px;
+      margin-top: -130px;
     }
     .header-right-search {
       width: 70%;
