@@ -74,9 +74,9 @@
                 <span class="header-action-text">
                   <strong>Mon compte</strong><br/>
                   {if $customer.is_logged}
-                    {$customerName}
+                    <span class="header-action-sub">{$customerName}</span>
                   {else}
-                    {l s='Sign in' d='Shop.Theme.Actions'}
+                    <span class="header-action-sub">Connexion/Inscription</span>
                   {/if}
                 </span>
               </a>
@@ -84,7 +84,7 @@
                 <img src="/img/template/icon-basket.png" alt="Mon panier" class="header-action-icon" />
                 <span class="header-action-text">
                   <strong>Mon panier</strong><br/>
-                  {$cart.products_count} {if $cart.products_count > 1}produits{else}produit{/if}
+                  <span class="header-action-sub">{$cart.products_count} {if $cart.products_count > 1}produits{else}produit{/if}</span>
                 </span>
               </a>
             </div>

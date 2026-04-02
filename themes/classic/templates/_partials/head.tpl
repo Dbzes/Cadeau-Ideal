@@ -150,6 +150,9 @@
       font-weight: 600;
       color: #ee7a03;
     }
+    .header-action-sub {
+      color: #004774;
+    }
     @media (max-width: 767px) {
       .header-top-bar {
         display: none;
