@@ -69,24 +69,28 @@
               {hook h='displayTop'}
             </div>
             <div class="header-right-actions">
-              <a class="header-action-item" href="{$urls.pages.my_account}" rel="nofollow">
-                <img src="/img/template/icon-account.png" alt="Mon compte" class="header-action-icon" />
-                <span class="header-action-text">
-                  <strong>Mon compte</strong><br/>
-                  {if $customer.is_logged}
-                    <span class="header-action-sub">{$customerName}</span>
-                  {else}
-                    <span class="header-action-sub">Connexion/Inscription</span>
-                  {/if}
-                </span>
-              </a>
-              <a class="header-action-item" href="{$urls.pages.cart}" rel="nofollow">
-                <img src="/img/template/icon-basket.png" alt="Mon panier" class="header-action-icon" />
-                <span class="header-action-text">
-                  <strong>Mon panier</strong><br/>
-                  <span class="header-action-sub">{$cart.products_count} {if $cart.products_count > 1}produits{else}produit{/if}</span>
-                </span>
-              </a>
+              <div class="header-action-block header-action-block--account">
+                <a class="header-action-item" href="{$urls.pages.my_account}" rel="nofollow">
+                  <img src="/img/template/icon-account.png" alt="Mon compte" class="header-action-icon" />
+                  <span class="header-action-text">
+                    <strong>Mon compte</strong><br/>
+                    {if $customer.is_logged}
+                      <span class="header-action-sub">{$customerName}</span>
+                    {else}
+                      <span class="header-action-sub">Connexion/Inscription</span>
+                    {/if}
+                  </span>
+                </a>
+              </div>
+              <div class="header-action-block header-action-block--cart">
+                <a class="header-action-item" href="{$urls.pages.cart}" rel="nofollow">
+                  <img src="/img/template/icon-basket.png" alt="Mon panier" class="header-action-icon" />
+                  <span class="header-action-text">
+                    <strong>Mon panier</strong><br/>
+                    <span class="header-action-sub">{$cart.products_count} {if $cart.products_count > 1}produits{else}produit{/if}</span>
+                  </span>
+                </a>
+              </div>
             </div>
           </div>
         </div>

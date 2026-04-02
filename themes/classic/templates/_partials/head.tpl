@@ -125,6 +125,9 @@
       gap: 40px;
       margin-right: 10px;
     }
+    .header-action-block {
+      flex-shrink: 0;
+    }
     .header-action-item {
       display: flex;
       align-items: center;
@@ -185,12 +188,19 @@
         justify-content: space-between;
         margin-right: 0;
         padding: 0;
+        gap: 0;
       }
-      .header-action-text strong {
-        white-space: nowrap;
+      .header-action-block {
+        width: 48%;
+      }
+      .header-action-block--cart {
+        text-align: right;
+      }
+      .header-action-block--cart .header-action-item {
+        justify-content: flex-end;
       }
       .header-action-item {
-        max-width: 48%;
+        max-width: 100%;
       }
       .logo-desktop {
         width: 280px;
