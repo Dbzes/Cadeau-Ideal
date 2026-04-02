@@ -109,10 +109,10 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
-      padding-top: 5px;
+      margin-top: -20px;
     }
     .header-right-search {
-      width: 100%;
+      width: 70%;
     }
     #search_widget {
       min-width: 100% !important;
