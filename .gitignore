@@ -9,6 +9,7 @@ config/settings.inc.php
 
 # Dossier upload client
 img/
+!img/template/
 upload/
 download/
 
