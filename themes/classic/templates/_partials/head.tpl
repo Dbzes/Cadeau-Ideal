@@ -93,8 +93,7 @@
 {block name='custom_css'}
   <style>
     .header-top-bar {
-      width: 100vw;
-      margin-left: calc(-50vw + 50%);
+      width: 100%;
       height: 12px;
       background-color: #1a3c6e;
     }
@@ -109,20 +108,25 @@
     .header-right {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
+      padding-top: 5px;
     }
     .header-right-search {
       width: 100%;
     }
+    #search_widget {
+      min-width: 100% !important;
+      width: 100% !important;
+    }
     .header-right-actions {
       display: flex;
       justify-content: flex-end;
-      gap: 30px;
+      gap: 40px;
     }
     .header-action-item {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
       text-decoration: none;
       color: #333;
     }
@@ -131,13 +135,13 @@
       color: #ee7a03;
     }
     .header-action-icon {
-      width: 35px;
-      height: 35px;
+      width: 48px;
+      height: 48px;
     }
     .header-action-text {
       font-family: 'Open Sans', sans-serif;
-      font-size: 0.8rem;
-      line-height: 1.3;
+      font-size: 0.85rem;
+      line-height: 1.4;
       color: #333;
     }
     .header-action-text strong {
@@ -150,6 +154,10 @@
       }
       .logo-desktop {
         width: 280px;
+      }
+      .header-action-icon {
+        width: 36px;
+        height: 36px;
       }
     }
   </style>
