@@ -123,6 +123,7 @@
       display: flex;
       justify-content: flex-end;
       gap: 40px;
+      margin-right: 10px;
     }
     .header-action-item {
       display: flex;
