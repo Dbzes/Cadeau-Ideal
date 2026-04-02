@@ -28,7 +28,7 @@
     <input type="hidden" name="controller" value="search">
     <i class="material-icons search" aria-hidden="true">search</i>
     <input type="text" name="s" value="{$search_string}" placeholder="Mug, tapis de souris,..." aria-label="{l s='Search' d='Shop.Theme.Catalog'}">
-    <button type="submit" class="search-btn" aria-label="{l s='Search' d='Shop.Theme.Catalog'}"></button>
+    <input type="image" src="/img/template/bt-rechercher.png" class="search-btn" alt="{l s='Search' d='Shop.Theme.Catalog'}" />
     <i class="material-icons clear" aria-hidden="true">clear</i>
   </form>
 </div>
