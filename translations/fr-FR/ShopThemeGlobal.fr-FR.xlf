@@ -522,7 +522,7 @@
     <body>
       <trans-unit id="7601c8e861088bd27255e18afaefab6b" approved="yes">
         <source>%copyright% %year% - Ecommerce software by %prestashop%</source>
-        <target state="final">%copyright% %year% - Logiciel e-commerce par %prestashop% - Développé par Evolution Informatik</target>
+        <target state="final">%copyright% %year% - Logiciel e-commerce par %prestashop%</target>
         <note>Line: 41</note>
       </trans-unit>
     </body>
