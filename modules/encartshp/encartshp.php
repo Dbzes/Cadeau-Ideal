@@ -13,6 +13,8 @@ if (!defined('_PS_VERSION_')) {
 
 class Encartshp extends Module
 {
+    private $positions = [1, 2, 3, 4];
+
     public function __construct()
     {
         $this->name = 'encartshp';
@@ -25,20 +27,53 @@ class Encartshp extends Module
         parent::__construct();
 
         $this->displayName = $this->l('Encarts HP');
-        $this->description = $this->l('Gestion des encarts de la page d\'accueil.');
+        $this->description = $this->l('Affiche 4 encarts visuels sur la page d\'accueil.');
         $this->ps_versions_compliancy = ['min' => '8.0.0', 'max' => _PS_VERSION_];
     }
 
     public function install()
     {
-        return parent::install()
-            && Configuration::updateValue('ENCARTSHP_ACTIVE', 0);
+        if (!parent::install()
+            || !$this->registerHook('displayHome')
+            || !$this->registerHook('actionFrontControllerSetMedia')
+        ) {
+            return false;
+        }
+
+        Configuration::updateValue('ENCARTSHP_ACTIVE', 0);
+
+        foreach ($this->positions as $i) {
+            Configuration::updateValue('ENCARTSHP_LINK_' . $i, '');
+            Configuration::updateValue('ENCARTSHP_ALT_' . $i, '');
+            Configuration::updateValue('ENCARTSHP_TITLE_' . $i, '');
+            Configuration::updateValue('ENCARTSHP_NEWTAB_' . $i, 0);
+        }
+
+        $imgDir = _PS_MODULE_DIR_ . $this->name . '/img/';
+        if (!is_dir($imgDir)) {
+            mkdir($imgDir, 0755, true);
+        }
+
+        return true;
     }
 
     public function uninstall()
     {
-        return parent::uninstall()
-            && Configuration::deleteByName('ENCARTSHP_ACTIVE');
+        Configuration::deleteByName('ENCARTSHP_ACTIVE');
+
+        foreach ($this->positions as $i) {
+            Configuration::deleteByName('ENCARTSHP_LINK_' . $i);
+            Configuration::deleteByName('ENCARTSHP_ALT_' . $i);
+            Configuration::deleteByName('ENCARTSHP_TITLE_' . $i);
+            Configuration::deleteByName('ENCARTSHP_NEWTAB_' . $i);
+
+            $imgPath = _PS_MODULE_DIR_ . $this->name . '/img/encart_' . $i . '.jpg';
+            if (file_exists($imgPath)) {
+                unlink($imgPath);
+            }
+        }
+
+        return parent::uninstall();
     }
 
     public function getContent()
@@ -46,46 +81,163 @@ class Encartshp extends Module
         $output = '';
 
         if (Tools::isSubmit('submitEncartshpModule')) {
-            Configuration::updateValue('ENCARTSHP_ACTIVE', (int) Tools::getValue('ENCARTSHP_ACTIVE'));
-            $output .= $this->displayConfirmation($this->l('Paramètres mis à jour.'));
+            $output .= $this->processForm();
         }
 
         return $output . $this->renderForm();
     }
 
+    protected function processForm()
+    {
+        $output = '';
+
+        Configuration::updateValue('ENCARTSHP_ACTIVE', (int) Tools::getValue('ENCARTSHP_ACTIVE'));
+
+        foreach ($this->positions as $i) {
+            Configuration::updateValue('ENCARTSHP_LINK_' . $i, Tools::getValue('ENCARTSHP_LINK_' . $i));
+            Configuration::updateValue('ENCARTSHP_ALT_' . $i, Tools::getValue('ENCARTSHP_ALT_' . $i));
+            Configuration::updateValue('ENCARTSHP_TITLE_' . $i, Tools::getValue('ENCARTSHP_TITLE_' . $i));
+            Configuration::updateValue('ENCARTSHP_NEWTAB_' . $i, (int) Tools::getValue('ENCARTSHP_NEWTAB_' . $i));
+
+            if (isset($_FILES['ENCARTSHP_IMG_' . $i]) && $_FILES['ENCARTSHP_IMG_' . $i]['size'] > 0) {
+                $imgDir = _PS_MODULE_DIR_ . $this->name . '/img/';
+                $fileName = 'encart_' . $i . '.jpg';
+                $allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+
+                if (!in_array($_FILES['ENCARTSHP_IMG_' . $i]['type'], $allowedTypes)) {
+                    $output .= $this->displayError($this->l('Encart') . ' ' . $i . ' : ' . $this->l('format non supporté (JPG, PNG, WebP, GIF uniquement).'));
+                    continue;
+                }
+
+                if (!move_uploaded_file($_FILES['ENCARTSHP_IMG_' . $i]['tmp_name'], $imgDir . $fileName)) {
+                    $output .= $this->displayError($this->l('Encart') . ' ' . $i . ' : ' . $this->l('erreur lors de l\'upload.'));
+                    continue;
+                }
+            }
+
+            if (Tools::getValue('ENCARTSHP_DELETE_IMG_' . $i)) {
+                $imgPath = _PS_MODULE_DIR_ . $this->name . '/img/encart_' . $i . '.jpg';
+                if (file_exists($imgPath)) {
+                    unlink($imgPath);
+                }
+            }
+        }
+
+        if (empty($output)) {
+            $output = $this->displayConfirmation($this->l('Paramètres mis à jour.'));
+        }
+
+        return $output;
+    }
+
     protected function renderForm()
     {
-        $fields_form = [
+        $inputs = [
+            [
+                'type' => 'switch',
+                'label' => $this->l('Activer les encarts'),
+                'name' => 'ENCARTSHP_ACTIVE',
+                'is_bool' => true,
+                'values' => [
+                    ['id' => 'active_on', 'value' => 1, 'label' => $this->l('Oui')],
+                    ['id' => 'active_off', 'value' => 0, 'label' => $this->l('Non')],
+                ],
+            ],
+        ];
+
+        $forms = [];
+
+        $forms[] = [
             'form' => [
                 'legend' => [
-                    'title' => $this->l('Paramètres'),
+                    'title' => $this->l('Paramètres généraux'),
                     'icon' => 'icon-cogs',
                 ],
-                'input' => [
-                    [
-                        'type' => 'switch',
-                        'label' => $this->l('Activer les encarts'),
-                        'name' => 'ENCARTSHP_ACTIVE',
-                        'is_bool' => true,
-                        'values' => [
-                            [
-                                'id' => 'active_on',
-                                'value' => 1,
-                                'label' => $this->l('Oui'),
-                            ],
-                            [
-                                'id' => 'active_off',
-                                'value' => 0,
-                                'label' => $this->l('Non'),
-                            ],
-                        ],
-                    ],
-                ],
+                'input' => $inputs,
                 'submit' => [
                     'title' => $this->l('Enregistrer'),
                 ],
             ],
         ];
+
+        foreach ($this->positions as $i) {
+            $posLabels = [
+                1 => $this->l('Haut gauche'),
+                2 => $this->l('Haut droite'),
+                3 => $this->l('Bas gauche'),
+                4 => $this->l('Bas droite'),
+            ];
+
+            $encartInputs = [
+                [
+                    'type' => 'file',
+                    'label' => $this->l('Image (545x340)'),
+                    'name' => 'ENCARTSHP_IMG_' . $i,
+                    'desc' => $this->l('Formats : JPG, PNG, WebP, GIF. Taille recommandée : 545x340 px.'),
+                ],
+                [
+                    'type' => 'text',
+                    'label' => $this->l('URL du lien'),
+                    'name' => 'ENCARTSHP_LINK_' . $i,
+                    'desc' => $this->l('Adresse de destination au clic sur l\'encart.'),
+                ],
+                [
+                    'type' => 'text',
+                    'label' => $this->l('Texte alternatif (alt)'),
+                    'name' => 'ENCARTSHP_ALT_' . $i,
+                    'desc' => $this->l('Attribut alt de l\'image pour le référencement et l\'accessibilité.'),
+                ],
+                [
+                    'type' => 'text',
+                    'label' => $this->l('Titre du lien (title)'),
+                    'name' => 'ENCARTSHP_TITLE_' . $i,
+                    'desc' => $this->l('Attribut title du lien pour le référencement.'),
+                ],
+                [
+                    'type' => 'switch',
+                    'label' => $this->l('Ouvrir dans un nouvel onglet'),
+                    'name' => 'ENCARTSHP_NEWTAB_' . $i,
+                    'is_bool' => true,
+                    'values' => [
+                        ['id' => 'newtab_' . $i . '_on', 'value' => 1, 'label' => $this->l('Oui')],
+                        ['id' => 'newtab_' . $i . '_off', 'value' => 0, 'label' => $this->l('Non')],
+                    ],
+                ],
+            ];
+
+            $imgPath = _PS_MODULE_DIR_ . $this->name . '/img/encart_' . $i . '.jpg';
+            if (file_exists($imgPath)) {
+                $imgUrl = $this->_path . 'img/encart_' . $i . '.jpg?' . filemtime($imgPath);
+                array_unshift($encartInputs, [
+                    'type' => 'html',
+                    'name' => 'ENCARTSHP_PREVIEW_' . $i,
+                    'html_content' => '<div class="form-group"><label class="control-label col-lg-3">' . $this->l('Aperçu') . '</label><div class="col-lg-9"><img src="' . $imgUrl . '" style="max-width:272px;max-height:170px;border:1px solid #ccc;margin-bottom:10px;" /><br/></div></div>',
+                ]);
+                $encartInputs[] = [
+                    'type' => 'switch',
+                    'label' => $this->l('Supprimer l\'image'),
+                    'name' => 'ENCARTSHP_DELETE_IMG_' . $i,
+                    'is_bool' => true,
+                    'values' => [
+                        ['id' => 'delete_' . $i . '_on', 'value' => 1, 'label' => $this->l('Oui')],
+                        ['id' => 'delete_' . $i . '_off', 'value' => 0, 'label' => $this->l('Non')],
+                    ],
+                ];
+            }
+
+            $forms[] = [
+                'form' => [
+                    'legend' => [
+                        'title' => $this->l('Encart') . ' ' . $i . ' — ' . $posLabels[$i],
+                        'icon' => 'icon-picture-o',
+                    ],
+                    'input' => $encartInputs,
+                    'submit' => [
+                        'title' => $this->l('Enregistrer'),
+                    ],
+                ],
+            ];
+        }
 
         $helper = new HelperForm();
         $helper->module = $this;
@@ -94,8 +246,58 @@ class Encartshp extends Module
         $helper->currentIndex = AdminController::$currentIndex . '&configure=' . $this->name;
         $helper->default_form_language = (int) Configuration::get('PS_LANG_DEFAULT');
         $helper->submit_action = 'submitEncartshpModule';
+
         $helper->fields_value['ENCARTSHP_ACTIVE'] = Configuration::get('ENCARTSHP_ACTIVE');
 
-        return $helper->generateForm([$fields_form]);
+        foreach ($this->positions as $i) {
+            $helper->fields_value['ENCARTSHP_LINK_' . $i] = Configuration::get('ENCARTSHP_LINK_' . $i);
+            $helper->fields_value['ENCARTSHP_ALT_' . $i] = Configuration::get('ENCARTSHP_ALT_' . $i);
+            $helper->fields_value['ENCARTSHP_TITLE_' . $i] = Configuration::get('ENCARTSHP_TITLE_' . $i);
+            $helper->fields_value['ENCARTSHP_NEWTAB_' . $i] = Configuration::get('ENCARTSHP_NEWTAB_' . $i);
+            $helper->fields_value['ENCARTSHP_DELETE_IMG_' . $i] = 0;
+        }
+
+        return $helper->generateForm($forms);
+    }
+
+    public function hookActionFrontControllerSetMedia()
+    {
+        if ((int) Configuration::get('ENCARTSHP_ACTIVE')) {
+            $this->context->controller->registerStylesheet(
+                'module-encartshp-style',
+                'modules/' . $this->name . '/views/css/encartshp.css',
+                ['media' => 'all', 'priority' => 150]
+            );
+        }
+    }
+
+    public function hookDisplayHome()
+    {
+        if (!(int) Configuration::get('ENCARTSHP_ACTIVE')) {
+            return '';
+        }
+
+        $encarts = [];
+
+        foreach ($this->positions as $i) {
+            $imgPath = _PS_MODULE_DIR_ . $this->name . '/img/encart_' . $i . '.jpg';
+            $hasImage = file_exists($imgPath);
+
+            $encarts[] = [
+                'position' => $i,
+                'has_image' => $hasImage,
+                'image_url' => $hasImage ? $this->_path . 'img/encart_' . $i . '.jpg?' . filemtime($imgPath) : '',
+                'link' => Configuration::get('ENCARTSHP_LINK_' . $i),
+                'alt' => Configuration::get('ENCARTSHP_ALT_' . $i),
+                'title' => Configuration::get('ENCARTSHP_TITLE_' . $i),
+                'new_tab' => (int) Configuration::get('ENCARTSHP_NEWTAB_' . $i),
+            ];
+        }
+
+        $this->context->smarty->assign([
+            'encarts' => $encarts,
+        ]);
+
+        return $this->display(__FILE__, 'views/templates/hook/displayHome.tpl');
     }
 }

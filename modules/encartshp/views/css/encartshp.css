@@ -1,0 +1,39 @@
+.encartshp-container {
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+.encartshp-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.encartshp-item {
+  width: calc(50% - 10px);
+  margin-bottom: 20px;
+}
+
+.encartshp-item a {
+  display: block;
+}
+
+.encartshp-img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.encartshp-placeholder {
+  width: 100%;
+  aspect-ratio: 545 / 340;
+  border: 1px solid #000;
+  box-sizing: border-box;
+}
+
+@media (max-width: 767px) {
+  .encartshp-item {
+    width: 100%;
+    margin-bottom: 15px;
+  }
+}
