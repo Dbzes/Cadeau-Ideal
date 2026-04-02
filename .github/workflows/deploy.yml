@@ -19,6 +19,9 @@ jobs:
           port: 42527
           script: |
             cd /home/davidmahe/prestashop/data/prestashop
+            echo 'mmauhlea' | sudo -S chown -R davidmahe:davidmahe /home/davidmahe/prestashop/data/prestashop
             git fetch origin main
             git reset --hard origin/main
+            echo 'mmauhlea' | sudo -S chown -R www-data:www-data /home/davidmahe/prestashop/data/prestashop
+            echo 'mmauhlea' | sudo -S chown -R davidmahe:davidmahe /home/davidmahe/prestashop/data/prestashop/.git
             echo "Deploiement OK - $(date)"
