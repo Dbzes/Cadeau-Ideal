@@ -89,3 +89,13 @@
 {/block}
 
 {block name='hook_extra'}{/block}
+
+{block name='custom_css'}
+  <style>
+    .logo-desktop {
+      width: 420px;
+      height: auto;
+      display: block;
+    }
+  </style>
+{/block}

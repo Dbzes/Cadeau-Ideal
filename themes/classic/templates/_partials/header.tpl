@@ -58,18 +58,20 @@
   <div class="header-top">
     <div class="container">
        <div class="row">
-        <div class="col-md-2 hidden-sm-down" id="_desktop_logo">
-          {if $shop.logo_details}
-            {if $page.page_name == 'index'}
-              <h1>
-                {renderLogo}
-              </h1>
-            {else}
-              {renderLogo}
-            {/if}
+        <div class="col-md-4 hidden-sm-down" id="_desktop_logo">
+          {if $page.page_name == 'index'}
+            <h1>
+              <a href="{$urls.base_url}">
+                <img src="/img/template/le-cadeau-ideal.png" alt="{$shop.name}" class="logo-desktop" />
+              </a>
+            </h1>
+          {else}
+            <a href="{$urls.base_url}">
+              <img src="/img/template/le-cadeau-ideal.png" alt="{$shop.name}" class="logo-desktop" />
+            </a>
           {/if}
         </div>
-        <div class="header-top-right col-md-10 col-sm-12 position-static">
+        <div class="header-top-right col-md-8 col-sm-12 position-static">
           {hook h='displayTop'}
         </div>
       </div>
