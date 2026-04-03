@@ -165,11 +165,16 @@
         display: none !important;
       }
       .mobile-header-sticky {
-        position: sticky;
+        position: fixed;
         top: 0;
+        left: 0;
+        right: 0;
         z-index: 1000;
         background: #fff;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+      .header-nav.hidden-md-up {
+        margin-bottom: 110px;
       }
       .mobile-header-top {
         display: flex;
