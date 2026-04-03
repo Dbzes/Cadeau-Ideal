@@ -14,13 +14,14 @@ if (!defined('_PS_VERSION_')) {
 class Encartshp extends Module
 {
     private $grands = [1, 2];
+    private $grands2 = [6, 7];
     private $petits = [3, 4, 5];
 
     public function __construct()
     {
         $this->name = 'encartshp';
         $this->tab = 'front_office_features';
-        $this->version = '1.1.0';
+        $this->version = '1.2.0';
         $this->author = 'Claude';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -34,7 +35,7 @@ class Encartshp extends Module
 
     private function getAllPositions()
     {
-        return array_merge($this->grands, $this->petits);
+        return array_merge($this->grands, $this->grands2, $this->petits);
     }
 
     public function install()
@@ -55,6 +56,10 @@ class Encartshp extends Module
             Configuration::updateValue('ENCARTSHP_NEWTAB_' . $i, 0);
         }
 
+        foreach ($this->grands2 as $i) {
+            Configuration::updateValue('ENCARTSHP_DISABLED_' . $i, 1);
+        }
+
         $imgDir = _PS_MODULE_DIR_ . $this->name . '/img/';
         if (!is_dir($imgDir)) {
             mkdir($imgDir, 0755, true);
@@ -72,6 +77,7 @@ class Encartshp extends Module
             Configuration::deleteByName('ENCARTSHP_ALT_' . $i);
             Configuration::deleteByName('ENCARTSHP_TITLE_' . $i);
             Configuration::deleteByName('ENCARTSHP_NEWTAB_' . $i);
+            Configuration::deleteByName('ENCARTSHP_DISABLED_' . $i);
 
             $imgPath = _PS_MODULE_DIR_ . $this->name . '/img/encart_' . $i . '.jpg';
             if (file_exists($imgPath)) {
@@ -98,6 +104,10 @@ class Encartshp extends Module
         $output = '';
 
         Configuration::updateValue('ENCARTSHP_ACTIVE', (int) Tools::getValue('ENCARTSHP_ACTIVE'));
+
+        foreach ($this->grands2 as $i) {
+            Configuration::updateValue('ENCARTSHP_DISABLED_' . $i, (int) Tools::getValue('ENCARTSHP_DISABLED_' . $i));
+        }
 
         foreach ($this->getAllPositions() as $i) {
             Configuration::updateValue('ENCARTSHP_LINK_' . $i, Tools::getValue('ENCARTSHP_LINK_' . $i));
@@ -171,6 +181,11 @@ class Encartshp extends Module
             2 => $this->l('Grand encart — Droite'),
         ];
 
+        $grand2Labels = [
+            6 => $this->l('Grand encart 2 — Gauche'),
+            7 => $this->l('Grand encart 2 — Droite'),
+        ];
+
         $petitLabels = [
             3 => $this->l('Petit encart — Gauche'),
             4 => $this->l('Petit encart — Centre'),
@@ -179,6 +194,10 @@ class Encartshp extends Module
 
         foreach ($this->grands as $i) {
             $forms[] = $this->buildEncartForm($i, $grandLabels[$i], '545x340');
+        }
+
+        foreach ($this->grands2 as $i) {
+            $forms[] = $this->buildEncartForm($i, $grand2Labels[$i], '545x340', true);
         }
 
         foreach ($this->petits as $i) {
@@ -200,15 +219,31 @@ class Encartshp extends Module
             $helper->fields_value['ENCARTSHP_ALT_' . $i] = Configuration::get('ENCARTSHP_ALT_' . $i);
             $helper->fields_value['ENCARTSHP_TITLE_' . $i] = Configuration::get('ENCARTSHP_TITLE_' . $i);
             $helper->fields_value['ENCARTSHP_NEWTAB_' . $i] = Configuration::get('ENCARTSHP_NEWTAB_' . $i);
+            $helper->fields_value['ENCARTSHP_DISABLED_' . $i] = Configuration::get('ENCARTSHP_DISABLED_' . $i);
             $helper->fields_value['ENCARTSHP_DELETE_IMG_' . $i] = 0;
         }
 
         return $helper->generateForm($forms);
     }
 
-    protected function buildEncartForm($i, $label, $size)
+    protected function buildEncartForm($i, $label, $size, $hasDisable = false)
     {
-        $encartInputs = [
+        $encartInputs = [];
+
+        if ($hasDisable) {
+            $encartInputs[] = [
+                'type' => 'switch',
+                'label' => $this->l('Désactiver cet encart'),
+                'name' => 'ENCARTSHP_DISABLED_' . $i,
+                'is_bool' => true,
+                'values' => [
+                    ['id' => 'disabled_' . $i . '_on', 'value' => 1, 'label' => $this->l('Oui')],
+                    ['id' => 'disabled_' . $i . '_off', 'value' => 0, 'label' => $this->l('Non')],
+                ],
+            ];
+        }
+
+        $encartInputs = array_merge($encartInputs, [
             [
                 'type' => 'file',
                 'label' => $this->l('Image') . ' (' . $size . ')',
@@ -243,7 +278,7 @@ class Encartshp extends Module
                     ['id' => 'newtab_' . $i . '_off', 'value' => 0, 'label' => $this->l('Non')],
                 ],
             ],
-        ];
+        ]);
 
         $imgPath = _PS_MODULE_DIR_ . $this->name . '/img/encart_' . $i . '.jpg';
         if (file_exists($imgPath)) {
@@ -297,12 +332,30 @@ class Encartshp extends Module
         }
 
         $grands = [];
+        $grands2 = [];
         $petits = [];
 
         foreach ($this->grands as $i) {
             $imgPath = _PS_MODULE_DIR_ . $this->name . '/img/encart_' . $i . '.jpg';
             $hasImage = file_exists($imgPath);
             $grands[] = [
+                'position' => $i,
+                'has_image' => $hasImage,
+                'image_url' => $hasImage ? $this->_path . 'img/encart_' . $i . '.jpg?' . filemtime($imgPath) : '',
+                'link' => Configuration::get('ENCARTSHP_LINK_' . $i),
+                'alt' => Configuration::get('ENCARTSHP_ALT_' . $i),
+                'title' => Configuration::get('ENCARTSHP_TITLE_' . $i),
+                'new_tab' => (int) Configuration::get('ENCARTSHP_NEWTAB_' . $i),
+            ];
+        }
+
+        foreach ($this->grands2 as $i) {
+            if ((int) Configuration::get('ENCARTSHP_DISABLED_' . $i)) {
+                continue;
+            }
+            $imgPath = _PS_MODULE_DIR_ . $this->name . '/img/encart_' . $i . '.jpg';
+            $hasImage = file_exists($imgPath);
+            $grands2[] = [
                 'position' => $i,
                 'has_image' => $hasImage,
                 'image_url' => $hasImage ? $this->_path . 'img/encart_' . $i . '.jpg?' . filemtime($imgPath) : '',
@@ -329,6 +382,7 @@ class Encartshp extends Module
 
         $this->context->smarty->assign([
             'grands' => $grands,
+            'grands2' => $grands2,
             'petits' => $petits,
         ]);
 
