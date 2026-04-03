@@ -87,7 +87,7 @@
                   <img src="/img/template/icon-basket.png" alt="Mon panier" class="header-action-icon" />
                   <span class="header-action-text">
                     <strong>Mon panier</strong><br/>
-                    <span class="header-action-sub">{$cart.products_count} {if $cart.products_count > 1}produits{else}produit{/if}</span>
+                    <span class="header-action-sub" id="header-cart-count">{$cart.products_count} {if $cart.products_count > 1}produits{else}produit{/if}</span>
                   </span>
                 </a>
               </div>

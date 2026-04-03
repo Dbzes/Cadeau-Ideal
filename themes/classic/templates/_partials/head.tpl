@@ -213,4 +213,18 @@
       }
     }
   </style>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      if (typeof prestashop !== 'undefined') {
+        prestashop.on('updateCart', function(e) {
+          if (e && e.resp && e.resp.cart) {
+            var count = e.resp.cart.products_count;
+            var text = count + ' ' + (count > 1 ? 'produits' : 'produit');
+            var el = document.getElementById('header-cart-count');
+            if (el) el.textContent = text;
+          }
+        });
+      }
+    });
+  </script>
 {/block}
