@@ -1,6 +1,6 @@
 <?php
 /**
- * Mouse Pad Editor - Personnalisation de tapis de souris
+ * Editor Mouse Pad - Personnalisation de tapis de souris
  *
  * @author    Claude
  * @copyright 2026
@@ -32,7 +32,6 @@ class Mousepadeditor extends Module
     public function install()
     {
         return parent::install()
-            && $this->registerHook('displayFooterProduct')
             && Configuration::updateValue('MOUSEPAD_PRODUCT_IDS', '');
     }
 
@@ -91,25 +90,15 @@ class Mousepadeditor extends Module
         return $helper->generateForm([$fields_form]);
     }
 
-    public function hookDisplayFooterProduct($params)
+    public static function isActiveForProduct($productId)
     {
-        $productId = (int) Tools::getValue('id_product');
-
-        if (!$productId) {
-            return '';
-        }
-
         $configIds = Configuration::get('MOUSEPAD_PRODUCT_IDS');
         if (empty($configIds)) {
-            return '';
+            return false;
         }
 
         $allowedIds = array_map('intval', array_filter(explode(',', $configIds)));
 
-        if (!in_array($productId, $allowedIds)) {
-            return '';
-        }
-
-        return $this->display(__FILE__, 'views/templates/hook/editor.tpl');
+        return in_array((int) $productId, $allowedIds);
     }
 }
