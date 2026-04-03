@@ -93,31 +93,33 @@ class Mousepadeditor extends Module
 
     public function hookDisplayProductExtraContent($params)
     {
-        if (isset($params['product']) && is_object($params['product'])) {
-            $productId = (int) $params['product']->getId();
-        } elseif (isset($params['product']['id_product'])) {
-            $productId = (int) $params['product']['id_product'];
-        } else {
+        try {
+            $productId = (int) Tools::getValue('id_product');
+
+            if (!$productId) {
+                return [];
+            }
+
+            $configIds = Configuration::get('MOUSEPAD_PRODUCT_IDS');
+            if (empty($configIds)) {
+                return [];
+            }
+
+            $allowedIds = array_map('intval', array_filter(explode(',', $configIds)));
+
+            if (!in_array($productId, $allowedIds)) {
+                return [];
+            }
+
+            $content = $this->display(__FILE__, 'views/templates/hook/editor.tpl');
+
+            $extraContent = new \PrestaShop\PrestaShop\Core\Product\ProductExtraContent();
+            $extraContent->setTitle($this->l('Personnalisation'));
+            $extraContent->setContent($content);
+
+            return [$extraContent];
+        } catch (\Exception $e) {
             return [];
         }
-
-        $configIds = Configuration::get('MOUSEPAD_PRODUCT_IDS');
-        if (empty($configIds)) {
-            return [];
-        }
-
-        $allowedIds = array_map('intval', array_filter(explode(',', $configIds)));
-
-        if (!in_array($productId, $allowedIds)) {
-            return [];
-        }
-
-        $content = $this->display(__FILE__, 'views/templates/hook/editor.tpl');
-
-        $extraContent = new \PrestaShop\PrestaShop\Core\Product\ProductExtraContent();
-        $extraContent->setTitle($this->l('Personnalisation'));
-        $extraContent->setContent($content);
-
-        return [$extraContent];
     }
 }
