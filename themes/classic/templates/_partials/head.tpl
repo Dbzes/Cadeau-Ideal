@@ -160,8 +160,7 @@
       .header-top-bar {
         display: none;
       }
-      .header-top .header-right,
-      .header-top .header-right-actions {
+      .header-top {
         display: none !important;
       }
       .mobile-header-sticky {
