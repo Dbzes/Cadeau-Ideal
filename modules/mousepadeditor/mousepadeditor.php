@@ -32,6 +32,7 @@ class Mousepadeditor extends Module
     public function install()
     {
         return parent::install()
+            && $this->registerHook('displayMousepadEditor')
             && Configuration::updateValue('MOUSEPAD_PRODUCT_IDS', '');
     }
 
@@ -90,15 +91,25 @@ class Mousepadeditor extends Module
         return $helper->generateForm([$fields_form]);
     }
 
-    public static function isActiveForProduct($productId)
+    public function hookDisplayMousepadEditor($params)
     {
+        $productId = (int) Tools::getValue('id_product');
+
+        if (!$productId) {
+            return '';
+        }
+
         $configIds = Configuration::get('MOUSEPAD_PRODUCT_IDS');
         if (empty($configIds)) {
-            return false;
+            return '';
         }
 
         $allowedIds = array_map('intval', array_filter(explode(',', $configIds)));
 
-        return in_array((int) $productId, $allowedIds);
+        if (!in_array($productId, $allowedIds)) {
+            return '';
+        }
+
+        return $this->display(__FILE__, 'views/templates/hook/editor.tpl');
     }
 }

@@ -240,11 +240,7 @@
       {/if}
     {/block}
 
-    {if Module::isEnabled('mousepadeditor') && Mousepadeditor::isActiveForProduct($product.id)}
-      <section class="mousepad-editor-section">
-        {include file='module:mousepadeditor/views/templates/hook/editor.tpl'}
-      </section>
-    {/if}
+    {hook h='displayMousepadEditor'}
 
     {block name='product_footer'}
       {hook h='displayFooterProduct' product=$product category=$category}
