@@ -47,7 +47,10 @@
 }
 
 @media (max-width: 767px) {
-  .encartshp-grid-grands,
+  .encartshp-grid-grands {
+    flex-direction: column;
+    margin-bottom: 0;
+  }
   .encartshp-grid-petits {
     flex-direction: column;
   }
