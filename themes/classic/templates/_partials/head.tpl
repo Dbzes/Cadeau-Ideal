@@ -195,7 +195,7 @@
         height: 38px;
       }
       .mobile-header-search {
-        padding: 0 15px 10px;
+        padding: 0 15px 5px;
       }
       .mobile-header-search #search_widget {
         float: none !important;
