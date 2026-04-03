@@ -29,21 +29,27 @@
 {/block}
 
 {block name='header_nav'}
-  <nav class="header-nav">
-    <div class="container">
-      <div class="row">
-        <div class="hidden-md-up text-sm-center mobile">
-          <div class="float-xs-left" id="menu-icon">
-            <i class="material-icons d-inline">&#xE5D2;</i>
-          </div>
-          <div class="float-xs-right" id="_mobile_cart"></div>
-          <div class="float-xs-right" id="_mobile_user_info"></div>
-          <div class="top-logo" id="_mobile_logo"></div>
-          <div class="clearfix"></div>
+  <nav class="header-nav hidden-md-up">
+    <div class="mobile-header-sticky">
+      <div class="mobile-header-top">
+        <a href="{$urls.base_url}" class="mobile-logo">
+          <img src="/img/template/icone-lci-mobile.png" alt="{$shop.name}" />
+        </a>
+        <div class="mobile-header-icons">
+          <a href="{$urls.pages.my_account}" rel="nofollow">
+            <img src="/img/template/icon-account-mobile.png" alt="Mon compte" />
+          </a>
+          <a href="{$urls.pages.cart}" rel="nofollow">
+            <img src="/img/template/icon-basket-mobile.png" alt="Mon panier" />
+          </a>
         </div>
+      </div>
+      <div class="mobile-header-search">
+        {hook h='displayTop'}
       </div>
     </div>
   </nav>
+  <nav class="header-nav hidden-sm-down"></nav>
 {/block}
 
 {block name='header_top'}

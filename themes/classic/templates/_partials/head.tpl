@@ -160,56 +160,43 @@
       .header-top-bar {
         display: none;
       }
-      .header-top .container {
-        padding: 0 15px;
+      .header-top .header-right,
+      .header-top .header-right-actions {
+        display: none !important;
       }
-      .header-top .col-md-8 {
-        padding: 0 15px !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        flex: 0 0 100% !important;
-        box-sizing: border-box;
+      .mobile-header-sticky {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        background: #fff;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
       }
-      .header-right {
-        margin-top: 0;
+      .mobile-header-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 15px;
       }
-      .header-right-search {
-        width: 100% !important;
-        margin-left: 0;
-        padding: 0;
-        box-sizing: border-box;
+      .mobile-logo img {
+        height: 45px;
+        width: auto;
       }
-      #search_widget {
+      .mobile-header-icons {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+      .mobile-header-icons img {
+        width: 38px;
+        height: 38px;
+      }
+      .mobile-header-search {
+        padding: 0 15px 10px;
+      }
+      .mobile-header-search #search_widget {
         float: none !important;
         min-width: 100% !important;
         width: 100% !important;
-      }
-      .header-right-actions {
-        justify-content: space-between;
-        margin-right: 0;
-        padding: 0;
-        gap: 0;
-      }
-      .header-action-block {
-        width: 48%;
-      }
-      .header-action-block--cart {
-        text-align: left;
-        margin-right: 5%;
-        margin-left: 15%;
-      }
-      .header-action-block--cart .header-action-item {
-        justify-content: flex-start;
-      }
-      .header-action-item {
-        max-width: 100%;
-      }
-      .logo-desktop {
-        width: 280px;
-      }
-      .header-action-icon {
-        width: 36px;
-        height: 36px;
       }
     }
   </style>
