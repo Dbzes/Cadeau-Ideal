@@ -24,7 +24,7 @@ class Mousepadeditor extends Module
 
         parent::__construct();
 
-        $this->displayName = $this->l('Mouse Pad Editor');
+        $this->displayName = $this->l('Editor Mouse Pad');
         $this->description = $this->l('Affiche une zone de personnalisation sur les fiches produits sélectionnés.');
         $this->ps_versions_compliancy = ['min' => '8.0.0', 'max' => _PS_VERSION_];
     }
@@ -93,16 +93,30 @@ class Mousepadeditor extends Module
 
     public function hookDisplayProductExtraContent($params)
     {
-        $productId = (int) $params['product']->getId();
-        $allowedIds = array_map('intval', array_filter(explode(',', Configuration::get('MOUSEPAD_PRODUCT_IDS'))));
-
-        if (empty($allowedIds) || !in_array($productId, $allowedIds)) {
+        if (isset($params['product']) && is_object($params['product'])) {
+            $productId = (int) $params['product']->getId();
+        } elseif (isset($params['product']['id_product'])) {
+            $productId = (int) $params['product']['id_product'];
+        } else {
             return [];
         }
 
-        $extraContent = new PrestaShop\PrestaShop\Core\Product\ProductExtraContent();
+        $configIds = Configuration::get('MOUSEPAD_PRODUCT_IDS');
+        if (empty($configIds)) {
+            return [];
+        }
+
+        $allowedIds = array_map('intval', array_filter(explode(',', $configIds)));
+
+        if (!in_array($productId, $allowedIds)) {
+            return [];
+        }
+
+        $content = $this->display(__FILE__, 'views/templates/hook/editor.tpl');
+
+        $extraContent = new \PrestaShop\PrestaShop\Core\Product\ProductExtraContent();
         $extraContent->setTitle($this->l('Personnalisation'));
-        $extraContent->setContent($this->display(__FILE__, 'views/templates/hook/editor.tpl'));
+        $extraContent->setContent($content);
 
         return [$extraContent];
     }

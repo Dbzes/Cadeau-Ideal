@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <module>
   <name>mousepadeditor</name>
-  <displayName><![CDATA[Mouse Pad Editor]]></displayName>
+  <displayName><![CDATA[Editor Mouse Pad]]></displayName>
   <version><![CDATA[1.0.0]]></version>
   <description><![CDATA[Affiche une zone de personnalisation sur les fiches produits sélectionnés.]]></description>
   <author><![CDATA[Claude]]></author>
