@@ -13,13 +13,14 @@ if (!defined('_PS_VERSION_')) {
 
 class Encartshp extends Module
 {
-    private $positions = [1, 2, 3, 4];
+    private $grands = [1, 2];
+    private $petits = [3, 4, 5];
 
     public function __construct()
     {
         $this->name = 'encartshp';
         $this->tab = 'front_office_features';
-        $this->version = '1.0.0';
+        $this->version = '1.1.0';
         $this->author = 'Claude';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -27,8 +28,13 @@ class Encartshp extends Module
         parent::__construct();
 
         $this->displayName = $this->l('Encarts HP');
-        $this->description = $this->l('Affiche 4 encarts visuels sur la page d\'accueil.');
+        $this->description = $this->l('Affiche 2 grands encarts + 3 petits encarts sur la page d\'accueil.');
         $this->ps_versions_compliancy = ['min' => '8.0.0', 'max' => _PS_VERSION_];
+    }
+
+    private function getAllPositions()
+    {
+        return array_merge($this->grands, $this->petits);
     }
 
     public function install()
@@ -40,9 +46,9 @@ class Encartshp extends Module
             return false;
         }
 
-        Configuration::updateValue('ENCARTSHP_ACTIVE', 0);
+        Configuration::updateValue('ENCARTSHP_ACTIVE', 1);
 
-        foreach ($this->positions as $i) {
+        foreach ($this->getAllPositions() as $i) {
             Configuration::updateValue('ENCARTSHP_LINK_' . $i, '');
             Configuration::updateValue('ENCARTSHP_ALT_' . $i, '');
             Configuration::updateValue('ENCARTSHP_TITLE_' . $i, '');
@@ -61,7 +67,7 @@ class Encartshp extends Module
     {
         Configuration::deleteByName('ENCARTSHP_ACTIVE');
 
-        foreach ($this->positions as $i) {
+        foreach ($this->getAllPositions() as $i) {
             Configuration::deleteByName('ENCARTSHP_LINK_' . $i);
             Configuration::deleteByName('ENCARTSHP_ALT_' . $i);
             Configuration::deleteByName('ENCARTSHP_TITLE_' . $i);
@@ -93,7 +99,7 @@ class Encartshp extends Module
 
         Configuration::updateValue('ENCARTSHP_ACTIVE', (int) Tools::getValue('ENCARTSHP_ACTIVE'));
 
-        foreach ($this->positions as $i) {
+        foreach ($this->getAllPositions() as $i) {
             Configuration::updateValue('ENCARTSHP_LINK_' . $i, Tools::getValue('ENCARTSHP_LINK_' . $i));
             Configuration::updateValue('ENCARTSHP_ALT_' . $i, Tools::getValue('ENCARTSHP_ALT_' . $i));
             Configuration::updateValue('ENCARTSHP_TITLE_' . $i, Tools::getValue('ENCARTSHP_TITLE_' . $i));
@@ -160,83 +166,23 @@ class Encartshp extends Module
             ],
         ];
 
-        foreach ($this->positions as $i) {
-            $posLabels = [
-                1 => $this->l('Haut gauche'),
-                2 => $this->l('Haut droite'),
-                3 => $this->l('Bas gauche'),
-                4 => $this->l('Bas droite'),
-            ];
+        $grandLabels = [
+            1 => $this->l('Grand encart — Gauche'),
+            2 => $this->l('Grand encart — Droite'),
+        ];
 
-            $encartInputs = [
-                [
-                    'type' => 'file',
-                    'label' => $this->l('Image (545x340)'),
-                    'name' => 'ENCARTSHP_IMG_' . $i,
-                    'desc' => $this->l('Formats : JPG, PNG, WebP, GIF. Taille recommandée : 545x340 px.'),
-                ],
-                [
-                    'type' => 'text',
-                    'label' => $this->l('URL du lien'),
-                    'name' => 'ENCARTSHP_LINK_' . $i,
-                    'desc' => $this->l('Adresse de destination au clic sur l\'encart.'),
-                ],
-                [
-                    'type' => 'text',
-                    'label' => $this->l('Texte alternatif (alt)'),
-                    'name' => 'ENCARTSHP_ALT_' . $i,
-                    'desc' => $this->l('Attribut alt de l\'image pour le référencement et l\'accessibilité.'),
-                ],
-                [
-                    'type' => 'text',
-                    'label' => $this->l('Titre du lien (title)'),
-                    'name' => 'ENCARTSHP_TITLE_' . $i,
-                    'desc' => $this->l('Attribut title du lien pour le référencement.'),
-                ],
-                [
-                    'type' => 'switch',
-                    'label' => $this->l('Ouvrir dans un nouvel onglet'),
-                    'name' => 'ENCARTSHP_NEWTAB_' . $i,
-                    'is_bool' => true,
-                    'values' => [
-                        ['id' => 'newtab_' . $i . '_on', 'value' => 1, 'label' => $this->l('Oui')],
-                        ['id' => 'newtab_' . $i . '_off', 'value' => 0, 'label' => $this->l('Non')],
-                    ],
-                ],
-            ];
+        $petitLabels = [
+            3 => $this->l('Petit encart — Gauche'),
+            4 => $this->l('Petit encart — Centre'),
+            5 => $this->l('Petit encart — Droite'),
+        ];
 
-            $imgPath = _PS_MODULE_DIR_ . $this->name . '/img/encart_' . $i . '.jpg';
-            if (file_exists($imgPath)) {
-                $imgUrl = $this->_path . 'img/encart_' . $i . '.jpg?' . filemtime($imgPath);
-                array_unshift($encartInputs, [
-                    'type' => 'html',
-                    'name' => 'ENCARTSHP_PREVIEW_' . $i,
-                    'html_content' => '<div class="form-group"><label class="control-label col-lg-3">' . $this->l('Aperçu') . '</label><div class="col-lg-9"><img src="' . $imgUrl . '" style="max-width:272px;max-height:170px;border:1px solid #ccc;margin-bottom:10px;" /><br/></div></div>',
-                ]);
-                $encartInputs[] = [
-                    'type' => 'switch',
-                    'label' => $this->l('Supprimer l\'image'),
-                    'name' => 'ENCARTSHP_DELETE_IMG_' . $i,
-                    'is_bool' => true,
-                    'values' => [
-                        ['id' => 'delete_' . $i . '_on', 'value' => 1, 'label' => $this->l('Oui')],
-                        ['id' => 'delete_' . $i . '_off', 'value' => 0, 'label' => $this->l('Non')],
-                    ],
-                ];
-            }
+        foreach ($this->grands as $i) {
+            $forms[] = $this->buildEncartForm($i, $grandLabels[$i], '545x340');
+        }
 
-            $forms[] = [
-                'form' => [
-                    'legend' => [
-                        'title' => $this->l('Encart') . ' ' . $i . ' — ' . $posLabels[$i],
-                        'icon' => 'icon-picture-o',
-                    ],
-                    'input' => $encartInputs,
-                    'submit' => [
-                        'title' => $this->l('Enregistrer'),
-                    ],
-                ],
-            ];
+        foreach ($this->petits as $i) {
+            $forms[] = $this->buildEncartForm($i, $petitLabels[$i], '300x183');
         }
 
         $helper = new HelperForm();
@@ -249,7 +195,7 @@ class Encartshp extends Module
 
         $helper->fields_value['ENCARTSHP_ACTIVE'] = Configuration::get('ENCARTSHP_ACTIVE');
 
-        foreach ($this->positions as $i) {
+        foreach ($this->getAllPositions() as $i) {
             $helper->fields_value['ENCARTSHP_LINK_' . $i] = Configuration::get('ENCARTSHP_LINK_' . $i);
             $helper->fields_value['ENCARTSHP_ALT_' . $i] = Configuration::get('ENCARTSHP_ALT_' . $i);
             $helper->fields_value['ENCARTSHP_TITLE_' . $i] = Configuration::get('ENCARTSHP_TITLE_' . $i);
@@ -258,6 +204,79 @@ class Encartshp extends Module
         }
 
         return $helper->generateForm($forms);
+    }
+
+    protected function buildEncartForm($i, $label, $size)
+    {
+        $encartInputs = [
+            [
+                'type' => 'file',
+                'label' => $this->l('Image') . ' (' . $size . ')',
+                'name' => 'ENCARTSHP_IMG_' . $i,
+                'desc' => $this->l('Formats : JPG, PNG, WebP, GIF. Taille recommandée :') . ' ' . $size . ' px.',
+            ],
+            [
+                'type' => 'text',
+                'label' => $this->l('URL du lien'),
+                'name' => 'ENCARTSHP_LINK_' . $i,
+                'desc' => $this->l('Adresse de destination au clic sur l\'encart.'),
+            ],
+            [
+                'type' => 'text',
+                'label' => $this->l('Texte alternatif (alt)'),
+                'name' => 'ENCARTSHP_ALT_' . $i,
+                'desc' => $this->l('Attribut alt de l\'image pour le référencement et l\'accessibilité.'),
+            ],
+            [
+                'type' => 'text',
+                'label' => $this->l('Titre du lien (title)'),
+                'name' => 'ENCARTSHP_TITLE_' . $i,
+                'desc' => $this->l('Attribut title du lien pour le référencement.'),
+            ],
+            [
+                'type' => 'switch',
+                'label' => $this->l('Ouvrir dans un nouvel onglet'),
+                'name' => 'ENCARTSHP_NEWTAB_' . $i,
+                'is_bool' => true,
+                'values' => [
+                    ['id' => 'newtab_' . $i . '_on', 'value' => 1, 'label' => $this->l('Oui')],
+                    ['id' => 'newtab_' . $i . '_off', 'value' => 0, 'label' => $this->l('Non')],
+                ],
+            ],
+        ];
+
+        $imgPath = _PS_MODULE_DIR_ . $this->name . '/img/encart_' . $i . '.jpg';
+        if (file_exists($imgPath)) {
+            $imgUrl = $this->_path . 'img/encart_' . $i . '.jpg?' . filemtime($imgPath);
+            array_unshift($encartInputs, [
+                'type' => 'html',
+                'name' => 'ENCARTSHP_PREVIEW_' . $i,
+                'html_content' => '<div class="form-group"><label class="control-label col-lg-3">' . $this->l('Aperçu') . '</label><div class="col-lg-9"><img src="' . $imgUrl . '" style="max-width:272px;max-height:170px;border:1px solid #ccc;margin-bottom:10px;" /><br/></div></div>',
+            ]);
+            $encartInputs[] = [
+                'type' => 'switch',
+                'label' => $this->l('Supprimer l\'image'),
+                'name' => 'ENCARTSHP_DELETE_IMG_' . $i,
+                'is_bool' => true,
+                'values' => [
+                    ['id' => 'delete_' . $i . '_on', 'value' => 1, 'label' => $this->l('Oui')],
+                    ['id' => 'delete_' . $i . '_off', 'value' => 0, 'label' => $this->l('Non')],
+                ],
+            ];
+        }
+
+        return [
+            'form' => [
+                'legend' => [
+                    'title' => $label,
+                    'icon' => 'icon-picture-o',
+                ],
+                'input' => $encartInputs,
+                'submit' => [
+                    'title' => $this->l('Enregistrer'),
+                ],
+            ],
+        ];
     }
 
     public function hookActionFrontControllerSetMedia()
@@ -277,13 +296,27 @@ class Encartshp extends Module
             return '';
         }
 
-        $encarts = [];
+        $grands = [];
+        $petits = [];
 
-        foreach ($this->positions as $i) {
+        foreach ($this->grands as $i) {
             $imgPath = _PS_MODULE_DIR_ . $this->name . '/img/encart_' . $i . '.jpg';
             $hasImage = file_exists($imgPath);
+            $grands[] = [
+                'position' => $i,
+                'has_image' => $hasImage,
+                'image_url' => $hasImage ? $this->_path . 'img/encart_' . $i . '.jpg?' . filemtime($imgPath) : '',
+                'link' => Configuration::get('ENCARTSHP_LINK_' . $i),
+                'alt' => Configuration::get('ENCARTSHP_ALT_' . $i),
+                'title' => Configuration::get('ENCARTSHP_TITLE_' . $i),
+                'new_tab' => (int) Configuration::get('ENCARTSHP_NEWTAB_' . $i),
+            ];
+        }
 
-            $encarts[] = [
+        foreach ($this->petits as $i) {
+            $imgPath = _PS_MODULE_DIR_ . $this->name . '/img/encart_' . $i . '.jpg';
+            $hasImage = file_exists($imgPath);
+            $petits[] = [
                 'position' => $i,
                 'has_image' => $hasImage,
                 'image_url' => $hasImage ? $this->_path . 'img/encart_' . $i . '.jpg?' . filemtime($imgPath) : '',
@@ -295,7 +328,8 @@ class Encartshp extends Module
         }
 
         $this->context->smarty->assign([
-            'encarts' => $encarts,
+            'grands' => $grands,
+            'petits' => $petits,
         ]);
 
         return $this->display(__FILE__, 'views/templates/hook/displayHome.tpl');
