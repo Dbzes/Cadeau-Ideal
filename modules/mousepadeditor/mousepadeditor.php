@@ -14,7 +14,7 @@ if (!defined('_PS_VERSION_')) {
 class Mousepadeditor extends Module
 {
     const UPLOAD_DIR = 'uploads/backgrounds/';
-    const MAX_SIZE = 4194304; // 4 Mo
+    const MAX_SIZE = 5242880; // 5 Mo
     const ALLOWED = ['jpg', 'jpeg', 'png', 'webp'];
 
     public function __construct()
@@ -130,7 +130,7 @@ class Mousepadeditor extends Module
                 continue;
             }
             if ($size > self::MAX_SIZE) {
-                $errors[] = sprintf($this->l('%s : dépasse 4 Mo.'), $name);
+                $errors[] = sprintf($this->l('%s : dépasse 5 Mo.'), $name);
                 continue;
             }
 
@@ -195,7 +195,7 @@ class Mousepadeditor extends Module
 
         $html = '<div class="panel"><h3><i class="icon-picture"></i> ' . $this->l('Gestion des fonds') . '</h3>';
         $html .= '<form method="post" enctype="multipart/form-data">';
-        $html .= '<div class="form-group"><label>' . $this->l('Ajouter des fonds (jpg, png, webp — max 4 Mo)') . '</label>';
+        $html .= '<div class="form-group"><label>' . $this->l('Ajouter des fonds (jpg, png, webp — max 5 Mo)') . '</label>';
         $html .= '<input type="file" name="mousepad_bg[]" multiple accept="image/jpeg,image/png,image/webp" /></div>';
         $html .= '<button type="submit" name="submitMousepadBackgroundUpload" class="btn btn-default pull-right">'
             . '<i class="process-icon-save"></i> ' . $this->l('Uploader') . '</button>';
