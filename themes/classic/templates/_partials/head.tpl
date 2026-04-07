@@ -156,6 +156,22 @@
     .header-action-sub {
       color: #004774;
     }
+    body {
+      overflow-x: hidden;
+    }
+    .product-add-to-cart .product-minimal-quantity,
+    .product-add-to-cart .js-mailalert,
+    #product-availability,
+    .js-mailalert,
+    .js-mailalert form,
+    .js-mailalert input {
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+    .js-mailalert input[type="email"] {
+      width: 100% !important;
+      min-width: 0 !important;
+    }
     @media (max-width: 767px) {
       .header-top-bar {
         display: none;
