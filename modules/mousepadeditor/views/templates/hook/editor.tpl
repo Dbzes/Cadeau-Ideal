@@ -1,3 +1,16 @@
+<div id="mpe-ext-warning" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:99999;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:#fff;border-radius:8px;max-width:480px;width:100%;padding:28px;box-shadow:0 10px 40px rgba(0,0,0,.3);text-align:center;">
+    <div style="font-size:48px;margin-bottom:10px;">⚠️</div>
+    <h3 style="color:#004774;margin:0 0 12px;font-size:20px;">Extension navigateur détectée</h3>
+    <p style="color:#666;font-size:14px;line-height:1.5;margin:0 0 20px;">
+      Une extension de votre navigateur (gestionnaire de mots de passe type Bitwarden, 1Password, LastPass…) semble interférer avec l'éditeur de personnalisation.
+      <br/><br/>
+      Pour une expérience optimale, nous vous recommandons de <strong>désactiver temporairement</strong> cette extension sur cette page, ou d'ouvrir le site en <strong>navigation privée</strong>.
+    </p>
+    <button type="button" id="mpe-ext-close" style="background:#ee7a03;color:#fff;border:none;padding:12px 28px;border-radius:4px;font-weight:600;cursor:pointer;font-size:14px;">J'ai compris, continuer</button>
+  </div>
+</div>
+
 <div class="mousepad-editor">
   <h3 class="mpe-title">Zone de personnalisation</h3>
 
@@ -125,6 +138,36 @@
 </style>
 {/if}
 <script>
+// Détection d'extensions navigateur interférant
+(function(){
+  var shown = false;
+  function showWarn(){
+    if (shown) return;
+    shown = true;
+    var m = document.getElementById('mpe-ext-warning');
+    if (m) m.style.display = 'flex';
+  }
+  window.addEventListener('error', function(e){
+    var src = (e.filename || '') + ' ' + (e.message || '');
+    if (/chrome-extension|moz-extension|bitwarden|autofill|lastpass|1password|dashlane/i.test(src)) {
+      showWarn();
+    }
+  }, true);
+  // Détection DOM Bitwarden/LastPass/1Password
+  setTimeout(function(){
+    var markers = ['bitwarden-notification-bar-iframe','__lpform_','__1PasswordExtension','dashlane-com'];
+    for (var i=0;i<markers.length;i++){
+      if (document.getElementById(markers[i]) || document.querySelector('[id*="'+markers[i]+'"]')) { showWarn(); return; }
+    }
+  }, 1500);
+  document.addEventListener('DOMContentLoaded', function(){
+    var btn = document.getElementById('mpe-ext-close');
+    if (btn) btn.addEventListener('click', function(){
+      document.getElementById('mpe-ext-warning').style.display = 'none';
+    });
+  });
+})();
+
 function mpeInit() {
   // Accordion
   var heads = document.querySelectorAll('.mousepad-editor .mpe-head');
