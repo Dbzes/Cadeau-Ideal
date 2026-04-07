@@ -201,7 +201,10 @@ function mpeInit() {
     console.warn('[mousepadeditor] Fabric.js non chargé — mode dégradé');
   }
 
-  var RATIO = 220 / 180; // largeur / hauteur
+  var TEMPLATE_URL = {if isset($mpe_template) && $mpe_template}'{$mpe_template.url}'{else}null{/if};
+  var TEMPLATE_W = {if isset($mpe_template) && $mpe_template}{$mpe_template.width}{else}220{/if};
+  var TEMPLATE_H = {if isset($mpe_template) && $mpe_template}{$mpe_template.height}{else}180{/if};
+  var RATIO = TEMPLATE_W / TEMPLATE_H;
   var canvasEl = document.getElementById('mpe-canvas');
   var wrap = document.querySelector('.mpe-canvas-wrap');
   var W = wrap.clientWidth;
@@ -216,12 +219,40 @@ function mpeInit() {
       preserveObjectStacking: true
     });
     canvas.setDimensions({ width: W, height: H });
+    loadTemplateOverlay();
   }
 
   var bgImage = null;
   var bgZoom = 1;
   var imageCount = 0;
   var MAX_IMAGES = 3;
+  var templateOverlay = null;
+
+  function loadTemplateOverlay() {
+    if (!TEMPLATE_URL || !fabricReady || !canvas) return;
+    fabric.Image.fromURL(TEMPLATE_URL, function(img){
+      var scale = W / img.width;
+      img.set({
+        originX: 'center', originY: 'center',
+        left: W / 2, top: H / 2,
+        scaleX: scale, scaleY: scale,
+        selectable: false, evented: false,
+        hoverCursor: 'default',
+        mpeIsTemplate: true
+      });
+      if (templateOverlay) { canvas.remove(templateOverlay); }
+      templateOverlay = img;
+      canvas.add(img);
+      canvas.bringToFront(img);
+      canvas.requestRenderAll();
+    }, { crossOrigin: 'anonymous' });
+  }
+
+  function bringTemplateToFront() {
+    if (templateOverlay && canvas) {
+      canvas.bringToFront(templateOverlay);
+    }
+  }
 
   function removeOldBg() {
     if (bgImage) {
@@ -234,6 +265,7 @@ function mpeInit() {
   function finishBgSetup(obj) {
     canvas.add(obj);
     canvas.sendToBack(obj);
+    bringTemplateToFront();
     bgImage = obj;
     bgZoom = 1;
     document.getElementById('mpe-bg-zoom').value = 100;
@@ -477,6 +509,7 @@ function mpeInit() {
         });
         canvas.add(img);
         canvas.setActiveObject(img);
+        bringTemplateToFront();
         canvas.renderAll();
         imageCount++;
         updateImgCounter();
@@ -524,6 +557,7 @@ function mpeInit() {
     });
     canvas.add(t);
     canvas.setActiveObject(t);
+    bringTemplateToFront();
     canvas.renderAll();
     input.value = '';
   });
@@ -556,10 +590,12 @@ function mpeInit() {
     canvas.clear();
     canvas.backgroundColor = '#f0f0f0';
     bgImage = null;
+    templateOverlay = null;
     imageCount = 0;
     updateImgCounter();
     document.getElementById('mpe-bg-controls').style.display = 'none';
     document.querySelectorAll('.mpe-bg-thumb').forEach(function(x){ x.classList.remove('mpe-active'); });
+    loadTemplateOverlay();
     canvas.requestRenderAll();
   });
 
@@ -575,12 +611,12 @@ function mpeInit() {
       o.left *= ratio; o.top *= ratio;
       o.setCoords();
     });
-    if (canvas.backgroundImage) {
-      var bg = canvas.backgroundImage;
-      var s = Math.max(newW / bg.width, newH / bg.height) * bgZoom;
-      bg.set({ left: newW / 2, top: newH / 2, scaleX: s, scaleY: s });
+    if (templateOverlay) {
+      var ts = newW / templateOverlay.width;
+      templateOverlay.set({ left: newW / 2, top: newH / 2, scaleX: ts, scaleY: ts });
     }
     W = newW; H = newH;
+    bringTemplateToFront();
     canvas.renderAll();
   });
 }

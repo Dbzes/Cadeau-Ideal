@@ -15,6 +15,7 @@ class Mousepadeditor extends Module
 {
     const UPLOAD_DIR = 'uploads/backgrounds/';
     const FONT_DIR = 'uploads/fonts/';
+    const TEMPLATE_DIR = 'uploads/template/';
     const MAX_SIZE = 5242880; // 5 Mo
     const FONT_MAX_SIZE = 2097152; // 2 Mo
     const ALLOWED = ['jpg', 'jpeg', 'png', 'webp'];
@@ -138,7 +139,14 @@ class Mousepadeditor extends Module
             $output .= $this->handleToggleFont(Tools::getValue('toggleFont'));
         }
 
-        return $output . $this->renderForm() . $this->renderBackgroundsManager() . $this->renderFontsManager();
+        if (Tools::isSubmit('submitMousepadTemplateUpload')) {
+            $output .= $this->handleTemplateUpload();
+        }
+        if (Tools::getValue('deleteTemplate')) {
+            $output .= $this->handleTemplateDelete();
+        }
+
+        return $output . $this->renderForm() . $this->renderTemplateManager() . $this->renderBackgroundsManager() . $this->renderFontsManager();
     }
 
     protected function getBackgrounds()
@@ -533,6 +541,99 @@ class Mousepadeditor extends Module
         return $html;
     }
 
+    protected function getTemplate()
+    {
+        $file = Configuration::get('MOUSEPAD_TEMPLATE');
+        if (!$file) return null;
+        $path = _PS_MODULE_DIR_ . $this->name . '/' . self::TEMPLATE_DIR . $file;
+        if (!file_exists($path)) return null;
+        $info = @getimagesize($path);
+        return [
+            'file' => $file,
+            'url' => _MODULE_DIR_ . $this->name . '/' . self::TEMPLATE_DIR . $file . '?t=' . filemtime($path),
+            'width' => $info ? $info[0] : 0,
+            'height' => $info ? $info[1] : 0,
+        ];
+    }
+
+    protected function handleTemplateUpload()
+    {
+        if (empty($_FILES['mousepad_template']) || $_FILES['mousepad_template']['error'] !== UPLOAD_ERR_OK) {
+            return $this->displayWarning($this->l('Aucun fichier reçu.'));
+        }
+        $f = $_FILES['mousepad_template'];
+        $ext = strtolower(pathinfo($f['name'], PATHINFO_EXTENSION));
+        if ($ext !== 'png') {
+            return $this->displayWarning($this->l('Format PNG requis uniquement.'));
+        }
+        if ($f['size'] > 5242880) {
+            return $this->displayWarning($this->l('Fichier trop volumineux (max 5 Mo).'));
+        }
+        $dir = _PS_MODULE_DIR_ . $this->name . '/' . self::TEMPLATE_DIR;
+        if (!is_dir($dir)) { @mkdir($dir, 0755, true); }
+        // Purge ancien
+        foreach (glob($dir . 'template.*') as $old) { @unlink($old); }
+        $dest = $dir . 'template.png';
+        if (!move_uploaded_file($f['tmp_name'], $dest)) {
+            return $this->displayWarning($this->l('Échec écriture du fichier.'));
+        }
+        Configuration::updateValue('MOUSEPAD_TEMPLATE', 'template.png');
+        return $this->displayConfirmation($this->l('Gabarit mis à jour.'));
+    }
+
+    protected function handleTemplateDelete()
+    {
+        $dir = _PS_MODULE_DIR_ . $this->name . '/' . self::TEMPLATE_DIR;
+        foreach (glob($dir . 'template.*') as $f) { @unlink($f); }
+        Configuration::updateValue('MOUSEPAD_TEMPLATE', '');
+        return $this->displayConfirmation($this->l('Gabarit supprimé.'));
+    }
+
+    protected function renderTemplateManager()
+    {
+        $tpl = $this->getTemplate();
+        $base = AdminController::$currentIndex . '&configure=' . $this->name . '&token=' . Tools::getAdminTokenLite('AdminModules');
+
+        $html = '<div class="panel"><h3><i class="icon-crop"></i> ' . $this->l('Gabarit du tapis (template)') . '</h3>';
+        $html .= '<p style="color:#888;font-size:13px;">' . $this->l('Image PNG avec zone centrale transparente. Dicte la forme et le ratio de la zone de personnalisation côté client.') . '</p>';
+
+        if ($tpl) {
+            $html .= '<div style="display:flex;gap:20px;align-items:center;background:#f0f7fc;border:1px solid #cfe2f0;border-radius:4px;padding:16px;margin-bottom:15px;">';
+            $html .= '<div style="width:200px;height:160px;background-image:url(\'data:image/svg+xml;utf8,<svg xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"20\\" height=\\"20\\"><rect width=\\"10\\" height=\\"10\\" fill=\\"%23ddd\\"/><rect x=\\"10\\" y=\\"10\\" width=\\"10\\" height=\\"10\\" fill=\\"%23ddd\\"/></svg>\'),url(\'' . $tpl['url'] . '\');background-repeat:repeat,no-repeat;background-size:20px,contain;background-position:center;border:1px solid #ddd;"></div>';
+            $html .= '<div style="flex:1;">';
+            $html .= '<div style="font-weight:600;color:#004774;font-size:14px;">' . $this->l('Gabarit actif') . '</div>';
+            $html .= '<div style="font-size:13px;color:#666;margin:4px 0;">' . $tpl['width'] . ' × ' . $tpl['height'] . ' px · ratio ' . number_format($tpl['width'] / max($tpl['height'], 1), 2) . ':1</div>';
+            $html .= '<a href="' . $base . '&deleteTemplate=1" class="btn btn-danger btn-xs" onclick="return confirm(\'Supprimer ce gabarit ?\')">✕ ' . $this->l('Supprimer') . '</a>';
+            $html .= '</div></div>';
+        }
+
+        $html .= '<form method="post" enctype="multipart/form-data">';
+        $html .= '<label class="mpe-dropzone" id="mpe-tdz">
+            <div class="mpe-dropzone-icon">🖼</div>
+            <div class="mpe-dropzone-title">' . ($tpl ? $this->l('Remplacer le gabarit') : $this->l('Glissez le gabarit ici')) . '</div>
+            <div class="mpe-dropzone-sub">' . $this->l('ou cliquez pour parcourir — PNG uniquement · max 5 Mo') . '</div>
+            <input type="file" name="mousepad_template" id="mpe-tfile" accept="image/png" />
+        </label>';
+        $html .= '<div style="margin-top:15px;text-align:right;"><button type="submit" name="submitMousepadTemplateUpload" class="btn btn-primary"><i class="process-icon-save"></i> ' . $this->l('Uploader') . '</button></div>';
+        $html .= '</form>';
+        $html .= '<script>
+            (function(){
+                var dz=document.getElementById("mpe-tdz"),inp=document.getElementById("mpe-tfile");
+                if(!dz)return;
+                ["dragenter","dragover"].forEach(function(e){dz.addEventListener(e,function(ev){ev.preventDefault();ev.stopPropagation();dz.classList.add("mpe-drag");});});
+                ["dragleave","drop"].forEach(function(e){dz.addEventListener(e,function(ev){ev.preventDefault();ev.stopPropagation();dz.classList.remove("mpe-drag");});});
+                dz.addEventListener("drop",function(ev){
+                    var dt=new DataTransfer();
+                    Array.from(ev.dataTransfer.files).forEach(function(f){dt.items.add(f);});
+                    inp.files=dt.files;
+                });
+                inp.addEventListener("click",function(e){e.stopPropagation();});
+            })();
+        </script>';
+        $html .= '</div>';
+        return $html;
+    }
+
     protected function renderBackgroundsManager()
     {
         $list = $this->getBackgrounds();
@@ -717,6 +818,8 @@ class Mousepadeditor extends Module
             $googleFrontUrl = 'https://fonts.googleapis.com/css2?' . implode('&', $params) . '&display=swap';
         }
 
+        $template = $this->getTemplate();
+
         $this->context->smarty->assign([
             'mpe_backgrounds' => $backgrounds,
             'mpe_bg_url' => $bgUrl,
@@ -726,6 +829,7 @@ class Mousepadeditor extends Module
             'mpe_font_url' => $fontUrl,
             'mpe_default_fonts' => array_merge($activeWebsafe, $activeTheme, $activeGoogle),
             'mpe_google_url' => $googleFrontUrl,
+            'mpe_template' => $template,
         ]);
 
         return $this->display(__FILE__, 'views/templates/hook/editor.tpl');
