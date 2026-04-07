@@ -24,6 +24,94 @@
   margin: 0 0 20px 0;
 }
 
+.mpe-canvas-wrap {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto 25px;
+  background: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  overflow: hidden;
+  position: relative;
+}
+.mpe-canvas-wrap canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.mpe-canvas-toolbar {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  padding: 10px;
+  background: #fafafa;
+  border-top: 1px solid #ddd;
+}
+.mpe-tool-btn {
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 8px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: #004774;
+  transition: all .2s;
+}
+.mpe-tool-btn:hover {
+  background: #ee7a03;
+  color: #fff;
+  border-color: #ee7a03;
+}
+
+.mpe-bg-thumb.mpe-active {
+  border-color: #ee7a03 !important;
+  border-width: 3px !important;
+  box-shadow: 0 0 0 2px #fff7ee;
+}
+
+.mpe-slider-label {
+  display: block;
+  margin-top: 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #004774;
+}
+.mpe-slider-label input[type="range"] {
+  width: 100%;
+  margin-top: 6px;
+}
+
+.mpe-text-controls {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 12px 0;
+}
+.mpe-text-controls label {
+  display: flex;
+  flex-direction: column;
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+  gap: 4px;
+}
+.mpe-text-controls select,
+.mpe-text-controls input[type="number"] {
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
+.mpe-text-controls input[type="color"] {
+  width: 50px;
+  height: 36px;
+  padding: 2px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
 .mpe-accordion {
   display: flex;
   flex-direction: column;
