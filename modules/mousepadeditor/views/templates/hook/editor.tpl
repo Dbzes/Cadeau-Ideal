@@ -31,6 +31,12 @@
         <span class="mpe-arrow">+</span>
       </button>
       <div class="mpe-body" id="mpe-fonds">
+        <div class="mpe-bg-controls" id="mpe-bg-controls" style="display:none;margin-bottom:14px;">
+          <label class="mpe-slider-label">Zoom du fond
+            <input type="range" id="mpe-bg-zoom" min="100" max="300" value="100" />
+          </label>
+        </div>
+
         <p class="mpe-hint">Choisissez un fond pour votre tapis :</p>
         <div class="mpe-grid">
           <div class="mpe-thumb mpe-bg-thumb mpe-thumb-solid" style="background:#ffffff;border:2px solid #ccc;" data-bg="#ffffff" title="Fond blanc"></div>
@@ -40,12 +46,6 @@
               <div class="mpe-thumb mpe-thumb-img mpe-bg-thumb" style="background-image:url('{$mpe_bg_url}{$bg}');" data-bg="{$mpe_bg_url}{$bg}"></div>
             {/foreach}
           {/if}
-        </div>
-
-        <div class="mpe-bg-controls" id="mpe-bg-controls" style="display:none;">
-          <label class="mpe-slider-label">Zoom du fond
-            <input type="range" id="mpe-bg-zoom" min="100" max="300" value="100" />
-          </label>
         </div>
 
         <div class="mpe-divider"><span>OU</span></div>
@@ -286,20 +286,27 @@ function mpeInit() {
     });
   }
 
-  // Zoom fond (désactivé pour les couleurs unies, leur lockMovement est maintenu)
+  // Zoom fond (désactivé pour les couleurs unies)
   document.getElementById('mpe-bg-zoom').addEventListener('input', function(e){
     if (!bgImage || bgImage.type === 'rect') return;
     var z = parseInt(e.target.value, 10) / 100;
     bgZoom = z;
     var baseScale = Math.max(W / bgImage.width, H / bgImage.height);
-    bgImage.set({ scaleX: baseScale * z, scaleY: baseScale * z });
-    // Débloquer le drag uniquement si zoom > 100 %
+    bgImage.scaleX = baseScale * z;
+    bgImage.scaleY = baseScale * z;
     if (z > 1) {
-      bgImage.set({ lockMovementX: false, lockMovementY: false, hoverCursor: 'move' });
+      bgImage.lockMovementX = false;
+      bgImage.lockMovementY = false;
+      bgImage.hoverCursor = 'move';
     } else {
-      bgImage.set({ lockMovementX: true, lockMovementY: true, hoverCursor: 'default', left: W/2, top: H/2 });
+      bgImage.lockMovementX = true;
+      bgImage.lockMovementY = true;
+      bgImage.hoverCursor = 'default';
+      bgImage.left = W / 2;
+      bgImage.top = H / 2;
     }
-    canvas.renderAll();
+    bgImage.setCoords();
+    canvas.requestRenderAll();
   });
 
   // Upload fond client (AJAX)
