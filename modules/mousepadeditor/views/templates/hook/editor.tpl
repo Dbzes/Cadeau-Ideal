@@ -115,7 +115,10 @@
   });
 
   // Canvas init
-  if (typeof fabric === 'undefined') return;
+  var fabricReady = (typeof fabric !== 'undefined');
+  if (!fabricReady) {
+    console.warn('[mousepadeditor] Fabric.js non chargé — mode dégradé');
+  }
 
   var RATIO = 220 / 180; // largeur / hauteur
   var canvasEl = document.getElementById('mpe-canvas');
@@ -125,11 +128,14 @@
   canvasEl.width = W;
   canvasEl.height = H;
 
-  var canvas = new fabric.Canvas('mpe-canvas', {
-    backgroundColor: '#f0f0f0',
-    preserveObjectStacking: true
-  });
-  canvas.setDimensions({ width: W, height: H });
+  var canvas = null;
+  if (fabricReady) {
+    canvas = new fabric.Canvas('mpe-canvas', {
+      backgroundColor: '#f0f0f0',
+      preserveObjectStacking: true
+    });
+    canvas.setDimensions({ width: W, height: H });
+  }
 
   var bgImage = null;
   var bgZoom = 1;
@@ -137,6 +143,7 @@
   var MAX_IMAGES = 3;
 
   function setBackground(url) {
+    if (!fabricReady || !canvas) return;
     fabric.Image.fromURL(url, function(img) {
       var scale = Math.max(W / img.width, H / img.height);
       img.set({
@@ -271,6 +278,7 @@
   var imgUploadLabel = document.getElementById('mpe-img-upload-label');
 
   imgInput.addEventListener('change', function(e){
+    if (!fabricReady || !canvas) { alert('Éditeur non chargé.'); return; }
     if (imageCount >= MAX_IMAGES) { alert('Maximum 3 images.'); return; }
     var file = e.target.files[0];
     if (!file) return;
@@ -309,6 +317,7 @@
 
   // Texte
   document.getElementById('mpe-text-add').addEventListener('click', function(){
+    if (!fabricReady || !canvas) { alert('Éditeur non chargé. Vérifiez votre connexion.'); return; }
     var input = document.getElementById('mpe-text-input');
     var txt = input.value.trim();
     if (!txt) return;
@@ -329,6 +338,7 @@
 
   // Suppression sélection
   document.getElementById('mpe-delete-selected').addEventListener('click', function(){
+    if (!canvas) return;
     var obj = canvas.getActiveObject();
     if (!obj) return;
     var wasImage = obj.type === 'image';
@@ -340,6 +350,7 @@
 
   // Reset
   document.getElementById('mpe-reset').addEventListener('click', function(){
+    if (!canvas) return;
     if (!confirm('Tout réinitialiser ?')) return;
     canvas.clear();
     canvas.setBackgroundImage(null, canvas.renderAll.bind(canvas));
@@ -353,6 +364,7 @@
 
   // Resize responsive
   window.addEventListener('resize', function(){
+    if (!canvas) return;
     var newW = wrap.clientWidth;
     var newH = Math.round(newW / RATIO);
     var ratio = newW / W;
