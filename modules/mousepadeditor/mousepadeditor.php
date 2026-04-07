@@ -55,6 +55,25 @@ class Mousepadeditor extends Module
         return parent::uninstall();
     }
 
+    protected function getCustomerBackground()
+    {
+        $ctx = Context::getContext();
+        if ($ctx->customer && $ctx->customer->isLogged()) {
+            $key = 'c_' . (int) $ctx->customer->id;
+        } elseif (!empty($ctx->cookie->mpe_guest_hash)) {
+            $key = 'g_' . $ctx->cookie->mpe_guest_hash;
+        } else {
+            return null;
+        }
+        $dir = _PS_MODULE_DIR_ . $this->name . '/uploads/customer/' . $key . '/';
+        foreach (['jpg', 'png', 'webp'] as $ext) {
+            if (file_exists($dir . 'bg.' . $ext)) {
+                return _MODULE_DIR_ . $this->name . '/uploads/customer/' . $key . '/bg.' . $ext . '?t=' . filemtime($dir . 'bg.' . $ext);
+            }
+        }
+        return null;
+    }
+
     public function hookHeader($params)
     {
         $this->context->controller->addCSS($this->_path . 'views/css/mousepadeditor.css');
@@ -367,9 +386,14 @@ class Mousepadeditor extends Module
         $backgrounds = $this->getBackgrounds();
         $bgUrl = $this->_path . self::UPLOAD_DIR;
 
+        // Détection fond client existant
+        $customerBg = $this->getCustomerBackground();
+
         $this->context->smarty->assign([
             'mpe_backgrounds' => $backgrounds,
             'mpe_bg_url' => $bgUrl,
+            'mpe_customer_bg' => $customerBg,
+            'mpe_upload_url' => $this->context->link->getModuleLink('mousepadeditor', 'upload', [], true),
         ]);
 
         return $this->display(__FILE__, 'views/templates/hook/editor.tpl');
