@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<module>
+  <name>customerpicturevisualize</name>
+  <displayName><![CDATA[Customer Picture Visualize]]></displayName>
+  <version><![CDATA[1.0.0]]></version>
+  <description><![CDATA[Visualise les images personnalisées en attente dans les paniers.]]></description>
+  <author><![CDATA[Claude]]></author>
+  <tab><![CDATA[administration]]></tab>
+  <is_configurable>1</is_configurable>
+  <need_instance>0</need_instance>
+  <limited_countries></limited_countries>
+</module>
