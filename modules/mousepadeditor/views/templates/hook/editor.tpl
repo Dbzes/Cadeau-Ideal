@@ -1,3 +1,7 @@
+<div id="mpe-debug" style="position:fixed;bottom:10px;right:10px;max-width:480px;max-height:300px;overflow:auto;background:#000;color:#0f0;font-family:monospace;font-size:11px;padding:10px;border-radius:4px;z-index:99999;display:none;">
+  <strong style="color:#fff;">MPE DEBUG</strong> <a href="#" onclick="document.getElementById('mpe-debug').style.display='none';return false;" style="color:#fff;float:right;">✕</a>
+  <pre id="mpe-debug-log" style="margin:5px 0 0;color:#0f0;white-space:pre-wrap;"></pre>
+</div>
 <div id="mpe-loader" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:99999;align-items:center;justify-content:center;flex-direction:column;">
   <div style="width:70px;height:70px;border:6px solid rgba(255,255,255,.25);border-top-color:#ee7a03;border-radius:50%;animation:mpe-spin 1s linear infinite;"></div>
   <div style="color:#fff;margin-top:18px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;">Génération de votre aperçu HD...</div>
@@ -170,6 +174,28 @@ window.MPE_TEMPLATE_URL = {if isset($mpe_template) && $mpe_template}'{$mpe_templ
 window.MPE_TEMPLATE_W = {if isset($mpe_template) && $mpe_template}{$mpe_template.width}{else}220{/if};
 window.MPE_TEMPLATE_H = {if isset($mpe_template) && $mpe_template}{$mpe_template.height}{else}180{/if};
 {literal}
+function mpeLog(msg, color) {
+  var dbg = document.getElementById('mpe-debug');
+  var log = document.getElementById('mpe-debug-log');
+  if (dbg && log) {
+    dbg.style.display = 'block';
+    var line = document.createElement('div');
+    line.style.color = color || '#0f0';
+    line.textContent = '[' + new Date().toISOString().substr(11,8) + '] ' + msg;
+    log.appendChild(line);
+  }
+  console.log('[MPE]', msg);
+}
+window.addEventListener('error', function(e){
+  if (e.filename && e.filename.indexOf('mousepad') > -1) {
+    mpeLog('ERR ' + e.message + ' @ ' + e.lineno, '#f55');
+  }
+});
+mpeLog('Init script chargé');
+mpeLog('Fabric: ' + (typeof fabric !== 'undefined' ? 'OK' : 'KO'));
+mpeLog('Canvas el: ' + (document.getElementById('mpe-canvas') ? 'présent' : 'ABSENT'));
+mpeLog('Editor div: ' + (document.querySelector('.mousepad-editor') ? 'présent' : 'ABSENT'));
+
 // Détection d'extensions navigateur interférant
 (function(){
   var shown = false;
