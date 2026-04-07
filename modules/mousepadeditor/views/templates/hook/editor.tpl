@@ -100,8 +100,9 @@
 </div>
 
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&family=Bebas+Neue&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/fabric@5.3.1/dist/fabric.min.js"></script>
 <script>
+function mpeInit() {
+(function() {
 (function() {
   // Accordion
   var heads = document.querySelectorAll('.mousepad-editor .mpe-head');
@@ -383,4 +384,10 @@
     canvas.renderAll();
   });
 })();
+}
+(function waitFabric(tries){
+  if (typeof fabric !== 'undefined') { mpeInit(); return; }
+  if (tries > 50) { console.error('[mpe] Fabric.js failed to load'); mpeInit(); return; }
+  setTimeout(function(){ waitFabric(tries+1); }, 100);
+})(0);
 </script>

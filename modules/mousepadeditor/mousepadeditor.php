@@ -77,6 +77,7 @@ class Mousepadeditor extends Module
     public function hookHeader($params)
     {
         $this->context->controller->addCSS($this->_path . 'views/css/mousepadeditor.css');
+        $this->context->controller->addJS('https://cdn.jsdelivr.net/npm/fabric@5.3.1/dist/fabric.min.js', false);
     }
 
     public function getContent()
