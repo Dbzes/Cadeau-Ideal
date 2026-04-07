@@ -14,8 +14,11 @@ if (!defined('_PS_VERSION_')) {
 class Mousepadeditor extends Module
 {
     const UPLOAD_DIR = 'uploads/backgrounds/';
+    const FONT_DIR = 'uploads/fonts/';
     const MAX_SIZE = 5242880; // 5 Mo
+    const FONT_MAX_SIZE = 2097152; // 2 Mo
     const ALLOWED = ['jpg', 'jpeg', 'png', 'webp'];
+    const FONT_ALLOWED = ['ttf', 'otf', 'woff', 'woff2'];
 
     public function __construct()
     {
@@ -44,13 +47,15 @@ class Mousepadeditor extends Module
             && $this->registerHook('displayMousepadEditor')
             && $this->registerHook('header')
             && Configuration::updateValue('MOUSEPAD_PRODUCT_IDS', '')
-            && Configuration::updateValue('MOUSEPAD_BACKGROUNDS', json_encode([]));
+            && Configuration::updateValue('MOUSEPAD_BACKGROUNDS', json_encode([]))
+            && Configuration::updateValue('MOUSEPAD_FONTS', json_encode([]));
     }
 
     public function uninstall()
     {
         Configuration::deleteByName('MOUSEPAD_PRODUCT_IDS');
         Configuration::deleteByName('MOUSEPAD_BACKGROUNDS');
+        Configuration::deleteByName('MOUSEPAD_FONTS');
 
         return parent::uninstall();
     }
@@ -120,7 +125,14 @@ class Mousepadeditor extends Module
             }
         }
 
-        return $output . $this->renderForm() . $this->renderBackgroundsManager();
+        if (Tools::isSubmit('submitMousepadFontUpload')) {
+            $output .= $this->handleFontUpload();
+        }
+        if (Tools::getValue('deleteFont')) {
+            $output .= $this->handleFontDelete(Tools::getValue('deleteFont'));
+        }
+
+        return $output . $this->renderForm() . $this->renderBackgroundsManager() . $this->renderFontsManager();
     }
 
     protected function getBackgrounds()
@@ -222,6 +234,114 @@ class Mousepadeditor extends Module
         $list[$newIdx] = $tmp;
         $this->saveBackgrounds($list);
         return '';
+    }
+
+    protected function getFonts()
+    {
+        $raw = Configuration::get('MOUSEPAD_FONTS');
+        $list = json_decode($raw, true);
+        return is_array($list) ? $list : [];
+    }
+
+    protected function saveFonts(array $list)
+    {
+        Configuration::updateValue('MOUSEPAD_FONTS', json_encode(array_values($list)));
+    }
+
+    protected function handleFontUpload()
+    {
+        if (empty($_FILES['mousepad_font']) || empty($_FILES['mousepad_font']['name'][0])) {
+            return $this->displayWarning($this->l('Aucun fichier sélectionné.'));
+        }
+        $dir = _PS_MODULE_DIR_ . $this->name . '/' . self::FONT_DIR;
+        if (!is_dir($dir)) { @mkdir($dir, 0755, true); }
+
+        $list = $this->getFonts();
+        $errors = [];
+        $count = 0;
+        $files = $_FILES['mousepad_font'];
+        $total = count($files['name']);
+
+        for ($i = 0; $i < $total; $i++) {
+            if ($files['error'][$i] !== UPLOAD_ERR_OK) continue;
+            $name = $files['name'][$i];
+            $size = $files['size'][$i];
+            $tmp = $files['tmp_name'][$i];
+            $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
+            if (!in_array($ext, self::FONT_ALLOWED)) {
+                $errors[] = sprintf($this->l('%s : format non autorisé.'), $name);
+                continue;
+            }
+            if ($size > self::FONT_MAX_SIZE) {
+                $errors[] = sprintf($this->l('%s : dépasse 2 Mo.'), $name);
+                continue;
+            }
+            $family = preg_replace('/\.[^.]+$/', '', $name);
+            $family = preg_replace('/[^a-zA-Z0-9 _-]/', '', $family);
+            $newFile = uniqid('font_', true) . '.' . $ext;
+            if (move_uploaded_file($tmp, $dir . $newFile)) {
+                $list[] = ['family' => $family, 'file' => $newFile, 'ext' => $ext];
+                $count++;
+            }
+        }
+        $this->saveFonts($list);
+        $msg = '';
+        if ($count > 0) $msg .= $this->displayConfirmation(sprintf($this->l('%d police(s) ajoutée(s).'), $count));
+        if (!empty($errors)) $msg .= $this->displayWarning(implode('<br>', $errors));
+        return $msg;
+    }
+
+    protected function handleFontDelete($file)
+    {
+        $list = $this->getFonts();
+        $new = [];
+        foreach ($list as $f) {
+            if ($f['file'] === $file) {
+                $path = _PS_MODULE_DIR_ . $this->name . '/' . self::FONT_DIR . $file;
+                if (file_exists($path)) @unlink($path);
+            } else {
+                $new[] = $f;
+            }
+        }
+        $this->saveFonts($new);
+        return $this->displayConfirmation($this->l('Police supprimée.'));
+    }
+
+    protected function renderFontsManager()
+    {
+        $list = $this->getFonts();
+        $url = $this->_path . self::FONT_DIR;
+        $base = AdminController::$currentIndex . '&configure=' . $this->name . '&token=' . Tools::getAdminTokenLite('AdminModules');
+
+        $html = '<div class="panel"><h3><i class="icon-font"></i> ' . $this->l('Gestion des polices') . '</h3>';
+        $html .= '<p style="color:#888;font-size:13px;">' . $this->l('Polices par défaut toujours disponibles : Open Sans, Bebas Neue, Arial.') . '</p>';
+        $html .= '<form method="post" enctype="multipart/form-data">';
+        $html .= '<div class="form-group"><label>' . $this->l('Ajouter des polices (ttf, otf, woff, woff2 — max 2 Mo)') . '</label>';
+        $html .= '<input type="file" name="mousepad_font[]" multiple accept=".ttf,.otf,.woff,.woff2" /></div>';
+        $html .= '<button type="submit" name="submitMousepadFontUpload" class="btn btn-primary"><i class="process-icon-save"></i> ' . $this->l('Uploader') . '</button>';
+        $html .= '</form><hr/>';
+
+        if (empty($list)) {
+            $html .= '<p>' . $this->l('Aucune police personnalisée.') . '</p>';
+        } else {
+            $html .= '<style>';
+            foreach ($list as $f) {
+                $fmt = $f['ext'] === 'ttf' ? 'truetype' : ($f['ext'] === 'otf' ? 'opentype' : $f['ext']);
+                $html .= '@font-face{font-family:"' . htmlspecialchars($f['family']) . '";src:url("' . $url . $f['file'] . '") format("' . $fmt . '");}';
+            }
+            $html .= '</style>';
+            $html .= '<div style="display:flex;flex-wrap:wrap;gap:12px;">';
+            foreach ($list as $f) {
+                $html .= '<div style="border:1px solid #ddd;padding:12px;width:220px;background:#fafafa;border-radius:4px;">';
+                $html .= '<div style="font-family:\'' . htmlspecialchars($f['family']) . '\';font-size:22px;color:#004774;margin-bottom:6px;">Aa Bb Cc 123</div>';
+                $html .= '<div style="font-size:12px;color:#666;margin-bottom:8px;">' . htmlspecialchars($f['family']) . ' (.' . $f['ext'] . ')</div>';
+                $html .= '<a href="' . $base . '&deleteFont=' . urlencode($f['file']) . '" class="btn btn-danger btn-xs" onclick="return confirm(\'Supprimer cette police ?\')">✕ ' . $this->l('Supprimer') . '</a>';
+                $html .= '</div>';
+            }
+            $html .= '</div>';
+        }
+        $html .= '</div>';
+        return $html;
     }
 
     protected function renderBackgroundsManager()
@@ -390,11 +510,16 @@ class Mousepadeditor extends Module
         // Détection fond client existant
         $customerBg = $this->getCustomerBackground();
 
+        $fonts = $this->getFonts();
+        $fontUrl = $this->_path . self::FONT_DIR;
+
         $this->context->smarty->assign([
             'mpe_backgrounds' => $backgrounds,
             'mpe_bg_url' => $bgUrl,
             'mpe_customer_bg' => $customerBg,
             'mpe_upload_url' => $this->context->link->getModuleLink('mousepadeditor', 'upload', [], true),
+            'mpe_fonts' => $fonts,
+            'mpe_font_url' => $fontUrl,
         ]);
 
         return $this->display(__FILE__, 'views/templates/hook/editor.tpl');

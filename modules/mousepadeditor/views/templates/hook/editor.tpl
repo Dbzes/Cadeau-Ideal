@@ -83,6 +83,11 @@
               <option value="Open Sans">Open Sans</option>
               <option value="Bebas Neue">Bebas Neue</option>
               <option value="Arial">Arial</option>
+              {if isset($mpe_fonts) && $mpe_fonts|count > 0}
+                {foreach from=$mpe_fonts item=f}
+                  <option value="{$f.family}">{$f.family}</option>
+                {/foreach}
+              {/if}
             </select>
           </label>
           <label>Taille
@@ -106,6 +111,13 @@
 </div>
 
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+{if isset($mpe_fonts) && $mpe_fonts|count > 0}
+<style>
+{foreach from=$mpe_fonts item=f}
+@font-face { font-family: "{$f.family}"; src: url("{$mpe_font_url}{$f.file}") format("{if $f.ext == 'ttf'}truetype{elseif $f.ext == 'otf'}opentype{else}{$f.ext}{/if}"); font-display: swap; }
+{/foreach}
+</style>
+{/if}
 <script>
 function mpeInit() {
   // Accordion
