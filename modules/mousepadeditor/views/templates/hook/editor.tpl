@@ -33,12 +33,12 @@
       <div class="mpe-body" id="mpe-fonds">
         <p class="mpe-hint">Choisissez un fond pour votre tapis :</p>
         <div class="mpe-grid">
+          <div class="mpe-thumb mpe-bg-thumb mpe-thumb-solid" style="background:#ffffff;border:2px solid #ccc;" data-bg="#ffffff" title="Fond blanc"></div>
+          <div class="mpe-thumb mpe-bg-thumb mpe-thumb-solid" style="background:#000000;border:2px solid #000;" data-bg="#000000" title="Fond noir"></div>
           {if isset($mpe_backgrounds) && $mpe_backgrounds|count > 0}
             {foreach from=$mpe_backgrounds item=bg}
               <div class="mpe-thumb mpe-thumb-img mpe-bg-thumb" style="background-image:url('{$mpe_bg_url}{$bg}');" data-bg="{$mpe_bg_url}{$bg}"></div>
             {/foreach}
-          {else}
-            <p class="mpe-hint">Aucun fond catalogue disponible.</p>
           {/if}
         </div>
 
@@ -208,23 +208,68 @@ function mpeInit() {
   var imageCount = 0;
   var MAX_IMAGES = 3;
 
-  function setBackground(url) {
+  function removeOldBg() {
+    if (bgImage) {
+      canvas.remove(bgImage);
+      bgImage = null;
+    }
+    canvas.backgroundColor = '#f0f0f0';
+  }
+
+  function finishBgSetup(obj) {
+    canvas.add(obj);
+    canvas.sendToBack(obj);
+    bgImage = obj;
+    bgZoom = 1;
+    document.getElementById('mpe-bg-zoom').value = 100;
+    document.getElementById('mpe-bg-controls').style.display = 'block';
+    canvas.discardActiveObject();
+    canvas.renderAll();
+  }
+
+  function setBackground(value) {
     if (!fabricReady || !canvas) return;
-    fabric.Image.fromURL(url, function(img) {
+    removeOldBg();
+
+    // Couleur unie
+    if (value && value.charAt(0) === '#') {
+      var rect = new fabric.Rect({
+        left: W / 2, top: H / 2,
+        originX: 'center', originY: 'center',
+        width: W, height: H,
+        fill: value,
+        selectable: true, evented: true,
+        hasControls: false, hasBorders: false,
+        lockRotation: true, lockScalingX: true, lockScalingY: true,
+        lockMovementX: true, lockMovementY: true,
+        hoverCursor: 'default',
+        mpeIsBg: true
+      });
+      finishBgSetup(rect);
+      return;
+    }
+
+    // Image URL
+    fabric.Image.fromURL(value, function(img) {
       var scale = Math.max(W / img.width, H / img.height);
       img.set({
         originX: 'center', originY: 'center',
         left: W / 2, top: H / 2,
         scaleX: scale, scaleY: scale,
-        selectable: false, evented: false
+        selectable: true, evented: true,
+        hasControls: false, hasBorders: false,
+        lockRotation: true, lockScalingX: true, lockScalingY: true,
+        lockMovementX: true, lockMovementY: true,
+        hoverCursor: 'default',
+        mpeIsBg: true
       });
-      canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
-      bgImage = img;
-      bgZoom = 1;
-      document.getElementById('mpe-bg-zoom').value = 100;
-      document.getElementById('mpe-bg-controls').style.display = 'block';
+      finishBgSetup(img);
     }, { crossOrigin: 'anonymous' });
   }
+
+  // Empêche la sélection active du fond (pas de suppression via toolbar)
+  // Le drag reste possible via evented=true mais getActiveObject ignore le bg
+  function isBgObject(o) { return o && o.mpeIsBg === true; }
 
   // Click sur thumb fond
   document.querySelectorAll('.mpe-bg-thumb').forEach(function(t){ bindBgClick(t); });
@@ -241,12 +286,19 @@ function mpeInit() {
     });
   }
 
-  // Zoom fond
+  // Zoom fond (désactivé pour les couleurs unies, leur lockMovement est maintenu)
   document.getElementById('mpe-bg-zoom').addEventListener('input', function(e){
-    if (!bgImage) return;
+    if (!bgImage || bgImage.type === 'rect') return;
     var z = parseInt(e.target.value, 10) / 100;
+    bgZoom = z;
     var baseScale = Math.max(W / bgImage.width, H / bgImage.height);
     bgImage.set({ scaleX: baseScale * z, scaleY: baseScale * z });
+    // Débloquer le drag uniquement si zoom > 100 %
+    if (z > 1) {
+      bgImage.set({ lockMovementX: false, lockMovementY: false, hoverCursor: 'move' });
+    } else {
+      bgImage.set({ lockMovementX: true, lockMovementY: true, hoverCursor: 'default', left: W/2, top: H/2 });
+    }
     canvas.renderAll();
   });
 
@@ -416,7 +468,7 @@ function mpeInit() {
   document.getElementById('mpe-delete-selected').addEventListener('click', function(){
     if (!canvas) return;
     var obj = canvas.getActiveObject();
-    if (!obj) return;
+    if (!obj || isBgObject(obj)) return;
     var wasImage = obj.type === 'image';
     canvas.remove(obj);
     canvas.discardActiveObject();
@@ -429,7 +481,6 @@ function mpeInit() {
     if (!canvas) return;
     if (!confirm('Tout réinitialiser ?')) return;
     canvas.clear();
-    canvas.setBackgroundImage(null, canvas.renderAll.bind(canvas));
     canvas.backgroundColor = '#f0f0f0';
     bgImage = null;
     imageCount = 0;
