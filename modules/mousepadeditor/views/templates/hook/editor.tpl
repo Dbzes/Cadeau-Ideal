@@ -474,6 +474,11 @@ function mpeInit() {
     });
   }
 
+  function scrollToCanvas(){
+    var w = document.querySelector('.mpe-canvas-wrap');
+    if (w) w.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
   function showError(msg){
     errBox.textContent = msg;
     errBox.style.display = 'block';
@@ -500,6 +505,7 @@ function mpeInit() {
           setBackground(d.url);
           document.querySelectorAll('.mpe-bg-thumb').forEach(function(x){ x.classList.remove('mpe-active'); });
           pimg.classList.add('mpe-active');
+          scrollToCanvas();
         } else {
           showError(d.error || 'Erreur inconnue');
           cdz.style.display = '';
@@ -544,6 +550,7 @@ function mpeInit() {
         canvas.renderAll();
         imageCount++;
         updateImgCounter();
+        scrollToCanvas();
       });
     };
     reader.readAsDataURL(file);
@@ -591,6 +598,7 @@ function mpeInit() {
     bringTemplateToFront();
     canvas.renderAll();
     input.value = '';
+    scrollToCanvas();
   });
 
   // Suppression sélection
