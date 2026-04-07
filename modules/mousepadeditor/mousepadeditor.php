@@ -132,7 +132,7 @@ class Mousepadeditor extends Module
             $output .= $this->handleFontDelete(Tools::getValue('deleteFont'));
         }
 
-        return $output . $this->renderForm() . $this->renderBackgroundsManager() . $this->renderFontsManager();
+        return $output . $this->renderStatusPanel() . $this->renderForm() . $this->renderBackgroundsManager() . $this->renderFontsManager();
     }
 
     protected function getBackgrounds()
@@ -236,6 +236,68 @@ class Mousepadeditor extends Module
         return '';
     }
 
+    protected function renderStatusPanel()
+    {
+        $bgs = count($this->getBackgrounds());
+        $fonts = count($this->getFonts());
+        $defaultFonts = 3;
+        $totalFonts = $defaultFonts + $fonts;
+        $productIds = Configuration::get('MOUSEPAD_PRODUCT_IDS');
+        $productCount = empty($productIds) ? 0 : count(array_filter(explode(',', $productIds)));
+
+        $features = [
+            ['icon' => '🖼', 'label' => 'Sélection de fonds catalogue', 'active' => $bgs > 0, 'value' => $bgs . ' fond(s) disponible(s)'],
+            ['icon' => '⬆', 'label' => 'Upload fond client (drag-drop)', 'active' => true, 'value' => 'Actif · jpg/png/webp/heic · max 10 Mo'],
+            ['icon' => '🔄', 'label' => 'Conversion HEIC automatique', 'active' => extension_loaded('imagick'), 'value' => extension_loaded('imagick') ? 'Imagick OK' : 'Imagick KO'],
+            ['icon' => '🔍', 'label' => 'Zoom du fond (slider 100-300%)', 'active' => true, 'value' => 'Actif'],
+            ['icon' => '🖌', 'label' => 'Ajout d\'images (drag/resize/rotate)', 'active' => true, 'value' => 'Max 3 par création'],
+            ['icon' => '🔤', 'label' => 'Ajout de texte personnalisé', 'active' => true, 'value' => $totalFonts . ' police(s) disponible(s)'],
+            ['icon' => '𝐁', 'label' => 'Texte gras / italique', 'active' => true, 'value' => 'Actif'],
+            ['icon' => '🎨', 'label' => 'Personnalisation taille/couleur texte', 'active' => true, 'value' => 'Actif'],
+            ['icon' => '🗑', 'label' => 'Suppression sélective + reset global', 'active' => true, 'value' => 'Actif'],
+            ['icon' => '📦', 'label' => 'Produits avec éditeur activé', 'active' => $productCount > 0, 'value' => $productCount . ' produit(s) configuré(s)'],
+        ];
+
+        $todo = [
+            'Recomposition serveur HD (PNG 1299×1063 px @ 150dpi)',
+            'Sauvegarde de la création dans le panier (customization PrestaShop)',
+            'Aperçu HD téléchargeable depuis la fiche commande BO',
+            'Module Purgator (purge fichiers orphelins > 90j)',
+        ];
+
+        $html = '<div class="panel" style="border-left:4px solid #ee7a03;">';
+        $html .= '<h3><i class="icon-dashboard"></i> ' . $this->l('État du module Editor Mouse Pad') . '</h3>';
+        $html .= '<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">';
+
+        // Colonne 1 : ce qui est dispo
+        $html .= '<div><h4 style="color:#004774;margin-top:0;">✅ ' . $this->l('Disponible côté client') . '</h4>';
+        $html .= '<ul style="list-style:none;padding:0;margin:0;">';
+        foreach ($features as $f) {
+            $color = $f['active'] ? '#27ae60' : '#bbb';
+            $html .= '<li style="padding:8px 0;border-bottom:1px solid #eee;display:flex;align-items:center;gap:10px;">';
+            $html .= '<span style="font-size:18px;width:24px;text-align:center;">' . $f['icon'] . '</span>';
+            $html .= '<div style="flex:1;"><div style="font-weight:600;color:#004774;font-size:13px;">' . $f['label'] . '</div>';
+            $html .= '<div style="font-size:11px;color:#888;">' . $f['value'] . '</div></div>';
+            $html .= '<span style="color:' . $color . ';font-size:18px;">' . ($f['active'] ? '●' : '○') . '</span>';
+            $html .= '</li>';
+        }
+        $html .= '</ul></div>';
+
+        // Colonne 2 : à venir
+        $html .= '<div><h4 style="color:#004774;margin-top:0;">🚧 ' . $this->l('Prochaines fonctionnalités') . '</h4>';
+        $html .= '<ul style="list-style:none;padding:0;margin:0;">';
+        foreach ($todo as $t) {
+            $html .= '<li style="padding:8px 0;border-bottom:1px solid #eee;display:flex;align-items:center;gap:10px;">';
+            $html .= '<span style="color:#ee7a03;font-size:14px;">▸</span>';
+            $html .= '<span style="font-size:13px;color:#666;">' . $t . '</span>';
+            $html .= '</li>';
+        }
+        $html .= '</ul></div>';
+
+        $html .= '</div></div>';
+        return $html;
+    }
+
     protected function getFonts()
     {
         $raw = Configuration::get('MOUSEPAD_FONTS');
@@ -315,11 +377,42 @@ class Mousepadeditor extends Module
 
         $html = '<div class="panel"><h3><i class="icon-font"></i> ' . $this->l('Gestion des polices') . '</h3>';
         $html .= '<p style="color:#888;font-size:13px;">' . $this->l('Polices par défaut toujours disponibles : Open Sans, Bebas Neue, Arial.') . '</p>';
-        $html .= '<form method="post" enctype="multipart/form-data">';
-        $html .= '<div class="form-group"><label>' . $this->l('Ajouter des polices (ttf, otf, woff, woff2 — max 2 Mo)') . '</label>';
-        $html .= '<input type="file" name="mousepad_font[]" multiple accept=".ttf,.otf,.woff,.woff2" /></div>';
-        $html .= '<button type="submit" name="submitMousepadFontUpload" class="btn btn-primary"><i class="process-icon-save"></i> ' . $this->l('Uploader') . '</button>';
-        $html .= '</form><hr/>';
+        $html .= '<form method="post" enctype="multipart/form-data" id="mpe-font-form">';
+        $html .= '<label class="mpe-dropzone" id="mpe-fdz">
+            <div class="mpe-dropzone-icon">🔤</div>
+            <div class="mpe-dropzone-title">' . $this->l('Glissez vos polices ici') . '</div>
+            <div class="mpe-dropzone-sub">' . $this->l('ou cliquez pour parcourir — ttf, otf, woff, woff2 · max 2 Mo') . '</div>
+            <input type="file" name="mousepad_font[]" id="mpe-ffile" multiple accept=".ttf,.otf,.woff,.woff2" />
+            <div class="mpe-preview" id="mpe-fpreview"></div>
+        </label>';
+        $html .= '<div style="margin-top:15px;text-align:right;"><button type="submit" name="submitMousepadFontUpload" class="btn btn-primary"><i class="process-icon-save"></i> ' . $this->l('Uploader') . '</button></div>';
+        $html .= '</form>';
+        $html .= '<script>
+            (function(){
+                var dz=document.getElementById("mpe-fdz"),inp=document.getElementById("mpe-ffile"),pv=document.getElementById("mpe-fpreview");
+                if(!dz)return;
+                ["dragenter","dragover"].forEach(function(e){dz.addEventListener(e,function(ev){ev.preventDefault();ev.stopPropagation();dz.classList.add("mpe-drag");});});
+                ["dragleave","drop"].forEach(function(e){dz.addEventListener(e,function(ev){ev.preventDefault();ev.stopPropagation();dz.classList.remove("mpe-drag");});});
+                dz.addEventListener("drop",function(ev){
+                    var dt=new DataTransfer();
+                    Array.from(ev.dataTransfer.files).forEach(function(f){dt.items.add(f);});
+                    inp.files=dt.files;render();
+                });
+                inp.addEventListener("change",render);
+                inp.addEventListener("click",function(e){e.stopPropagation();});
+                function render(){
+                    pv.innerHTML="";
+                    Array.from(inp.files).forEach(function(f){
+                        var d=document.createElement("div");
+                        d.className="mpe-preview-item";
+                        d.style.display="flex";d.style.alignItems="center";d.style.justifyContent="center";
+                        d.style.background="#fff";d.style.color="#004774";d.style.fontWeight="600";d.style.fontSize="11px";d.style.padding="4px";d.style.textAlign="center";
+                        d.textContent=f.name;
+                        pv.appendChild(d);
+                    });
+                }
+            })();
+        </script><hr/>';
 
         if (empty($list)) {
             $html .= '<p>' . $this->l('Aucune police personnalisée.') . '</p>';
