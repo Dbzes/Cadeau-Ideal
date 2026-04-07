@@ -346,4 +346,7 @@
   .mpe-grid {
     grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
   }
+  .mpe-title {
+    text-align: center;
+  }
 }

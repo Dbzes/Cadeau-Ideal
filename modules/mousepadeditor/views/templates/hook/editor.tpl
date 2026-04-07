@@ -4,8 +4,8 @@
   <div class="mpe-canvas-wrap">
     <canvas id="mpe-canvas"></canvas>
     <div class="mpe-canvas-toolbar">
-      <button type="button" class="mpe-tool-btn" id="mpe-delete-selected" title="Supprimer la sélection">🗑 Supprimer</button>
-      <button type="button" class="mpe-tool-btn" id="mpe-reset" title="Tout réinitialiser">↺ Réinitialiser</button>
+      <button type="button" class="mpe-tool-btn" id="mpe-delete-selected" title="Supprimer l'élément sélectionné">🗑 Supprimer la sélection</button>
+      <button type="button" class="mpe-tool-btn" id="mpe-reset" title="Effacer toute la création">↺ Tout effacer</button>
     </div>
   </div>
 
