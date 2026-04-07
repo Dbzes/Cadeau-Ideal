@@ -231,6 +231,10 @@ function mpeInit() {
 
   var canvas = null;
   if (fabricReady) {
+    // Fix warning Chrome : Fabric utilise 'alphabetical' au lieu de 'alphabetic'
+    if (fabric.Text && fabric.Text.prototype) fabric.Text.prototype.textBaseline = 'alphabetic';
+    if (fabric.IText && fabric.IText.prototype) fabric.IText.prototype.textBaseline = 'alphabetic';
+    if (fabric.Textbox && fabric.Textbox.prototype) fabric.Textbox.prototype.textBaseline = 'alphabetic';
     canvas = new fabric.Canvas('mpe-canvas', {
       backgroundColor: '#f0f0f0',
       preserveObjectStacking: true
