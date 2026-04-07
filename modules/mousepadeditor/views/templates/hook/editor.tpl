@@ -102,8 +102,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&family=Bebas+Neue&display=swap" rel="stylesheet">
 <script>
 function mpeInit() {
-(function() {
-(function() {
   // Accordion
   var heads = document.querySelectorAll('.mousepad-editor .mpe-head');
   heads.forEach(function(h) {
@@ -383,7 +381,6 @@ function mpeInit() {
     W = newW; H = newH;
     canvas.renderAll();
   });
-})();
 }
 (function waitFabric(tries){
   if (typeof fabric !== 'undefined') { mpeInit(); return; }
