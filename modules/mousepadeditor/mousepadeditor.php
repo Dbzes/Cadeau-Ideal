@@ -193,13 +193,57 @@ class Mousepadeditor extends Module
         $url = $this->_path . self::UPLOAD_DIR;
         $base = AdminController::$currentIndex . '&configure=' . $this->name . '&token=' . Tools::getAdminTokenLite('AdminModules');
 
-        $html = '<div class="panel"><h3><i class="icon-picture"></i> ' . $this->l('Gestion des fonds') . '</h3>';
-        $html .= '<form method="post" enctype="multipart/form-data">';
-        $html .= '<div class="form-group"><label>' . $this->l('Ajouter des fonds (jpg, png, webp — max 5 Mo)') . '</label>';
-        $html .= '<input type="file" name="mousepad_bg[]" multiple accept="image/jpeg,image/png,image/webp" /></div>';
-        $html .= '<button type="submit" name="submitMousepadBackgroundUpload" class="btn btn-default pull-right">'
-            . '<i class="process-icon-save"></i> ' . $this->l('Uploader') . '</button>';
-        $html .= '<div class="clearfix"></div></form><hr/>';
+        $html = '<style>
+            .mpe-dropzone{border:3px dashed #ccd5e0;border-radius:8px;padding:40px 20px;text-align:center;background:#fafbfc;cursor:pointer;transition:all .2s;}
+            .mpe-dropzone:hover,.mpe-dropzone.mpe-drag{border-color:#ee7a03;background:#fff7ee;}
+            .mpe-dropzone-icon{font-size:54px;color:#004774;line-height:1;margin-bottom:12px;}
+            .mpe-dropzone-title{font-size:18px;font-weight:600;color:#004774;margin-bottom:6px;}
+            .mpe-dropzone-sub{font-size:13px;color:#888;}
+            .mpe-dropzone input[type=file]{display:none;}
+            .mpe-preview{display:flex;flex-wrap:wrap;gap:10px;margin-top:15px;}
+            .mpe-preview-item{position:relative;width:90px;height:90px;border-radius:4px;background-size:cover;background-position:center;border:1px solid #ddd;}
+            .mpe-preview-item .mpe-rm{position:absolute;top:-6px;right:-6px;width:22px;height:22px;border-radius:50%;background:#e74c3c;color:#fff;border:none;cursor:pointer;font-size:14px;line-height:1;}
+        </style>';
+        $html .= '<div class="panel"><h3><i class="icon-picture"></i> ' . $this->l('Gestion des fonds') . '</h3>';
+        $html .= '<form method="post" enctype="multipart/form-data" id="mpe-upload-form">';
+        $html .= '<label class="mpe-dropzone" id="mpe-dropzone">
+            <div class="mpe-dropzone-icon">⬆</div>
+            <div class="mpe-dropzone-title">' . $this->l('Glissez-déposez vos images ici') . '</div>
+            <div class="mpe-dropzone-sub">' . $this->l('ou cliquez pour parcourir — jpg, png, webp · max 5 Mo') . '</div>
+            <input type="file" name="mousepad_bg[]" id="mpe-file" multiple accept="image/jpeg,image/png,image/webp" />
+            <div class="mpe-preview" id="mpe-preview"></div>
+        </label>';
+        $html .= '<div style="margin-top:15px;text-align:right;"><button type="submit" name="submitMousepadBackgroundUpload" class="btn btn-primary">'
+            . '<i class="process-icon-save"></i> ' . $this->l('Uploader') . '</button></div>';
+        $html .= '</form>';
+        $html .= '<script>
+            (function(){
+                var dz=document.getElementById("mpe-dropzone"),inp=document.getElementById("mpe-file"),pv=document.getElementById("mpe-preview");
+                if(!dz)return;
+                ["dragenter","dragover"].forEach(function(e){dz.addEventListener(e,function(ev){ev.preventDefault();ev.stopPropagation();dz.classList.add("mpe-drag");});});
+                ["dragleave","drop"].forEach(function(e){dz.addEventListener(e,function(ev){ev.preventDefault();ev.stopPropagation();dz.classList.remove("mpe-drag");});});
+                dz.addEventListener("drop",function(ev){
+                    var dt=new DataTransfer();
+                    Array.from(ev.dataTransfer.files).forEach(function(f){dt.items.add(f);});
+                    inp.files=dt.files;render();
+                });
+                inp.addEventListener("change",render);
+                inp.addEventListener("click",function(e){e.stopPropagation();});
+                function render(){
+                    pv.innerHTML="";
+                    Array.from(inp.files).forEach(function(f,i){
+                        var r=new FileReader();
+                        r.onload=function(e){
+                            var d=document.createElement("div");
+                            d.className="mpe-preview-item";
+                            d.style.backgroundImage="url("+e.target.result+")";
+                            pv.appendChild(d);
+                        };
+                        r.readAsDataURL(f);
+                    });
+                }
+            })();
+        </script><hr/>';
 
         if (empty($list)) {
             $html .= '<p>' . $this->l('Aucun fond pour le moment.') . '</p>';
