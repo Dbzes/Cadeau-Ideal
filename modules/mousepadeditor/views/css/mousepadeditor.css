@@ -215,18 +215,20 @@
   max-height: 0;
   overflow: hidden;
   padding: 0 18px;
+  opacity: 0;
   background: #fff;
-  transition: max-height .4s cubic-bezier(.4,0,.2,1), padding .4s cubic-bezier(.4,0,.2,1);
+  transition: max-height .8s cubic-bezier(.25,.1,.25,1), padding .6s ease, opacity .5s ease;
 }
 
 .mpe-item.mpe-open .mpe-body {
   max-height: 2000px;
   padding: 18px;
-  transition: max-height .6s cubic-bezier(.4,0,.2,1), padding .3s ease;
+  opacity: 1;
+  transition: max-height 1s cubic-bezier(.25,.1,.25,1), padding .5s ease, opacity .6s ease .15s;
 }
 
 .mpe-arrow {
-  transition: transform .3s cubic-bezier(.4,0,.2,1);
+  transition: transform .5s cubic-bezier(.25,.1,.25,1);
 }
 
 .mpe-hint {
