@@ -83,6 +83,23 @@ class Mousepadeditor extends Module
             $output .= $this->handleMove(Tools::getValue('moveBg'), Tools::getValue('dir'));
         }
 
+        if (Tools::getValue('reorderBgs')) {
+            $order = explode(',', Tools::getValue('reorderBgs'));
+            $current = $this->getBackgrounds();
+            $new = [];
+            foreach ($order as $f) {
+                if (in_array($f, $current)) {
+                    $new[] = $f;
+                }
+            }
+            if (count($new) === count($current)) {
+                $this->saveBackgrounds($new);
+            }
+            if (Tools::getValue('ajax')) {
+                die('OK');
+            }
+        }
+
         return $output . $this->renderForm() . $this->renderBackgroundsManager();
     }
 
@@ -248,26 +265,46 @@ class Mousepadeditor extends Module
         if (empty($list)) {
             $html .= '<p>' . $this->l('Aucun fond pour le moment.') . '</p>';
         } else {
-            $html .= '<div style="display:flex;flex-wrap:wrap;gap:15px;">';
-            $total = count($list);
-            foreach ($list as $i => $f) {
-                $html .= '<div style="border:1px solid #ddd;padding:8px;width:160px;text-align:center;background:#fafafa;">';
-                $html .= '<img src="' . $url . $f . '" style="max-width:100%;height:100px;object-fit:cover;display:block;margin-bottom:6px;" />';
-                $html .= '<div style="display:flex;justify-content:space-between;gap:4px;">';
-                if ($i > 0) {
-                    $html .= '<a href="' . $base . '&moveBg=' . urlencode($f) . '&dir=up" class="btn btn-default btn-xs">↑</a>';
-                } else {
-                    $html .= '<span></span>';
-                }
-                $html .= '<a href="' . $base . '&deleteBg=' . urlencode($f) . '" class="btn btn-danger btn-xs" onclick="return confirm(\'Supprimer ce fond ?\')">✕</a>';
-                if ($i < $total - 1) {
-                    $html .= '<a href="' . $base . '&moveBg=' . urlencode($f) . '&dir=down" class="btn btn-default btn-xs">↓</a>';
-                } else {
-                    $html .= '<span></span>';
-                }
-                $html .= '</div></div>';
+            $html .= '<p style="color:#888;font-size:13px;margin-bottom:10px;"><i class="icon-info-circle"></i> ' . $this->l('Glissez-déposez les vignettes pour réorganiser l\'ordre d\'affichage.') . '</p>';
+            $html .= '<div id="mpe-bg-list" style="display:flex;flex-wrap:wrap;gap:15px;">';
+            foreach ($list as $f) {
+                $html .= '<div class="mpe-bg-card" draggable="true" data-file="' . htmlspecialchars($f) . '" style="border:1px solid #ddd;padding:8px;width:160px;text-align:center;background:#fafafa;cursor:move;border-radius:4px;transition:all .15s;">';
+                $html .= '<img src="' . $url . $f . '" style="max-width:100%;height:100px;object-fit:cover;display:block;margin-bottom:6px;pointer-events:none;" />';
+                $html .= '<a href="' . $base . '&deleteBg=' . urlencode($f) . '" class="btn btn-danger btn-xs" onclick="return confirm(\'Supprimer ce fond ?\')">✕ ' . $this->l('Supprimer') . '</a>';
+                $html .= '</div>';
             }
             $html .= '</div>';
+            $html .= '<style>
+                .mpe-bg-card.mpe-dragging{opacity:.4;}
+                .mpe-bg-card.mpe-over{border-color:#ee7a03 !important;background:#fff7ee !important;transform:scale(1.03);}
+            </style>';
+            $html .= '<script>
+                (function(){
+                    var list=document.getElementById("mpe-bg-list");
+                    if(!list)return;
+                    var dragEl=null;
+                    var cards=list.querySelectorAll(".mpe-bg-card");
+                    cards.forEach(function(c){
+                        c.addEventListener("dragstart",function(e){dragEl=c;c.classList.add("mpe-dragging");e.dataTransfer.effectAllowed="move";});
+                        c.addEventListener("dragend",function(){c.classList.remove("mpe-dragging");cards.forEach(function(x){x.classList.remove("mpe-over");});save();});
+                        c.addEventListener("dragover",function(e){e.preventDefault();e.dataTransfer.dropEffect="move";});
+                        c.addEventListener("dragenter",function(){if(c!==dragEl)c.classList.add("mpe-over");});
+                        c.addEventListener("dragleave",function(){c.classList.remove("mpe-over");});
+                        c.addEventListener("drop",function(e){
+                            e.preventDefault();
+                            if(c===dragEl)return;
+                            var rect=c.getBoundingClientRect();
+                            var after=(e.clientX-rect.left)>rect.width/2;
+                            list.insertBefore(dragEl,after?c.nextSibling:c);
+                        });
+                    });
+                    function save(){
+                        var order=Array.from(list.querySelectorAll(".mpe-bg-card")).map(function(c){return c.dataset.file;}).join(",");
+                        var url="' . $base . '&reorderBgs="+encodeURIComponent(order)+"&ajax=1";
+                        fetch(url,{credentials:"same-origin"});
+                    }
+                })();
+            </script>';
         }
 
         $html .= '</div>';
