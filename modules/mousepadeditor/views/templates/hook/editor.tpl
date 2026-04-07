@@ -112,7 +112,9 @@
   </div>
 </div>
 
-<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+{if isset($mpe_google_url) && $mpe_google_url}
+<link href="{$mpe_google_url}" rel="stylesheet">
+{/if}
 {if isset($mpe_fonts) && $mpe_fonts|count > 0}
 <style>
 {foreach from=$mpe_fonts item=f}
