@@ -38,7 +38,94 @@ class CustomerPictureVisualize extends Module
     public function getContent()
     {
         $items = $this->fetchPendingImages();
-        return $this->renderPanel($items);
+        $fsItems = $this->scanFilesystemImages();
+        return $this->renderPanel($items) . $this->renderFsPanel($fsItems);
+    }
+
+    /**
+     * Scan des fichiers physiques mousepadeditor non encore liés à un panier.
+     * - Fonds clients : modules/mousepadeditor/uploads/customer/{key}/bg.*
+     * - Aperçus HD générés : modules/mousepadeditor/uploads/previews/*.png
+     */
+    protected function scanFilesystemImages()
+    {
+        $base = _PS_MODULE_DIR_ . 'mousepadeditor/uploads/';
+        $baseUrl = __PS_BASE_URI__ . 'modules/mousepadeditor/uploads/';
+        $items = [];
+
+        // Fonds clients
+        $custDir = $base . 'customer/';
+        if (is_dir($custDir)) {
+            foreach (scandir($custDir) as $key) {
+                if ($key === '.' || $key === '..') continue;
+                $sub = $custDir . $key . '/';
+                if (!is_dir($sub)) continue;
+                foreach (glob($sub . 'bg.*') as $f) {
+                    $items[] = [
+                        'type' => $this->l('Fond client'),
+                        'thumb_url' => $baseUrl . 'customer/' . $key . '/' . basename($f),
+                        'full_url' => $baseUrl . 'customer/' . $key . '/' . basename($f),
+                        'key' => $key,
+                        'name' => basename($f),
+                        'size' => filesize($f),
+                        'mtime' => date('Y-m-d H:i', filemtime($f)),
+                    ];
+                }
+            }
+        }
+
+        // Aperçus HD générés (composés mais pas forcément ajoutés au panier)
+        $prevDir = $base . 'previews/';
+        if (is_dir($prevDir)) {
+            foreach (glob($prevDir . '*.png') as $f) {
+                $items[] = [
+                    'type' => $this->l('Aperçu HD'),
+                    'thumb_url' => $baseUrl . 'previews/' . basename($f),
+                    'full_url' => $baseUrl . 'previews/' . basename($f),
+                    'key' => '',
+                    'name' => basename($f),
+                    'size' => filesize($f),
+                    'mtime' => date('Y-m-d H:i', filemtime($f)),
+                ];
+            }
+        }
+
+        usort($items, function($a, $b){ return strcmp($b['mtime'], $a['mtime']); });
+        return $items;
+    }
+
+    protected function renderFsPanel(array $items)
+    {
+        $count = count($items);
+        $size = 0;
+        foreach ($items as $i) $size += $i['size'];
+
+        $html = '<div class="panel" style="margin-top:20px;border-left:4px solid #ee7a03;">';
+        $html .= '<h3><i class="icon-folder-open"></i> ' . $this->l('Fichiers physiques (hors panier)') . '</h3>';
+        $html .= '<p style="font-size:14px;color:#666;">' . $this->l('Fonds clients uploadés et aperçus HD générés, pas encore liés à une customization panier.') . '</p>';
+        $html .= '<p style="font-size:16px;color:#ee7a03;"><strong>' . $count . '</strong> ' . $this->l('fichier(s)') . ' · <strong>' . $this->formatBytes($size) . '</strong></p>';
+        $html .= '</div>';
+
+        if ($count === 0) return $html;
+
+        $html .= '<div class="panel">';
+        $html .= '<div style="display:flex;flex-wrap:wrap;gap:14px;">';
+        foreach ($items as $i) {
+            $badge = $i['type'] === 'Fond client' ? '#3498db' : '#ee7a03';
+            $html .= '<div style="border:1px solid #ddd;border-radius:6px;padding:10px;width:180px;background:#fafafa;">';
+            $html .= '<a href="#" class="cpv-zoom" data-full="' . htmlspecialchars($i['full_url']) . '">';
+            $html .= '<img src="' . htmlspecialchars($i['thumb_url']) . '" style="width:100%;height:120px;object-fit:cover;border-radius:4px;display:block;" />';
+            $html .= '</a>';
+            $html .= '<div style="font-size:10px;color:#fff;background:' . $badge . ';display:inline-block;padding:2px 6px;border-radius:3px;margin-top:6px;">' . htmlspecialchars($i['type']) . '</div>';
+            if ($i['key']) {
+                $html .= '<div style="font-size:10px;color:#666;margin-top:4px;word-break:break-all;">' . $this->l('Clé') . ' : ' . htmlspecialchars($i['key']) . '</div>';
+            }
+            $html .= '<div style="font-size:10px;color:#999;margin-top:4px;">' . $this->formatBytes($i['size']) . ' · ' . htmlspecialchars($i['mtime']) . '</div>';
+            $html .= '</div>';
+        }
+        $html .= '</div></div>';
+
+        return $html;
     }
 
     /**
