@@ -166,6 +166,10 @@ window.mpeComposeHD = null;
 window.MPE_COMPOSE_URL = '{$mpe_compose_url}';
 window.MPE_ATTACH_URL = '{$mpe_attach_url}';
 window.MPE_PRODUCT_ID = {$mpe_product_id};
+window.MPE_TEMPLATE_URL = {if isset($mpe_template) && $mpe_template}'{$mpe_template.url}'{else}null{/if};
+window.MPE_TEMPLATE_W = {if isset($mpe_template) && $mpe_template}{$mpe_template.width}{else}220{/if};
+window.MPE_TEMPLATE_H = {if isset($mpe_template) && $mpe_template}{$mpe_template.height}{else}180{/if};
+{literal}
 // Détection d'extensions navigateur interférant
 (function(){
   var shown = false;
@@ -214,9 +218,9 @@ function mpeInit() {
     console.warn('[mousepadeditor] Fabric.js non chargé — mode dégradé');
   }
 
-  var TEMPLATE_URL = {if isset($mpe_template) && $mpe_template}'{$mpe_template.url}'{else}null{/if};
-  var TEMPLATE_W = {if isset($mpe_template) && $mpe_template}{$mpe_template.width}{else}220{/if};
-  var TEMPLATE_H = {if isset($mpe_template) && $mpe_template}{$mpe_template.height}{else}180{/if};
+  var TEMPLATE_URL = window.MPE_TEMPLATE_URL;
+  var TEMPLATE_W = window.MPE_TEMPLATE_W;
+  var TEMPLATE_H = window.MPE_TEMPLATE_H;
   var RATIO = TEMPLATE_W / TEMPLATE_H;
   var canvasEl = document.getElementById('mpe-canvas');
   var wrap = document.querySelector('.mpe-canvas-wrap');
@@ -752,4 +756,5 @@ function mpeInit() {
   if (tries > 50) { console.error('[mpe] Fabric.js failed to load'); mpeInit(); return; }
   setTimeout(function(){ waitFabric(tries+1); }, 100);
 })(0);
+{/literal}
 </script>
