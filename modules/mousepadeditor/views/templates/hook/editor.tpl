@@ -231,7 +231,17 @@ function mpeInit() {
 
   var canvas = null;
   if (fabricReady) {
-    // Fix warning Chrome : Fabric utilise 'alphabetical' au lieu de 'alphabetic'
+    // Fix warning Chrome : Fabric utilise 'alphabetical' (invalide) au lieu de 'alphabetic'
+    try {
+      var _proto = CanvasRenderingContext2D.prototype;
+      var _desc = Object.getOwnPropertyDescriptor(_proto, 'textBaseline');
+      if (_desc && _desc.set) {
+        Object.defineProperty(_proto, 'textBaseline', {
+          set: function(v){ _desc.set.call(this, v === 'alphabetical' ? 'alphabetic' : v); },
+          get: _desc.get, configurable: true
+        });
+      }
+    } catch(e) {}
     if (fabric.Text && fabric.Text.prototype) fabric.Text.prototype.textBaseline = 'alphabetic';
     if (fabric.IText && fabric.IText.prototype) fabric.IText.prototype.textBaseline = 'alphabetic';
     if (fabric.Textbox && fabric.Textbox.prototype) fabric.Textbox.prototype.textBaseline = 'alphabetic';
