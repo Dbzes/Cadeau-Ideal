@@ -48,7 +48,8 @@ class Mousepadeditor extends Module
             && $this->registerHook('header')
             && Configuration::updateValue('MOUSEPAD_PRODUCT_IDS', '')
             && Configuration::updateValue('MOUSEPAD_BACKGROUNDS', json_encode([]))
-            && Configuration::updateValue('MOUSEPAD_FONTS', json_encode([]));
+            && Configuration::updateValue('MOUSEPAD_FONTS', json_encode([]))
+            && Configuration::updateValue('MOUSEPAD_DISABLED_DEFAULTS', json_encode([]));
     }
 
     public function uninstall()
@@ -56,6 +57,7 @@ class Mousepadeditor extends Module
         Configuration::deleteByName('MOUSEPAD_PRODUCT_IDS');
         Configuration::deleteByName('MOUSEPAD_BACKGROUNDS');
         Configuration::deleteByName('MOUSEPAD_FONTS');
+        Configuration::deleteByName('MOUSEPAD_DISABLED_DEFAULTS');
 
         return parent::uninstall();
     }
@@ -130,6 +132,9 @@ class Mousepadeditor extends Module
         }
         if (Tools::getValue('deleteFont')) {
             $output .= $this->handleFontDelete(Tools::getValue('deleteFont'));
+        }
+        if (Tools::getValue('toggleDefault')) {
+            $output .= $this->handleToggleDefault(Tools::getValue('toggleDefault'));
         }
 
         return $output . $this->renderForm() . $this->renderBackgroundsManager() . $this->renderFontsManager();
@@ -369,25 +374,54 @@ class Mousepadeditor extends Module
         return $this->displayConfirmation($this->l('Police supprimée.'));
     }
 
+    protected function getDisabledDefaults()
+    {
+        $raw = Configuration::get('MOUSEPAD_DISABLED_DEFAULTS');
+        $list = json_decode($raw, true);
+        return is_array($list) ? $list : [];
+    }
+
+    protected function handleToggleDefault($name)
+    {
+        $allowed = ['Open Sans', 'Bebas Neue', 'Arial'];
+        if (!in_array($name, $allowed)) return '';
+        $disabled = $this->getDisabledDefaults();
+        if (in_array($name, $disabled)) {
+            $disabled = array_values(array_diff($disabled, [$name]));
+            $msg = sprintf($this->l('Police "%s" réactivée.'), $name);
+        } else {
+            $disabled[] = $name;
+            $msg = sprintf($this->l('Police "%s" désactivée.'), $name);
+        }
+        Configuration::updateValue('MOUSEPAD_DISABLED_DEFAULTS', json_encode($disabled));
+        return $this->displayConfirmation($msg);
+    }
+
     protected function renderFontsManager()
     {
         $list = $this->getFonts();
         $url = $this->_path . self::FONT_DIR;
         $base = AdminController::$currentIndex . '&configure=' . $this->name . '&token=' . Tools::getAdminTokenLite('AdminModules');
 
-        $defaultFonts = ['Open Sans', 'Bebas Neue', 'Arial'];
-        $totalFonts = count($defaultFonts) + count($list);
+        $allDefaults = ['Open Sans', 'Bebas Neue', 'Arial'];
+        $disabledDefaults = $this->getDisabledDefaults();
+        $activeDefaults = array_values(array_diff($allDefaults, $disabledDefaults));
+        $totalFonts = count($activeDefaults) + count($list);
 
         $html = '<div class="panel"><h3><i class="icon-font"></i> ' . $this->l('Gestion des polices') . '</h3>';
 
         // Liste des polices actuellement disponibles client
         $html .= '<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400&family=Bebas+Neue&display=swap" rel="stylesheet">';
-        $html .= '<div style="background:#f0f7fc;border:1px solid #cfe2f0;border-radius:4px;padding:14px 18px;margin-bottom:18px;">';
-        $html .= '<div style="font-weight:600;color:#004774;margin-bottom:10px;font-size:14px;">' . sprintf($this->l('Polices actuellement disponibles côté client (%d)'), $totalFonts) . '</div>';
-        $html .= '<div style="display:flex;flex-wrap:wrap;gap:10px;">';
-        foreach ($defaultFonts as $df) {
-            $html .= '<span style="background:#fff;border:1px solid #cfe2f0;padding:6px 14px;border-radius:20px;font-family:\'' . $df . '\',sans-serif;font-size:14px;color:#004774;">' . $df . ' <span style="font-size:10px;color:#999;">(défaut)</span></span>';
-        }
+        $html .= '<style>
+            .mpe-tag{display:inline-flex;align-items:center;gap:8px;background:#fff;padding:6px 6px 6px 14px;border-radius:20px;font-size:14px;color:#004774;}
+            .mpe-tag .mpe-tag-x{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:#f4f4f4;color:#666;text-decoration:none;font-size:13px;transition:all .2s;}
+            .mpe-tag .mpe-tag-x:hover{background:#e74c3c;color:#fff;}
+            .mpe-tag-default{border:1px solid #cfe2f0;}
+            .mpe-tag-custom{border:1px solid #ee7a03;}
+            .mpe-tag-disabled{opacity:.45;border-style:dashed;}
+            .mpe-tag-disabled .mpe-tag-x{background:#e8f4ea;color:#27ae60;}
+            .mpe-tag-disabled .mpe-tag-x:hover{background:#27ae60;color:#fff;}
+        </style>';
         if (!empty($list)) {
             $html .= '<style>';
             foreach ($list as $f) {
@@ -395,11 +429,31 @@ class Mousepadeditor extends Module
                 $html .= '@font-face{font-family:"' . htmlspecialchars($f['family']) . '";src:url("' . $url . $f['file'] . '") format("' . $fmt . '");}';
             }
             $html .= '</style>';
-            foreach ($list as $f) {
-                $html .= '<span style="background:#fff;border:1px solid #ee7a03;padding:6px 14px;border-radius:20px;font-family:\'' . htmlspecialchars($f['family']) . '\',sans-serif;font-size:14px;color:#004774;">' . htmlspecialchars($f['family']) . ' <span style="font-size:10px;color:#ee7a03;">(custom)</span></span>';
-            }
         }
-        $html .= '</div></div>';
+        $html .= '<div style="background:#f0f7fc;border:1px solid #cfe2f0;border-radius:4px;padding:14px 18px;margin-bottom:18px;">';
+        $html .= '<div style="font-weight:600;color:#004774;margin-bottom:10px;font-size:14px;">' . sprintf($this->l('Polices actuellement disponibles côté client (%d active(s))'), $totalFonts) . '</div>';
+        $html .= '<div style="display:flex;flex-wrap:wrap;gap:10px;">';
+        foreach ($allDefaults as $df) {
+            $isDisabled = in_array($df, $disabledDefaults);
+            $cls = 'mpe-tag mpe-tag-default' . ($isDisabled ? ' mpe-tag-disabled' : '');
+            $title = $isDisabled ? $this->l('Réactiver') : $this->l('Désactiver');
+            $icon = $isDisabled ? '↻' : '✕';
+            $html .= '<span class="' . $cls . '" style="font-family:\'' . $df . '\',sans-serif;">';
+            $html .= $df . ' <span style="font-size:10px;color:#999;">(défaut)</span>';
+            $html .= '<a href="' . $base . '&toggleDefault=' . urlencode($df) . '" class="mpe-tag-x" title="' . $title . '">' . $icon . '</a>';
+            $html .= '</span>';
+        }
+        foreach ($list as $f) {
+            $html .= '<span class="mpe-tag mpe-tag-custom" style="font-family:\'' . htmlspecialchars($f['family']) . '\',sans-serif;">';
+            $html .= htmlspecialchars($f['family']) . ' <span style="font-size:10px;color:#ee7a03;">(custom)</span>';
+            $html .= '<a href="' . $base . '&deleteFont=' . urlencode($f['file']) . '" class="mpe-tag-x" title="' . $this->l('Supprimer définitivement') . '" onclick="return confirm(\'Supprimer cette police ?\')">✕</a>';
+            $html .= '</span>';
+        }
+        $html .= '</div>';
+        if (count($disabledDefaults) > 0) {
+            $html .= '<div style="margin-top:10px;font-size:12px;color:#888;">' . $this->l('Astuce : cliquez sur ↻ pour réactiver une police désactivée.') . '</div>';
+        }
+        $html .= '</div>';
         $html .= '<form method="post" enctype="multipart/form-data" id="mpe-font-form">';
         $html .= '<label class="mpe-dropzone" id="mpe-fdz">
             <div class="mpe-dropzone-icon">🔤</div>
@@ -437,25 +491,6 @@ class Mousepadeditor extends Module
             })();
         </script><hr/>';
 
-        if (empty($list)) {
-            $html .= '<p>' . $this->l('Aucune police personnalisée.') . '</p>';
-        } else {
-            $html .= '<style>';
-            foreach ($list as $f) {
-                $fmt = $f['ext'] === 'ttf' ? 'truetype' : ($f['ext'] === 'otf' ? 'opentype' : $f['ext']);
-                $html .= '@font-face{font-family:"' . htmlspecialchars($f['family']) . '";src:url("' . $url . $f['file'] . '") format("' . $fmt . '");}';
-            }
-            $html .= '</style>';
-            $html .= '<div style="display:flex;flex-wrap:wrap;gap:12px;">';
-            foreach ($list as $f) {
-                $html .= '<div style="border:1px solid #ddd;padding:12px;width:220px;background:#fafafa;border-radius:4px;">';
-                $html .= '<div style="font-family:\'' . htmlspecialchars($f['family']) . '\';font-size:22px;color:#004774;margin-bottom:6px;">Aa Bb Cc 123</div>';
-                $html .= '<div style="font-size:12px;color:#666;margin-bottom:8px;">' . htmlspecialchars($f['family']) . ' (.' . $f['ext'] . ')</div>';
-                $html .= '<a href="' . $base . '&deleteFont=' . urlencode($f['file']) . '" class="btn btn-danger btn-xs" onclick="return confirm(\'Supprimer cette police ?\')">✕ ' . $this->l('Supprimer') . '</a>';
-                $html .= '</div>';
-            }
-            $html .= '</div>';
-        }
         $html .= '</div>';
         return $html;
     }
@@ -628,6 +663,9 @@ class Mousepadeditor extends Module
 
         $fonts = $this->getFonts();
         $fontUrl = $this->_path . self::FONT_DIR;
+        $allDefaults = ['Open Sans', 'Bebas Neue', 'Arial'];
+        $disabled = $this->getDisabledDefaults();
+        $activeDefaults = array_values(array_diff($allDefaults, $disabled));
 
         $this->context->smarty->assign([
             'mpe_backgrounds' => $backgrounds,
@@ -636,6 +674,7 @@ class Mousepadeditor extends Module
             'mpe_upload_url' => $this->context->link->getModuleLink('mousepadeditor', 'upload', [], true),
             'mpe_fonts' => $fonts,
             'mpe_font_url' => $fontUrl,
+            'mpe_default_fonts' => $activeDefaults,
         ]);
 
         return $this->display(__FILE__, 'views/templates/hook/editor.tpl');

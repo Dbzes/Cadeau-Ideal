@@ -80,9 +80,11 @@
         <div class="mpe-text-controls">
           <label>Police
             <select id="mpe-text-font">
-              <option value="Open Sans">Open Sans</option>
-              <option value="Bebas Neue">Bebas Neue</option>
-              <option value="Arial">Arial</option>
+              {if isset($mpe_default_fonts)}
+                {foreach from=$mpe_default_fonts item=df}
+                  <option value="{$df}">{$df}</option>
+                {/foreach}
+              {/if}
               {if isset($mpe_fonts) && $mpe_fonts|count > 0}
                 {foreach from=$mpe_fonts item=f}
                   <option value="{$f.family}">{$f.family}</option>
