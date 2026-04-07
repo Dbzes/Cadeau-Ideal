@@ -33,6 +33,7 @@ class Mousepadeditor extends Module
     {
         return parent::install()
             && $this->registerHook('displayMousepadEditor')
+            && $this->registerHook('header')
             && Configuration::updateValue('MOUSEPAD_PRODUCT_IDS', '');
     }
 
@@ -89,6 +90,11 @@ class Mousepadeditor extends Module
         $helper->fields_value['MOUSEPAD_PRODUCT_IDS'] = Configuration::get('MOUSEPAD_PRODUCT_IDS');
 
         return $helper->generateForm([$fields_form]);
+    }
+
+    public function hookHeader($params)
+    {
+        $this->context->controller->addCSS($this->_path . 'views/css/mousepadeditor.css');
     }
 
     public function hookDisplayMousepadEditor($params)

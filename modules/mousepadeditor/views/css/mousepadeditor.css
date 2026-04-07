@@ -1,0 +1,25 @@
+.mousepad-editor {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 15px;
+  overflow: hidden;
+}
+
+.mousepad-editor *,
+.mousepad-editor *::before,
+.mousepad-editor *::after {
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+.mousepad-editor-zone {
+  width: 100%;
+  max-width: 100%;
+  min-height: 200px;
+  border: 2px dashed #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
