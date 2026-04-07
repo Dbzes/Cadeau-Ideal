@@ -297,12 +297,14 @@ function mpeInit() {
         }
       }
       localStorage.setItem(STORAGE_KEY, JSON.stringify({ bg: bg, images: images, texts: texts }));
-    } catch(e) {}
+      console.log('[mpe] saveState', { key: STORAGE_KEY, bg: !!bg, imgs: images.length, txts: texts.length });
+    } catch(e) { console.warn('[mpe] saveState err', e); }
   }
 
   function restoreState() {
     var raw;
     try { raw = localStorage.getItem(STORAGE_KEY); } catch(e) { return; }
+    console.log('[mpe] restoreState raw=', raw ? raw.length + ' chars' : 'EMPTY', 'key=', STORAGE_KEY);
     if (!raw) return;
     var state;
     try { state = JSON.parse(raw); } catch(e) { return; }
@@ -417,6 +419,7 @@ function mpeInit() {
     document.getElementById('mpe-bg-controls').style.display = 'block';
     canvas.discardActiveObject();
     canvas.renderAll();
+    if (typeof saveState === 'function') saveState();
   }
 
   function setBackground(value, cb) {
