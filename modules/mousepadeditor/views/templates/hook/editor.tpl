@@ -318,6 +318,20 @@ function mpeInit() {
     });
   }
 
+  function clampBg() {
+    if (!bgImage || bgImage.type === 'rect') return;
+    var sw = bgImage.width * bgImage.scaleX;
+    var sh = bgImage.height * bgImage.scaleY;
+    var minLeft = W - sw / 2;
+    var maxLeft = sw / 2;
+    var minTop = H - sh / 2;
+    var maxTop = sh / 2;
+    if (bgImage.left > maxLeft) bgImage.left = maxLeft;
+    if (bgImage.left < minLeft) bgImage.left = minLeft;
+    if (bgImage.top > maxTop) bgImage.top = maxTop;
+    if (bgImage.top < minTop) bgImage.top = minTop;
+  }
+
   // Zoom fond (désactivé pour les couleurs unies)
   document.getElementById('mpe-bg-zoom').addEventListener('input', function(e){
     if (!bgImage || bgImage.type === 'rect') return;
@@ -337,6 +351,7 @@ function mpeInit() {
       bgImage.left = W / 2;
       bgImage.top = H / 2;
     }
+    clampBg();
     bgImage.setCoords();
     canvas.requestRenderAll();
   });
