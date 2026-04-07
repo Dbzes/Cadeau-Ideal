@@ -1,3 +1,11 @@
+<div id="mpe-loader" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:99999;align-items:center;justify-content:center;flex-direction:column;">
+  <div style="width:70px;height:70px;border:6px solid rgba(255,255,255,.25);border-top-color:#ee7a03;border-radius:50%;animation:mpe-spin 1s linear infinite;"></div>
+  <div style="color:#fff;margin-top:18px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;">Génération de votre aperçu HD...</div>
+</div>
+<style>
+@keyframes mpe-spin { to { transform: rotate(360deg); } }
+</style>
+
 <div id="mpe-confirm-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:99998;align-items:center;justify-content:center;padding:20px;">
   <div style="background:#fff;border-radius:8px;max-width:440px;width:100%;padding:28px;box-shadow:0 10px 40px rgba(0,0,0,.3);text-align:center;">
     <div style="font-size:44px;margin-bottom:10px;">⚠️</div>
@@ -153,6 +161,9 @@
 </style>
 {/if}
 <script>
+window.mpeSerializeState = null;
+window.mpeComposeHD = null;
+window.MPE_COMPOSE_URL = '{$mpe_compose_url}';
 // Détection d'extensions navigateur interférant
 (function(){
   var shown = false;
@@ -598,6 +609,80 @@ function mpeInit() {
     loadTemplateOverlay();
     canvas.requestRenderAll();
   });
+
+  // Sérialisation d'état pour recomposition serveur HD
+  window.mpeSerializeState = function() {
+    if (!canvas) return null;
+    var state = {
+      canvasW: W,
+      canvasH: H,
+      targetW: Math.round(TEMPLATE_W * 150 * 0.0393701),
+      targetH: Math.round(TEMPLATE_H * 150 * 0.0393701),
+      bg: null,
+      images: [],
+      texts: []
+    };
+    canvas.getObjects().forEach(function(o){
+      if (o.mpeIsTemplate) return;
+      if (o.mpeIsBg) {
+        if (o.type === 'rect') {
+          state.bg = { color: o.fill };
+        } else if (o.type === 'image') {
+          state.bg = {
+            url: o._originalElement ? o._originalElement.src : (o.getSrc ? o.getSrc() : null),
+            left: o.left, top: o.top,
+            zoom: bgZoom
+          };
+        }
+        return;
+      }
+      if (o.type === 'image') {
+        state.images.push({
+          url: o._originalElement ? o._originalElement.src : (o.getSrc ? o.getSrc() : null),
+          left: o.left, top: o.top,
+          scaleX: o.scaleX, scaleY: o.scaleY,
+          angle: o.angle || 0
+        });
+      } else if (o.type === 'i-text' || o.type === 'text' || o.type === 'textbox') {
+        state.texts.push({
+          text: o.text,
+          fontFamily: o.fontFamily,
+          fontSize: o.fontSize,
+          fill: o.fill,
+          bold: o.fontWeight === 'bold' || o.fontWeight === 700,
+          italic: o.fontStyle === 'italic',
+          left: o.left, top: o.top,
+          angle: o.angle || 0
+        });
+      }
+    });
+    return state;
+  };
+
+  // Appel serveur de recomposition HD avec loader
+  window.mpeComposeHD = function(cb) {
+    var state = window.mpeSerializeState();
+    if (!state) { cb && cb({success:false, error:'État indisponible'}); return; }
+    showLoader();
+    fetch(window.MPE_COMPOSE_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(state),
+      credentials: 'same-origin'
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(d){ hideLoader(); cb && cb(d); })
+    .catch(function(e){ hideLoader(); cb && cb({success:false, error:String(e)}); });
+  };
+
+  function showLoader() {
+    var el = document.getElementById('mpe-loader');
+    if (el) el.style.display = 'flex';
+  }
+  function hideLoader() {
+    var el = document.getElementById('mpe-loader');
+    if (el) el.style.display = 'none';
+  }
 
   // Resize responsive
   window.addEventListener('resize', function(){

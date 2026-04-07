@@ -412,9 +412,54 @@ class Mousepadeditor extends Module
         } else {
             $list[$name] = true;
             $msg = sprintf($this->l('Police "%s" activée.'), $name);
+            // Télécharger Google Font pour recomposition serveur
+            if (in_array($name, self::GOOGLE_FONTS) || in_array($name, self::THEME_FONTS)) {
+                $this->downloadGoogleFont($name);
+            }
         }
         Configuration::updateValue('MOUSEPAD_ENABLED_FONTS', json_encode($list));
         return $this->displayConfirmation($msg);
+    }
+
+    protected function downloadGoogleFont($family)
+    {
+        $cacheDir = _PS_MODULE_DIR_ . $this->name . '/uploads/fonts_cache/';
+        if (!is_dir($cacheDir)) { @mkdir($cacheDir, 0755, true); }
+
+        $cssUrl = 'https://fonts.googleapis.com/css?family=' . urlencode($family) . ':400,700&display=swap';
+        $ctx = stream_context_create(['http' => ['header' => "User-Agent: Mozilla/5.0\r\n", 'timeout' => 10]]);
+        $css = @file_get_contents($cssUrl, false, $ctx);
+        if (!$css) return false;
+
+        // Parse chaque @font-face
+        if (!preg_match_all('/@font-face\s*\{[^}]*?font-weight:\s*(\d+)[^}]*?src:\s*url\(([^)]+)\)\s*format\([\'"]?(truetype|woff2?|opentype)[\'"]?\)/is', $css, $matches, PREG_SET_ORDER)) {
+            // Fallback plus simple
+            preg_match_all('/src:\s*url\(([^)]+)\)/i', $css, $m2);
+            if (!empty($m2[1])) {
+                $url = trim($m2[1][0], '"\'');
+                $data = @file_get_contents($url, false, $ctx);
+                if ($data) {
+                    $ext = strpos($url, '.woff2') ? 'woff2' : (strpos($url, '.ttf') ? 'ttf' : 'woff');
+                    if ($ext === 'ttf') {
+                        file_put_contents($cacheDir . str_replace(' ', '', $family) . '.ttf', $data);
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        foreach ($matches as $m) {
+            $weight = (int) $m[1];
+            $url = trim($m[2], '"\'');
+            $format = $m[3];
+            if ($format !== 'truetype') continue; // on ne garde que TTF
+            $data = @file_get_contents($url, false, $ctx);
+            if (!$data) continue;
+            $suffix = $weight >= 700 ? '-Bold' : '';
+            file_put_contents($cacheDir . str_replace(' ', '', $family) . $suffix . '.ttf', $data);
+        }
+        return true;
     }
 
     protected function getActiveGoogleFonts()
@@ -819,6 +864,7 @@ class Mousepadeditor extends Module
         }
 
         $template = $this->getTemplate();
+        $composeUrl = $this->context->link->getModuleLink('mousepadeditor', 'compose', [], true);
 
         $this->context->smarty->assign([
             'mpe_backgrounds' => $backgrounds,
@@ -830,6 +876,7 @@ class Mousepadeditor extends Module
             'mpe_default_fonts' => array_merge($activeWebsafe, $activeTheme, $activeGoogle),
             'mpe_google_url' => $googleFrontUrl,
             'mpe_template' => $template,
+            'mpe_compose_url' => $composeUrl,
         ]);
 
         return $this->display(__FILE__, 'views/templates/hook/editor.tpl');
