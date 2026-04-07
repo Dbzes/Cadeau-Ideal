@@ -51,6 +51,7 @@ class Mousepadeditor extends Module
         return parent::install()
             && $this->registerHook('displayMousepadEditor')
             && $this->registerHook('header')
+            && $this->registerHook('actionPurgatorRegister')
             && Configuration::updateValue('MOUSEPAD_PRODUCT_IDS', '')
             && Configuration::updateValue('MOUSEPAD_BACKGROUNDS', json_encode([]))
             && Configuration::updateValue('MOUSEPAD_FONTS', json_encode([]))
@@ -84,6 +85,59 @@ class Mousepadeditor extends Module
             }
         }
         return null;
+    }
+
+    public function hookActionPurgatorRegister($params)
+    {
+        if (!class_exists('Purgator')) return;
+        $delay = isset($params['delay']) ? (int) $params['delay'] : 90;
+        $cutoff = time() - ($delay * 86400);
+
+        // Source 1 : fonds clients
+        $files = [];
+        $base = _PS_MODULE_DIR_ . $this->name . '/uploads/customer/';
+        if (is_dir($base)) {
+            foreach (glob($base . '*/bg.*') as $f) {
+                if (filemtime($f) < $cutoff) {
+                    $rel = str_replace(_PS_MODULE_DIR_, '', $f);
+                    $files[] = [
+                        'path' => $f,
+                        'name' => basename(dirname($f)) . '/' . basename($f),
+                        'size' => filesize($f),
+                        'mtime' => filemtime($f),
+                        'preview_url' => _MODULE_DIR_ . $rel,
+                    ];
+                }
+            }
+        }
+        Purgator::register([
+            'source_id' => 'mousepadeditor_customer_bg',
+            'source_name' => $this->l('Editor Mouse Pad — Fonds clients'),
+            'files' => $files,
+        ]);
+
+        // Source 2 : aperçus HD générés (orphelins en /uploads/previews/)
+        $files2 = [];
+        $previewDir = _PS_MODULE_DIR_ . $this->name . '/uploads/previews/';
+        if (is_dir($previewDir)) {
+            foreach (glob($previewDir . '*.png') as $f) {
+                if (filemtime($f) < $cutoff) {
+                    $rel = str_replace(_PS_MODULE_DIR_, '', $f);
+                    $files2[] = [
+                        'path' => $f,
+                        'name' => basename($f),
+                        'size' => filesize($f),
+                        'mtime' => filemtime($f),
+                        'preview_url' => _MODULE_DIR_ . $rel,
+                    ];
+                }
+            }
+        }
+        Purgator::register([
+            'source_id' => 'mousepadeditor_previews',
+            'source_name' => $this->l('Editor Mouse Pad — Aperçus HD non finalisés'),
+            'files' => $files2,
+        ]);
     }
 
     public function hookHeader($params)
