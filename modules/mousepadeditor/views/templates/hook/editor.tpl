@@ -1,6 +1,7 @@
 <div class="mousepad-editor">
   <h3 class="mpe-title">Zone de personnalisation</h3>
 
+  <div class="mpe-layout">
   <div class="mpe-canvas-wrap">
     <canvas id="mpe-canvas"></canvas>
     <div class="mpe-canvas-toolbar">
@@ -109,6 +110,7 @@
       </div>
     </div>
 
+  </div>
   </div>
 </div>
 
