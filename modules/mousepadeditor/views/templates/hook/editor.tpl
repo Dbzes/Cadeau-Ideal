@@ -283,8 +283,25 @@ function mpeInit() {
   }
 
   // Empêche la sélection active du fond (pas de suppression via toolbar)
-  // Le drag reste possible via evented=true mais getActiveObject ignore le bg
   function isBgObject(o) { return o && o.mpeIsBg === true; }
+
+  // Plaquage aimanté du fond contre les bords lors du drag
+  if (fabricReady && canvas) {
+    canvas.on('object:moving', function(e){
+      var obj = e.target;
+      if (!obj || !obj.mpeIsBg || obj.type === 'rect') return;
+      var sw = obj.width * obj.scaleX;
+      var sh = obj.height * obj.scaleY;
+      var minLeft = W - sw / 2;
+      var maxLeft = sw / 2;
+      var minTop = H - sh / 2;
+      var maxTop = sh / 2;
+      if (obj.left > maxLeft) obj.left = maxLeft;
+      if (obj.left < minLeft) obj.left = minLeft;
+      if (obj.top > maxTop) obj.top = maxTop;
+      if (obj.top < minTop) obj.top = minTop;
+    });
+  }
 
   // Click sur thumb fond
   document.querySelectorAll('.mpe-bg-thumb').forEach(function(t){ bindBgClick(t); });
