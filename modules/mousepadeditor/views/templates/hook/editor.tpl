@@ -8,8 +8,7 @@
 
 <div id="mpe-confirm-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:99998;align-items:center;justify-content:center;padding:20px;">
   <div style="background:#fff;border-radius:8px;max-width:440px;width:100%;padding:28px;box-shadow:0 10px 40px rgba(0,0,0,.3);text-align:center;">
-    <div style="font-size:44px;margin-bottom:10px;">⚠️</div>
-    <h3 style="color:#004774;margin:0 0 12px;font-size:20px;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">Tout effacer ?</h3>
+    <h3 style="color:#004774;margin:0 0 12px;font-size:22px;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">Tout effacer ?</h3>
     <p style="color:#666;font-size:14px;line-height:1.5;margin:0 0 22px;">
       Votre création actuelle (fond, images et textes) sera intégralement supprimée.
       <br/>Cette action est <strong>irréversible</strong>.
