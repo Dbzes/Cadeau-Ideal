@@ -132,7 +132,7 @@ class Mousepadeditor extends Module
             $output .= $this->handleFontDelete(Tools::getValue('deleteFont'));
         }
 
-        return $output . $this->renderStatusPanel() . $this->renderForm() . $this->renderBackgroundsManager() . $this->renderFontsManager();
+        return $output . $this->renderForm() . $this->renderBackgroundsManager() . $this->renderFontsManager();
     }
 
     protected function getBackgrounds()
@@ -375,8 +375,31 @@ class Mousepadeditor extends Module
         $url = $this->_path . self::FONT_DIR;
         $base = AdminController::$currentIndex . '&configure=' . $this->name . '&token=' . Tools::getAdminTokenLite('AdminModules');
 
+        $defaultFonts = ['Open Sans', 'Bebas Neue', 'Arial'];
+        $totalFonts = count($defaultFonts) + count($list);
+
         $html = '<div class="panel"><h3><i class="icon-font"></i> ' . $this->l('Gestion des polices') . '</h3>';
-        $html .= '<p style="color:#888;font-size:13px;">' . $this->l('Polices par défaut toujours disponibles : Open Sans, Bebas Neue, Arial.') . '</p>';
+
+        // Liste des polices actuellement disponibles client
+        $html .= '<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400&family=Bebas+Neue&display=swap" rel="stylesheet">';
+        $html .= '<div style="background:#f0f7fc;border:1px solid #cfe2f0;border-radius:4px;padding:14px 18px;margin-bottom:18px;">';
+        $html .= '<div style="font-weight:600;color:#004774;margin-bottom:10px;font-size:14px;">' . sprintf($this->l('Polices actuellement disponibles côté client (%d)'), $totalFonts) . '</div>';
+        $html .= '<div style="display:flex;flex-wrap:wrap;gap:10px;">';
+        foreach ($defaultFonts as $df) {
+            $html .= '<span style="background:#fff;border:1px solid #cfe2f0;padding:6px 14px;border-radius:20px;font-family:\'' . $df . '\',sans-serif;font-size:14px;color:#004774;">' . $df . ' <span style="font-size:10px;color:#999;">(défaut)</span></span>';
+        }
+        if (!empty($list)) {
+            $html .= '<style>';
+            foreach ($list as $f) {
+                $fmt = $f['ext'] === 'ttf' ? 'truetype' : ($f['ext'] === 'otf' ? 'opentype' : $f['ext']);
+                $html .= '@font-face{font-family:"' . htmlspecialchars($f['family']) . '";src:url("' . $url . $f['file'] . '") format("' . $fmt . '");}';
+            }
+            $html .= '</style>';
+            foreach ($list as $f) {
+                $html .= '<span style="background:#fff;border:1px solid #ee7a03;padding:6px 14px;border-radius:20px;font-family:\'' . htmlspecialchars($f['family']) . '\',sans-serif;font-size:14px;color:#004774;">' . htmlspecialchars($f['family']) . ' <span style="font-size:10px;color:#ee7a03;">(custom)</span></span>';
+            }
+        }
+        $html .= '</div></div>';
         $html .= '<form method="post" enctype="multipart/form-data" id="mpe-font-form">';
         $html .= '<label class="mpe-dropzone" id="mpe-fdz">
             <div class="mpe-dropzone-icon">🔤</div>
