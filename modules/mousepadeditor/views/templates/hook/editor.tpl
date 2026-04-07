@@ -1,3 +1,18 @@
+<div id="mpe-confirm-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:99998;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:#fff;border-radius:8px;max-width:440px;width:100%;padding:28px;box-shadow:0 10px 40px rgba(0,0,0,.3);text-align:center;">
+    <div style="font-size:44px;margin-bottom:10px;">⚠️</div>
+    <h3 style="color:#004774;margin:0 0 12px;font-size:20px;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">Tout effacer ?</h3>
+    <p style="color:#666;font-size:14px;line-height:1.5;margin:0 0 22px;">
+      Votre création actuelle (fond, images et textes) sera intégralement supprimée.
+      <br/>Cette action est <strong>irréversible</strong>.
+    </p>
+    <div style="display:flex;gap:10px;justify-content:center;">
+      <button type="button" id="mpe-confirm-cancel" style="background:#fff;color:#666;border:1px solid #ddd;padding:12px 24px;border-radius:4px;font-weight:600;cursor:pointer;font-size:14px;">Annuler</button>
+      <button type="button" id="mpe-confirm-ok" style="background:#e74c3c;color:#fff;border:none;padding:12px 24px;border-radius:4px;font-weight:600;cursor:pointer;font-size:14px;">Oui, tout effacer</button>
+    </div>
+  </div>
+</div>
+
 <div id="mpe-ext-warning" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:99999;align-items:center;justify-content:center;padding:20px;">
   <div style="background:#fff;border-radius:8px;max-width:480px;width:100%;padding:28px;box-shadow:0 10px 40px rgba(0,0,0,.3);text-align:center;">
     <div style="font-size:48px;margin-bottom:10px;">⚠️</div>
@@ -338,6 +353,7 @@ function mpeInit() {
 
   if (cdel && uploadUrl) {
     cdel.addEventListener('click', function(){
+      var wasActive = pimg && pimg.classList.contains('mpe-active');
       var fd = new FormData();
       fd.append('action', 'delete');
       fetch(uploadUrl, { method: 'POST', body: fd, credentials: 'same-origin' })
@@ -349,6 +365,15 @@ function mpeInit() {
             cfile.value = '';
             pimg.style.backgroundImage = '';
             pimg.dataset.bg = '';
+            pimg.classList.remove('mpe-active');
+            // Retirer aussi le fond du canvas s'il correspondait
+            if (wasActive && canvas && bgImage) {
+              canvas.remove(bgImage);
+              bgImage = null;
+              canvas.backgroundColor = '#f0f0f0';
+              document.getElementById('mpe-bg-controls').style.display = 'none';
+              canvas.requestRenderAll();
+            }
           }
         });
     });
@@ -486,7 +511,16 @@ function mpeInit() {
   // Reset
   document.getElementById('mpe-reset').addEventListener('click', function(){
     if (!canvas) return;
-    if (!confirm('Tout réinitialiser ?')) return;
+    document.getElementById('mpe-confirm-modal').style.display = 'flex';
+  });
+
+  document.getElementById('mpe-confirm-cancel').addEventListener('click', function(){
+    document.getElementById('mpe-confirm-modal').style.display = 'none';
+  });
+
+  document.getElementById('mpe-confirm-ok').addEventListener('click', function(){
+    document.getElementById('mpe-confirm-modal').style.display = 'none';
+    if (!canvas) return;
     canvas.clear();
     canvas.backgroundColor = '#f0f0f0';
     bgImage = null;
@@ -494,6 +528,7 @@ function mpeInit() {
     updateImgCounter();
     document.getElementById('mpe-bg-controls').style.display = 'none';
     document.querySelectorAll('.mpe-bg-thumb').forEach(function(x){ x.classList.remove('mpe-active'); });
+    canvas.requestRenderAll();
   });
 
   // Resize responsive
