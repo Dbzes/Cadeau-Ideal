@@ -172,6 +172,14 @@
       width: 100% !important;
       min-width: 0 !important;
     }
+    .js-mailalert button,
+    button.js-mailalert-submit,
+    .product-add-to-cart button {
+      max-width: 100%;
+      white-space: normal !important;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
     @media (max-width: 767px) {
       .header-top-bar {
         display: none;
