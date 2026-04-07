@@ -2,9 +2,9 @@
   <div style="width:70px;height:70px;border:6px solid rgba(255,255,255,.25);border-top-color:#ee7a03;border-radius:50%;animation:mpe-spin 1s linear infinite;"></div>
   <div style="color:#fff;margin-top:18px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;">Génération de votre aperçu HD...</div>
 </div>
-<style>
+{literal}<style>
 @keyframes mpe-spin { to { transform: rotate(360deg); } }
-</style>
+</style>{/literal}
 
 <div id="mpe-confirm-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:99998;align-items:center;justify-content:center;padding:20px;">
   <div style="background:#fff;border-radius:8px;max-width:440px;width:100%;padding:28px;box-shadow:0 10px 40px rgba(0,0,0,.3);text-align:center;">
