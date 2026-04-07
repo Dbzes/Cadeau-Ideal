@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+
 .mousepad-editor {
   width: 100%;
   max-width: 100%;
@@ -14,8 +16,10 @@
 }
 
 .mpe-title {
-  font-size: 20px;
-  font-weight: 700;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 32px;
+  font-weight: 400;
+  letter-spacing: 1px;
   color: #004774;
   margin: 0 0 20px 0;
 }

@@ -1,5 +1,5 @@
 <div class="mousepad-editor">
-  <h3 class="mpe-title">Personnalisez votre tapis de souris</h3>
+  <h3 class="mpe-title">Zone de personnalisation</h3>
 
   <div class="mpe-accordion">
 
@@ -11,12 +11,13 @@
       <div class="mpe-body" id="mpe-fonds">
         <p class="mpe-hint">Choisissez un fond pour votre tapis :</p>
         <div class="mpe-grid">
-          <div class="mpe-thumb"></div>
-          <div class="mpe-thumb"></div>
-          <div class="mpe-thumb"></div>
-          <div class="mpe-thumb"></div>
-          <div class="mpe-thumb"></div>
-          <div class="mpe-thumb"></div>
+          {if isset($mpe_backgrounds) && $mpe_backgrounds|count > 0}
+            {foreach from=$mpe_backgrounds item=bg}
+              <div class="mpe-thumb mpe-thumb-img" style="background-image:url('{$mpe_bg_url}{$bg}');" data-bg="{$mpe_bg_url}{$bg}"></div>
+            {/foreach}
+          {else}
+            <p class="mpe-hint">Aucun fond disponible pour le moment.</p>
+          {/if}
         </div>
       </div>
     </div>
