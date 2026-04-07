@@ -926,6 +926,7 @@ class Mousepadeditor extends Module
             'mpe_bg_url' => $bgUrl,
             'mpe_customer_bg' => $customerBg,
             'mpe_upload_url' => $this->context->link->getModuleLink('mousepadeditor', 'upload', [], true),
+            'mpe_uploadimage_url' => $this->context->link->getModuleLink('mousepadeditor', 'uploadimage', [], true),
             'mpe_fonts' => $activeCustom,
             'mpe_font_url' => $fontUrl,
             'mpe_default_fonts' => array_merge($activeWebsafe, $activeTheme, $activeGoogle),

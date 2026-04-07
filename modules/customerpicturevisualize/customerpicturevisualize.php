@@ -74,6 +74,27 @@ class CustomerPictureVisualize extends Module
             }
         }
 
+        // Images canvas clients
+        if (is_dir($custDir)) {
+            foreach (scandir($custDir) as $key) {
+                if ($key === '.' || $key === '..') continue;
+                $imgDir = $custDir . $key . '/images/';
+                if (!is_dir($imgDir)) continue;
+                foreach (glob($imgDir . '*') as $f) {
+                    if (!is_file($f)) continue;
+                    $items[] = [
+                        'type' => $this->l('Image client'),
+                        'thumb_url' => $baseUrl . 'customer/' . $key . '/images/' . basename($f),
+                        'full_url' => $baseUrl . 'customer/' . $key . '/images/' . basename($f),
+                        'key' => $key,
+                        'name' => basename($f),
+                        'size' => filesize($f),
+                        'mtime' => date('Y-m-d H:i', filemtime($f)),
+                    ];
+                }
+            }
+        }
+
         // Aperçus HD générés (composés mais pas forcément ajoutés au panier)
         $prevDir = $base . 'previews/';
         if (is_dir($prevDir)) {
@@ -111,16 +132,13 @@ class CustomerPictureVisualize extends Module
         $html .= '<div class="panel">';
         $html .= '<div style="display:flex;flex-wrap:wrap;gap:14px;">';
         foreach ($items as $i) {
-            $badge = $i['type'] === 'Fond client' ? '#3498db' : '#ee7a03';
+            $badge = $i['type'] === 'Fond client' ? '#3498db' : ($i['type'] === 'Image client' ? '#27ae60' : '#ee7a03');
             $html .= '<div style="border:1px solid #ddd;border-radius:6px;padding:10px;width:180px;background:#fafafa;">';
             $html .= '<a href="#" class="cpv-zoom" data-full="' . htmlspecialchars($i['full_url']) . '">';
             $html .= '<img src="' . htmlspecialchars($i['thumb_url']) . '" style="width:100%;height:120px;object-fit:cover;border-radius:4px;display:block;" />';
             $html .= '</a>';
             $html .= '<div style="font-size:10px;color:#fff;background:' . $badge . ';display:inline-block;padding:2px 6px;border-radius:3px;margin-top:6px;">' . htmlspecialchars($i['type']) . '</div>';
-            if ($i['key']) {
-                $html .= '<div style="font-size:10px;color:#666;margin-top:4px;word-break:break-all;">' . $this->l('Clé') . ' : ' . htmlspecialchars($i['key']) . '</div>';
-            }
-            $html .= '<div style="font-size:10px;color:#999;margin-top:4px;">' . $this->formatBytes($i['size']) . ' · ' . htmlspecialchars($i['mtime']) . '</div>';
+            $html .= '<div style="font-size:10px;color:#999;margin-top:6px;">' . $this->formatBytes($i['size']) . ' · ' . htmlspecialchars($i['mtime']) . '</div>';
             $html .= '</div>';
         }
         $html .= '</div></div>';

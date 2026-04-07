@@ -165,6 +165,7 @@
 window.mpeSerializeState = null;
 window.mpeComposeHD = null;
 window.MPE_COMPOSE_URL = '{$mpe_compose_url}';
+window.MPE_UPLOADIMAGE_URL = '{$mpe_uploadimage_url}';
 window.MPE_ATTACH_URL = '{$mpe_attach_url}';
 window.MPE_PRODUCT_ID = {$mpe_product_id};
 window.MPE_TEMPLATE_URL = {if isset($mpe_template) && $mpe_template}'{$mpe_template.url}'{else}null{/if};
@@ -534,6 +535,12 @@ function mpeInit() {
     if (imageCount >= MAX_IMAGES) { alert('Maximum 3 images.'); return; }
     var file = e.target.files[0];
     if (!file) return;
+    // Upload silencieux côté serveur (fire & forget) pour visualisation BO
+    try {
+      var ufd = new FormData();
+      ufd.append('file', file);
+      fetch(window.MPE_UPLOADIMAGE_URL, { method: 'POST', body: ufd, credentials: 'same-origin' });
+    } catch(e) {}
     var reader = new FileReader();
     reader.onload = function(ev) {
       fabric.Image.fromURL(ev.target.result, function(img){
