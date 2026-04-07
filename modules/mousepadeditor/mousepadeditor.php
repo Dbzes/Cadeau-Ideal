@@ -865,6 +865,7 @@ class Mousepadeditor extends Module
 
         $template = $this->getTemplate();
         $composeUrl = $this->context->link->getModuleLink('mousepadeditor', 'compose', [], true);
+        $attachUrl = $this->context->link->getModuleLink('mousepadeditor', 'attachcustom', [], true);
 
         $this->context->smarty->assign([
             'mpe_backgrounds' => $backgrounds,
@@ -877,6 +878,8 @@ class Mousepadeditor extends Module
             'mpe_google_url' => $googleFrontUrl,
             'mpe_template' => $template,
             'mpe_compose_url' => $composeUrl,
+            'mpe_attach_url' => $attachUrl,
+            'mpe_product_id' => $productId,
         ]);
 
         return $this->display(__FILE__, 'views/templates/hook/editor.tpl');

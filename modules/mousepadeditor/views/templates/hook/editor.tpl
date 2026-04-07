@@ -164,6 +164,8 @@
 window.mpeSerializeState = null;
 window.mpeComposeHD = null;
 window.MPE_COMPOSE_URL = '{$mpe_compose_url}';
+window.MPE_ATTACH_URL = '{$mpe_attach_url}';
+window.MPE_PRODUCT_ID = {$mpe_product_id};
 // Détection d'extensions navigateur interférant
 (function(){
   var shown = false;
@@ -683,6 +685,46 @@ function mpeInit() {
     var el = document.getElementById('mpe-loader');
     if (el) el.style.display = 'none';
   }
+
+  // Interception ajout panier : génère HD puis attache la customization
+  (function interceptAddToCart(){
+    var form = document.getElementById('add-to-cart-or-refresh');
+    if (!form) return;
+    var btn = form.querySelector('[data-button-action="add-to-cart"]') || form.querySelector('button[type="submit"]');
+    if (!btn) return;
+    var bypass = false;
+
+    btn.addEventListener('click', function(e){
+      if (bypass) return;
+      var state = window.mpeSerializeState && window.mpeSerializeState();
+      if (!state) return;
+      var hasContent = state.bg || (state.images && state.images.length) || (state.texts && state.texts.length);
+      if (!hasContent) return;
+
+      e.preventDefault();
+      e.stopImmediatePropagation();
+
+      window.mpeComposeHD(function(res){
+        if (!res || !res.success) {
+          alert('Erreur génération aperçu : ' + (res && res.error || 'inconnue'));
+          return;
+        }
+        var fd = new FormData();
+        fd.append('id_product', window.MPE_PRODUCT_ID);
+        fd.append('hd_url', res.previewUrl);
+        fetch(window.MPE_ATTACH_URL, { method:'POST', body: fd, credentials:'same-origin' })
+          .then(function(r){ return r.json(); })
+          .then(function(d){
+            if (!d.success) { alert('Erreur attachement : ' + d.error); return; }
+            var customField = document.getElementById('product_customization_id');
+            if (customField) customField.value = d.id_customization;
+            bypass = true;
+            btn.click();
+          })
+          .catch(function(err){ alert('Erreur réseau : ' + err); });
+      });
+    }, true);
+  })();
 
   // Resize responsive
   window.addEventListener('resize', function(){
