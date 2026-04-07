@@ -262,10 +262,11 @@ function mpeInit() {
   var MAX_IMAGES = 3;
   var templateOverlay = null;
   var STORAGE_KEY = 'mpe_state_' + window.MPE_PRODUCT_ID;
-  var restoring = false;
+  var restoring = true; // bloque les saves jusqu'à la fin de restoreState
+  var restoreDone = false;
 
   function saveState() {
-    if (restoring || !canvas) return;
+    if (restoring || !restoreDone || !canvas) return;
     try {
       var images = [];
       var texts = [];
@@ -303,13 +304,12 @@ function mpeInit() {
 
   function restoreState() {
     var raw;
-    try { raw = localStorage.getItem(STORAGE_KEY); } catch(e) { return; }
+    try { raw = localStorage.getItem(STORAGE_KEY); } catch(e) { restoring = false; restoreDone = true; return; }
     console.log('[mpe] restoreState raw=', raw ? raw.length + ' chars' : 'EMPTY', 'key=', STORAGE_KEY);
-    if (!raw) return;
+    if (!raw) { restoring = false; restoreDone = true; return; }
     var state;
-    try { state = JSON.parse(raw); } catch(e) { return; }
-    if (!state) return;
-    restoring = true;
+    try { state = JSON.parse(raw); } catch(e) { restoring = false; restoreDone = true; return; }
+    if (!state) { restoring = false; restoreDone = true; return; }
 
     var pendingImages = (state.images || []).slice();
     var pendingTexts = (state.texts || []).slice();
@@ -346,6 +346,8 @@ function mpeInit() {
         bringTemplateToFront();
         canvas.renderAll();
         restoring = false;
+        restoreDone = true;
+        console.log('[mpe] restore done');
       }
       nextImg();
     }
