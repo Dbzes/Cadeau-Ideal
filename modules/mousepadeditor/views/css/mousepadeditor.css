@@ -103,6 +103,29 @@
   border-radius: 4px;
   font-size: 14px;
 }
+.mpe-style-btns {
+  display: flex;
+  gap: 4px;
+}
+.mpe-style-btn {
+  width: 36px;
+  height: 36px;
+  border: 1px solid #ccc;
+  background: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 15px;
+  color: #004774;
+  transition: all .2s;
+}
+.mpe-style-btn:hover {
+  border-color: #ee7a03;
+}
+.mpe-style-btn.mpe-active-style {
+  background: #ee7a03;
+  color: #fff;
+  border-color: #ee7a03;
+}
 .mpe-text-controls input[type="color"] {
   width: 50px;
   height: 36px;

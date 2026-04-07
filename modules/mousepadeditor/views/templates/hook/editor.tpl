@@ -91,6 +91,12 @@
           <label>Couleur
             <input type="color" id="mpe-text-color" value="#000000" />
           </label>
+          <label>Style
+            <div class="mpe-style-btns">
+              <button type="button" class="mpe-style-btn" id="mpe-text-bold" title="Gras"><b>B</b></button>
+              <button type="button" class="mpe-style-btn" id="mpe-text-italic" title="Italique"><i>I</i></button>
+            </div>
+          </label>
         </div>
         <button type="button" class="mpe-upload" id="mpe-text-add">+ Ajouter le texte</button>
       </div>
@@ -315,6 +321,12 @@ function mpeInit() {
   }
 
   // Texte
+  ['mpe-text-bold','mpe-text-italic'].forEach(function(id){
+    document.getElementById(id).addEventListener('click', function(){
+      this.classList.toggle('mpe-active-style');
+    });
+  });
+
   document.getElementById('mpe-text-add').addEventListener('click', function(){
     if (!fabricReady || !canvas) { alert('Éditeur non chargé. Vérifiez votre connexion.'); return; }
     var input = document.getElementById('mpe-text-input');
@@ -323,10 +335,14 @@ function mpeInit() {
     var font = document.getElementById('mpe-text-font').value;
     var size = parseInt(document.getElementById('mpe-text-size').value, 10) || 32;
     var color = document.getElementById('mpe-text-color').value;
+    var bold = document.getElementById('mpe-text-bold').classList.contains('mpe-active-style');
+    var italic = document.getElementById('mpe-text-italic').classList.contains('mpe-active-style');
     var t = new fabric.IText(txt, {
       left: W / 2, top: H / 2,
       originX: 'center', originY: 'center',
       fontFamily: font, fontSize: size, fill: color,
+      fontWeight: bold ? 'bold' : 'normal',
+      fontStyle: italic ? 'italic' : 'normal',
       cornerColor: '#ee7a03', borderColor: '#ee7a03', cornerSize: 10, transparentCorners: false
     });
     canvas.add(t);
