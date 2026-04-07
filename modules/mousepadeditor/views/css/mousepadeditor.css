@@ -15,6 +15,13 @@
   box-sizing: border-box;
 }
 
+.mpe-canvas-caption {
+  text-align: center;
+  font-size: 14px;
+  color: #666;
+  margin: 0 0 10px;
+  font-style: italic;
+}
 .mpe-title {
   font-family: 'Bebas Neue', sans-serif;
   font-size: 32px;

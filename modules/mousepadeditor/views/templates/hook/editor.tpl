@@ -39,6 +39,7 @@
 
   <div class="mpe-layout">
   <div class="mpe-canvas-wrap">
+    <p class="mpe-canvas-caption">Aperçu de votre tapis de souris personnalisable</p>
     <canvas id="mpe-canvas"></canvas>
     <div class="mpe-canvas-toolbar">
       <button type="button" class="mpe-tool-btn" id="mpe-delete-selected" title="Supprimer l'élément sélectionné">🗑 Supprimer la sélection</button>
