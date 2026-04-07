@@ -270,7 +270,7 @@ function mpeInit() {
       var images = [];
       var texts = [];
       canvas.getObjects().forEach(function(o){
-        if (o.mpeIsBg || o === templateOverlay) return;
+        if (o.mpeIsBg || o === templateOverlay || o.mpeIsTemplate) return;
         if (o.type === 'image') {
           images.push({
             src: o.getSrc ? o.getSrc() : o._element.src,
