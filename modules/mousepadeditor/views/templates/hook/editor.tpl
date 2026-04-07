@@ -82,12 +82,12 @@
             <select id="mpe-text-font">
               {if isset($mpe_default_fonts)}
                 {foreach from=$mpe_default_fonts item=df}
-                  <option value="{$df}">{$df}</option>
+                  <option value="{$df}" style="font-family:'{$df}', sans-serif;">{$df}</option>
                 {/foreach}
               {/if}
               {if isset($mpe_fonts) && $mpe_fonts|count > 0}
                 {foreach from=$mpe_fonts item=f}
-                  <option value="{$f.family}">{$f.family}</option>
+                  <option value="{$f.family}" style="font-family:'{$f.family}', sans-serif;">{$f.family}</option>
                 {/foreach}
               {/if}
             </select>
