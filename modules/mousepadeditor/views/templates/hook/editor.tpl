@@ -257,9 +257,121 @@ function mpeInit() {
 
   var bgImage = null;
   var bgZoom = 1;
+  var bgValue = null;
   var imageCount = 0;
   var MAX_IMAGES = 3;
   var templateOverlay = null;
+  var STORAGE_KEY = 'mpe_state_' + window.MPE_PRODUCT_ID;
+  var restoring = false;
+
+  function saveState() {
+    if (restoring || !canvas) return;
+    try {
+      var images = [];
+      var texts = [];
+      canvas.getObjects().forEach(function(o){
+        if (o.mpeIsBg || o === templateOverlay) return;
+        if (o.type === 'image') {
+          images.push({
+            src: o.getSrc ? o.getSrc() : o._element.src,
+            left: o.left, top: o.top,
+            scaleX: o.scaleX, scaleY: o.scaleY,
+            angle: o.angle || 0
+          });
+        } else if (o.type === 'i-text' || o.type === 'text' || o.type === 'textbox') {
+          texts.push({
+            text: o.text,
+            fontFamily: o.fontFamily, fontSize: o.fontSize, fill: o.fill,
+            fontWeight: o.fontWeight, fontStyle: o.fontStyle,
+            left: o.left, top: o.top, angle: o.angle || 0,
+            scaleX: o.scaleX, scaleY: o.scaleY
+          });
+        }
+      });
+      var bg = null;
+      if (bgValue) {
+        bg = { value: bgValue, zoom: bgZoom };
+        if (bgImage && bgImage.type !== 'rect') {
+          bg.left = bgImage.left;
+          bg.top = bgImage.top;
+        }
+      }
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ bg: bg, images: images, texts: texts }));
+    } catch(e) {}
+  }
+
+  function restoreState() {
+    var raw;
+    try { raw = localStorage.getItem(STORAGE_KEY); } catch(e) { return; }
+    if (!raw) return;
+    var state;
+    try { state = JSON.parse(raw); } catch(e) { return; }
+    if (!state) return;
+    restoring = true;
+
+    var pendingImages = (state.images || []).slice();
+    var pendingTexts = (state.texts || []).slice();
+
+    function loadImagesAndTexts() {
+      function nextImg() {
+        if (!pendingImages.length) { loadTexts(); return; }
+        var d = pendingImages.shift();
+        fabric.Image.fromURL(d.src, function(img){
+          img.set({
+            left: d.left, top: d.top,
+            originX: 'center', originY: 'center',
+            scaleX: d.scaleX, scaleY: d.scaleY, angle: d.angle,
+            cornerColor: '#ee7a03', borderColor: '#ee7a03', cornerSize: 10, transparentCorners: false
+          });
+          canvas.add(img);
+          imageCount++;
+          nextImg();
+        });
+      }
+      function loadTexts() {
+        pendingTexts.forEach(function(d){
+          var t = new fabric.IText(d.text, {
+            left: d.left, top: d.top,
+            originX: 'center', originY: 'center',
+            fontFamily: d.fontFamily, fontSize: d.fontSize, fill: d.fill,
+            fontWeight: d.fontWeight, fontStyle: d.fontStyle,
+            scaleX: d.scaleX, scaleY: d.scaleY, angle: d.angle,
+            cornerColor: '#ee7a03', borderColor: '#ee7a03', cornerSize: 10, transparentCorners: false
+          });
+          canvas.add(t);
+        });
+        if (typeof updateImgCounter === 'function') updateImgCounter();
+        bringTemplateToFront();
+        canvas.renderAll();
+        restoring = false;
+      }
+      nextImg();
+    }
+
+    if (state.bg && state.bg.value) {
+      setBackground(state.bg.value, function(obj){
+        if (obj && obj.type !== 'rect' && state.bg.zoom) {
+          bgZoom = state.bg.zoom;
+          var baseScale = Math.max(W / obj.width, H / obj.height);
+          obj.scaleX = baseScale * bgZoom;
+          obj.scaleY = baseScale * bgZoom;
+          if (state.bg.left != null) obj.left = state.bg.left;
+          if (state.bg.top != null) obj.top = state.bg.top;
+          if (bgZoom > 1) {
+            obj.lockMovementX = false;
+            obj.lockMovementY = false;
+            obj.hoverCursor = 'move';
+          }
+          obj.setCoords();
+          var slider = document.getElementById('mpe-bg-zoom');
+          if (slider) slider.value = Math.round(bgZoom * 100);
+        }
+        loadImagesAndTexts();
+      });
+    } else {
+      loadImagesAndTexts();
+    }
+  }
 
   function loadTemplateOverlay() {
     if (!TEMPLATE_URL || !fabricReady || !canvas) return;
@@ -307,9 +419,10 @@ function mpeInit() {
     canvas.renderAll();
   }
 
-  function setBackground(value) {
+  function setBackground(value, cb) {
     if (!fabricReady || !canvas) return;
     removeOldBg();
+    bgValue = value;
 
     // Couleur unie
     if (value && value.charAt(0) === '#') {
@@ -326,6 +439,7 @@ function mpeInit() {
         mpeIsBg: true
       });
       finishBgSetup(rect);
+      if (cb) cb(rect);
       return;
     }
 
@@ -344,6 +458,7 @@ function mpeInit() {
         mpeIsBg: true
       });
       finishBgSetup(img);
+      if (cb) cb(img);
     }, { crossOrigin: 'anonymous' });
   }
 
@@ -366,6 +481,12 @@ function mpeInit() {
       if (obj.top > maxTop) obj.top = maxTop;
       if (obj.top < minTop) obj.top = minTop;
     });
+
+    // Persistance localStorage
+    canvas.on('object:added', saveState);
+    canvas.on('object:removed', saveState);
+    canvas.on('object:modified', saveState);
+    canvas.on('mouse:up', saveState);
   }
 
   // Click sur thumb fond
@@ -398,6 +519,7 @@ function mpeInit() {
   }
 
   // Zoom fond (désactivé pour les couleurs unies)
+  document.getElementById('mpe-bg-zoom').addEventListener('change', function(){ saveState(); });
   document.getElementById('mpe-bg-zoom').addEventListener('input', function(e){
     if (!bgImage || bgImage.type === 'rect') return;
     var z = parseInt(e.target.value, 10) / 100;
@@ -467,6 +589,8 @@ function mpeInit() {
             if (wasActive && canvas && bgImage) {
               canvas.remove(bgImage);
               bgImage = null;
+              bgValue = null;
+              saveState();
               canvas.backgroundColor = '#f0f0f0';
               document.getElementById('mpe-bg-controls').style.display = 'none';
               canvas.requestRenderAll();
@@ -637,8 +761,10 @@ function mpeInit() {
     canvas.clear();
     canvas.backgroundColor = '#f0f0f0';
     bgImage = null;
+    bgValue = null;
     templateOverlay = null;
     imageCount = 0;
+    try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
     updateImgCounter();
     document.getElementById('mpe-bg-controls').style.display = 'none';
     document.querySelectorAll('.mpe-bg-thumb').forEach(function(x){ x.classList.remove('mpe-active'); });
@@ -780,6 +906,11 @@ function mpeInit() {
     bringTemplateToFront();
     canvas.renderAll();
   });
+
+  // Restauration état persisté
+  if (fabricReady && canvas) {
+    setTimeout(restoreState, 300);
+  }
 }
 (function waitFabric(tries){
   if (typeof fabric !== 'undefined') { mpeInit(); return; }
