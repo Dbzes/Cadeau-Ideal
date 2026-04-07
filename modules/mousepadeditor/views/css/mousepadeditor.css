@@ -212,13 +212,21 @@
 }
 
 .mpe-body {
-  display: none;
-  padding: 18px;
+  max-height: 0;
+  overflow: hidden;
+  padding: 0 18px;
   background: #fff;
+  transition: max-height .4s cubic-bezier(.4,0,.2,1), padding .4s cubic-bezier(.4,0,.2,1);
 }
 
 .mpe-item.mpe-open .mpe-body {
-  display: block;
+  max-height: 2000px;
+  padding: 18px;
+  transition: max-height .6s cubic-bezier(.4,0,.2,1), padding .3s ease;
+}
+
+.mpe-arrow {
+  transition: transform .3s cubic-bezier(.4,0,.2,1);
 }
 
 .mpe-hint {
