@@ -2,24 +2,152 @@
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
-  padding: 15px;
-  overflow: hidden;
+  padding: 20px 0;
+  margin-top: 30px;
+  border-top: 1px solid #e5e5e5;
 }
 
 .mousepad-editor *,
 .mousepad-editor *::before,
 .mousepad-editor *::after {
   box-sizing: border-box;
-  max-width: 100%;
 }
 
-.mousepad-editor-zone {
-  width: 100%;
-  max-width: 100%;
-  min-height: 200px;
-  border: 2px dashed #ccc;
+.mpe-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #004774;
+  margin: 0 0 20px 0;
+}
+
+.mpe-accordion {
   display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mpe-item {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.mpe-head {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  background: #f7f7f7;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  color: #004774;
+  text-align: left;
+  transition: background 0.2s;
+}
+
+.mpe-head:hover {
+  background: #eef3f8;
+}
+
+.mpe-arrow {
+  font-size: 22px;
+  font-weight: 400;
+  color: #ee7a03;
+  transition: transform 0.2s;
+}
+
+.mpe-item.mpe-open .mpe-arrow {
+  transform: rotate(45deg);
+}
+
+.mpe-item.mpe-open .mpe-head {
+  background: #eef3f8;
+}
+
+.mpe-body {
+  display: none;
+  padding: 18px;
+  background: #fff;
+}
+
+.mpe-item.mpe-open .mpe-body {
+  display: block;
+}
+
+.mpe-hint {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  color: #666;
+}
+
+.mpe-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 10px;
+}
+
+.mpe-thumb {
+  aspect-ratio: 1;
+  border: 2px dashed #ccc;
+  border-radius: 4px;
+  background: #fafafa;
+  cursor: pointer;
+  background-size: cover;
+  background-position: center;
+  transition: border-color 0.2s;
+}
+
+.mpe-thumb:hover {
+  border-color: #ee7a03;
+}
+
+.mpe-thumb-img {
+  border-style: solid;
+  border-color: #ddd;
+}
+
+.mpe-upload {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  text-align: center;
+  padding: 10px 18px;
+  background: #ee7a03;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-bottom: 14px;
+  transition: background 0.2s;
+}
+
+.mpe-upload:hover {
+  background: #d96d00;
+}
+
+.mpe-upload input[type="file"] {
+  display: none;
+}
+
+.mpe-text-input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 15px;
+  font-family: inherit;
+}
+
+.mpe-text-input:focus {
+  outline: none;
+  border-color: #ee7a03;
+}
+
+@media (max-width: 767px) {
+  .mpe-grid {
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  }
 }
