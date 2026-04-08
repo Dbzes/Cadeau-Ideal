@@ -37,6 +37,7 @@ class MousepadeditorPreviewModuleFrontController extends ModuleFrontController
                   AND cd.type = 0
                   AND cd.value = \'' . pSQL($hash) . '\'
                 LIMIT 1';
+            @file_put_contents('/tmp/mpe_preview.log', date('H:i:s') . ' SQL=[' . $sql . ']' . PHP_EOL, FILE_APPEND);
             $exists = Db::getInstance()->getValue($sql);
             @file_put_contents('/tmp/mpe_preview.log', date('H:i:s') . ' exists=' . var_export($exists, true) . PHP_EOL, FILE_APPEND);
 
