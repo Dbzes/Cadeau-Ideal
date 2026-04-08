@@ -139,12 +139,6 @@ class MousepadeditorAttachcustomModuleFrontController extends ModuleFrontControl
         ]);
         $newId = (int) $db->Insert_ID();
 
-        // product_shop link
-        $db->insert('customization_field_shop', [
-            'id_customization_field' => $newId,
-            'id_shop' => (int) Context::getContext()->shop->id,
-        ]);
-
         // Labels par langue
         foreach (Language::getLanguages() as $lang) {
             $db->insert('customization_field_lang', [
