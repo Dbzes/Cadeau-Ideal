@@ -132,12 +132,15 @@
               </div>
             </div>
           </div>
-          {* Modal custom fullscreen pour l'aperçu *}
+          {* Modal custom fullscreen pour l'aperçu HD avec drag-to-pan *}
           {if $mpeCustomImg}
-            <div id="mpe-preview-modal-{$customization.id_customization}" class="mpe-preview-modal" style="display:none;">
+            <div id="mpe-preview-modal-{$customization.id_customization}" class="mpe-preview-modal" style="display:none;" data-thumb="{$mpeCustomImg}">
               <div class="mpe-preview-backdrop"></div>
               <button type="button" class="mpe-preview-close" aria-label="Fermer">&times;</button>
-              <img src="{$mpeCustomImg}" alt="Aperçu de la création" class="mpe-preview-img" />
+              <div class="mpe-preview-viewport">
+                <img src="{$mpeCustomImg}" alt="Aperçu de la création" class="mpe-preview-img" draggable="false" />
+              </div>
+              <div class="mpe-preview-hint">Faites glisser pour inspecter</div>
             </div>
           {/if}
         {/foreach}
