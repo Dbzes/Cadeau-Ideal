@@ -39,8 +39,11 @@
           <a href="{$urls.pages.my_account}" rel="nofollow">
             <img src="/img/template/icon-account-mobile.png" alt="Mon compte" />
           </a>
-          <a href="{$urls.pages.cart}" rel="nofollow">
+          <a href="{$urls.pages.cart}" rel="nofollow" class="mobile-cart-link">
             <img src="/img/template/icon-basket-mobile.png" alt="Mon panier" />
+            {if $cart.products_count > 0}
+              <span class="mobile-cart-badge">{$cart.products_count}</span>
+            {/if}
           </a>
         </div>
       </div>

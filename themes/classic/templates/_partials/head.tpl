@@ -218,6 +218,28 @@
         width: 38px;
         height: 38px;
       }
+      .mobile-cart-link {
+        position: relative;
+        display: inline-block;
+      }
+      .mobile-cart-badge {
+        position: absolute;
+        top: -4px;
+        right: -6px;
+        background: #e74c3c;
+        color: #fff;
+        font-size: 11px;
+        font-weight: 700;
+        line-height: 1;
+        min-width: 18px;
+        height: 18px;
+        padding: 0 5px;
+        border-radius: 9px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 1px 3px rgba(0,0,0,.3);
+      }
       .mobile-header-search {
         padding: 0 15px 5px;
       }
