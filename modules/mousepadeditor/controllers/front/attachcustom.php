@@ -119,18 +119,15 @@ class MousepadeditorAttachcustomModuleFrontController extends ModuleFrontControl
         $db->update('product', ['customizable' => 2, 'uploadable_files' => 1], 'id_product = ' . (int) $pid);
         $db->update('product_shop', ['customizable' => 2, 'uploadable_files' => 1], 'id_product = ' . (int) $pid);
 
-        // Chercher champ existant "Aperçu personnalisé"
-        $label = 'Aperçu personnalisé';
-        $sql = 'SELECT cf.id_customization_field FROM ' . _DB_PREFIX_ . 'customization_field cf'
-            . ' INNER JOIN ' . _DB_PREFIX_ . 'customization_field_lang cfl ON cf.id_customization_field = cfl.id_customization_field'
-            . ' WHERE cf.id_product = ' . (int) $pid
-            . ' AND cf.type = 1'
-            . ' AND cfl.name = \'' . pSQL($label) . '\''
-            . ' LIMIT 1';
-        @file_put_contents('/tmp/mpe_attach.log', 'SQL: ' . $sql . PHP_EOL, FILE_APPEND);
-        $fieldId = $db->getValue($sql);
-
-        if ($fieldId) return (int) $fieldId;
+        // Chercher champ existant via Configuration (évite charset issues avec l'accent)
+        $confKey = 'MOUSEPAD_FIELD_' . (int) $pid;
+        $fieldId = (int) Configuration::get($confKey);
+        if ($fieldId) {
+            // Vérifier qu'il existe toujours
+            $exists = $db->getValue('SELECT id_customization_field FROM ' . _DB_PREFIX_ . 'customization_field WHERE id_customization_field = ' . $fieldId . ' AND is_deleted = 0');
+            if ($exists) return (int) $fieldId;
+        }
+        $label = 'Apercu personnalise';
 
         // Créer le champ
         $db->insert('customization_field', [
@@ -158,6 +155,7 @@ class MousepadeditorAttachcustomModuleFrontController extends ModuleFrontControl
             ]);
         }
 
+        Configuration::updateValue($confKey, $newId);
         return $newId;
     }
 }
