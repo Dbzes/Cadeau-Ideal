@@ -69,6 +69,8 @@ class MousepadeditorAttachcustomModuleFrontController extends ModuleFrontControl
             $customization->id_product_attribute = 0;
             $customization->id_address_delivery = 0;
             $customization->quantity = 0;
+            $customization->quantity_refunded = 0;
+            $customization->quantity_returned = 0;
             $customization->in_cart = 0;
             $customization->add();
             @file_put_contents('/tmp/mpe_attach.log', 'customization added id=' . $customization->id . PHP_EOL, FILE_APPEND);
