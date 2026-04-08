@@ -81,12 +81,15 @@ class MousepadeditorComposeModuleFrontController extends ModuleFrontController
             $t = $this->prof('draw_texts_' . $nTxt, $t);
         }
 
-        // Flatten + sauvegarde
-        $img->setImageFormat('png');
+        // Flatten + sauvegarde (JPG 100% = ~10x plus rapide que PNG)
+        $img->setImageFormat('jpeg');
+        $img->setImageCompressionQuality(100);
+        $img->setImageCompression(Imagick::COMPRESSION_JPEG);
+        $img->stripImage();
         $hash = md5(json_encode($state) . microtime(true));
         $dir = _PS_MODULE_DIR_ . 'mousepadeditor/uploads/previews/';
         if (!is_dir($dir)) { @mkdir($dir, 0755, true); }
-        $filename = $hash . '.png';
+        $filename = $hash . '.jpg';
         $img->writeImage($dir . $filename);
         $t = $this->prof('write_image', $t);
         $img->clear();
