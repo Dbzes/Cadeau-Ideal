@@ -36,6 +36,7 @@
           {/foreach}
         {/foreach}
       {/if}
+      {literal}<script>console.log('[MPE-CART-DEBUG] product:', {/literal}{$product.id_product|intval}{literal}, 'name:', {/literal}"{$product.name|escape:'quotes'}"{literal}, 'customizations:', {/literal}{if is_array($product.customizations)}{$product.customizations|json_encode nofilter}{else}null{/if}{literal}, 'resolvedImg:', {/literal}"{$mpeCustomImg|escape:'quotes'}"{literal});</script>{/literal}
       {if $mpeCustomImg}
         <img src="{$mpeCustomImg}" alt="{$product.name|escape:'quotes'}" loading="lazy" style="width:100%;height:auto;border-radius:4px;">
       {elseif $product.default_image}
