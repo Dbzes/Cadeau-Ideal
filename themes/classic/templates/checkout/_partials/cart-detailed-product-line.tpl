@@ -27,17 +27,21 @@
   <div class="product-line-grid-left col-md-3 col-xs-4">
     <span class="product-image media-middle">
       {assign var='mpeCustomImg' value=''}
+      {assign var='mpeCustomId' value=0}
       {if is_array($product.customizations) && $product.customizations|count}
         {foreach from=$product.customizations item="mpeCust"}
           {foreach from=$mpeCust.fields item="mpeField"}
             {if $mpeField.type == 'image' && $mpeField.image.small.url}
               {assign var='mpeCustomImg' value=$mpeField.image.small.url}
+              {assign var='mpeCustomId' value=$mpeCust.id_customization}
             {/if}
           {/foreach}
         {/foreach}
       {/if}
       {if $mpeCustomImg}
-        <img src="{$mpeCustomImg}" alt="{$product.name|escape:'quotes'}" loading="lazy" style="width:100%;height:auto;border-radius:4px;">
+        <a href="#" data-toggle="modal" data-target="#product-customizations-modal-{$mpeCustomId}" style="display:block;cursor:zoom-in;">
+          <img src="{$mpeCustomImg}" alt="{$product.name|escape:'quotes'}" loading="lazy" style="width:100%;height:auto;border-radius:4px;">
+        </a>
       {elseif $product.default_image}
         <picture>
           {if !empty($product.default_image.bySize.cart_default.sources.avif)}<source srcset="{$product.default_image.bySize.cart_default.sources.avif}" type="image/avif">{/if}
@@ -94,10 +98,8 @@
     {/foreach}
 
     {if is_array($product.customizations) && $product.customizations|count}
-      <br>
       {block name='cart_detailed_product_line_customization'}
         {foreach from=$product.customizations item="customization"}
-          <a href="#" data-toggle="modal" data-target="#product-customizations-modal-{$customization.id_customization}">Aperçu de la création</a>
           <div class="modal fade customization-modal js-customization-modal" id="product-customizations-modal-{$customization.id_customization}" tabindex="-1" role="dialog" aria-hidden="true">
             <div class="modal-dialog" role="document">
               <div class="modal-content">
