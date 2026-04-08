@@ -28,23 +28,31 @@ class MousepadeditorAttachcustomModuleFrontController extends ModuleFrontControl
             $fieldId = $this->ensureCustomField($pid);
             @file_put_contents('/tmp/mpe_attach.log', 'fieldId=' . $fieldId . PHP_EOL, FILE_APPEND);
 
-            // Copier dans /upload/ avec nom hashé
+            // Copier dans /upload/ avec nom hashé (fichier clean pour impression)
             $hash = md5_file($src) . '_' . substr(md5(microtime(true)), 0, 6);
             $dest = _PS_UPLOAD_DIR_ . $hash;
             copy($src, $dest);
 
-            // Créer un thumbnail pour affichage panier/commande
+            // Version preview avec template overlay → utilisée pour affichage panier
+            $previewSrc = preg_replace('/\.jpg$/', '_preview.jpg', $src);
+            $thumbSource = file_exists($previewSrc) ? $previewSrc : $src;
+
             if (extension_loaded('imagick')) {
                 try {
-                    $thumb = new Imagick($src);
+                    $thumb = new Imagick($thumbSource);
                     $thumb->thumbnailImage(300, 0);
                     $thumb->writeImage($dest . '_small');
                     $thumb->clear();
                 } catch (Exception $e) {
-                    @copy($src, $dest . '_small');
+                    @copy($thumbSource, $dest . '_small');
                 }
             } else {
-                @copy($src, $dest . '_small');
+                @copy($thumbSource, $dest . '_small');
+            }
+
+            // Copier aussi le preview pleine taille pour le modal
+            if (file_exists($previewSrc)) {
+                @copy($previewSrc, _PS_UPLOAD_DIR_ . $hash . '_full');
             }
 
             // Contexte / panier
@@ -127,9 +135,13 @@ class MousepadeditorAttachcustomModuleFrontController extends ModuleFrontControl
         if ($fieldId) {
             // Vérifier qu'il existe toujours
             $exists = $db->getValue('SELECT id_customization_field FROM ' . _DB_PREFIX_ . 'customization_field WHERE id_customization_field = ' . $fieldId . ' AND is_deleted = 0');
-            if ($exists) return (int) $fieldId;
+            if ($exists) {
+                // Sync du label (au cas où modifié)
+                $db->update('customization_field_lang', ['name' => pSQL('Aperçu de la création')], 'id_customization_field = ' . $fieldId);
+                return (int) $fieldId;
+            }
         }
-        $label = 'Apercu personnalise';
+        $label = 'Aperçu de la création';
 
         // Créer le champ
         $db->insert('customization_field', [

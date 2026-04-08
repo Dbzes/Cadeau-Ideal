@@ -63,24 +63,55 @@ class MousepadeditorComposeModuleFrontController extends ModuleFrontController
             }
         }
 
-        // Flatten + sauvegarde (JPG 100% = ~10x plus rapide que PNG)
+        $hash = md5(json_encode($state) . microtime(true));
+        $dir = _PS_MODULE_DIR_ . 'mousepadeditor/uploads/previews/';
+        if (!is_dir($dir)) { @mkdir($dir, 0755, true); }
+
+        // 1. Fichier HD CLEAN pour impression (sans overlay)
+        $cleanFile = $dir . $hash . '.jpg';
+        $clone = clone $img;
+        $clone->setImageFormat('jpeg');
+        $clone->setImageCompressionQuality(100);
+        $clone->setImageCompression(Imagick::COMPRESSION_JPEG);
+        $clone->stripImage();
+        $clone->writeImage($cleanFile);
+        $clone->clear();
+
+        // 2. Fichier PREVIEW avec template overlay pour affichage panier/modal
+        $this->drawTemplateOverlay($img, $targetW, $targetH);
         $img->setImageFormat('jpeg');
         $img->setImageCompressionQuality(100);
         $img->setImageCompression(Imagick::COMPRESSION_JPEG);
         $img->stripImage();
-        $hash = md5(json_encode($state) . microtime(true));
-        $dir = _PS_MODULE_DIR_ . 'mousepadeditor/uploads/previews/';
-        if (!is_dir($dir)) { @mkdir($dir, 0755, true); }
-        $filename = $hash . '.jpg';
-        $img->writeImage($dir . $filename);
+        $previewFile = $dir . $hash . '_preview.jpg';
+        $img->writeImage($previewFile);
         $img->clear();
 
         return [
-            'previewUrl' => _MODULE_DIR_ . 'mousepadeditor/uploads/previews/' . $filename,
+            'previewUrl' => _MODULE_DIR_ . 'mousepadeditor/uploads/previews/' . $hash . '_preview.jpg',
+            'cleanUrl' => _MODULE_DIR_ . 'mousepadeditor/uploads/previews/' . $hash . '.jpg',
             'hash' => $hash,
             'width' => $targetW,
             'height' => $targetH,
         ];
+    }
+
+    protected function drawTemplateOverlay(Imagick $canvas, $W, $H)
+    {
+        // Récupère le template configuré dans le BO
+        $file = Configuration::get('MOUSEPAD_TEMPLATE');
+        if (!$file) return;
+        $path = _PS_MODULE_DIR_ . 'mousepadeditor/uploads/template/' . $file;
+        if (!file_exists($path)) return;
+        try {
+            $overlay = new Imagick($path);
+            // Redimensionne pour couvrir toute la surface
+            $overlay->resizeImage($W, $H, Imagick::FILTER_LANCZOS, 1);
+            $canvas->compositeImage($overlay, Imagick::COMPOSITE_OVER, 0, 0);
+            $overlay->clear();
+        } catch (Exception $e) {
+            // silencieux
+        }
     }
 
     protected function drawBackground(Imagick $canvas, array $bg, $W, $H, $ratio)
