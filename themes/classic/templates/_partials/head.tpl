@@ -249,9 +249,74 @@
         width: 100% !important;
       }
     }
+    /* Modal aperçu de la création */
+    .mpe-preview-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .mpe-preview-modal.mpe-open {
+      display: flex !important;
+    }
+    .mpe-preview-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,.85);
+    }
+    .mpe-preview-img {
+      position: relative;
+      max-width: 100%;
+      max-height: 92vh;
+      width: auto;
+      height: auto;
+      border-radius: 6px;
+      box-shadow: 0 0 40px rgba(0,0,0,.5);
+    }
+    .mpe-preview-close {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-size: 40px;
+      line-height: 1;
+      cursor: pointer;
+      z-index: 2;
+      padding: 0;
+    }
+    @media (max-width: 767px) {
+      .mpe-preview-modal { padding: 0; }
+      .mpe-preview-img { max-width: 100vw; width: 100%; border-radius: 0; }
+    }
   </style>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
+      // Modal aperçu de la création (delegated pour survivre aux refreshs cart ajax)
+      document.addEventListener('click', function(e) {
+        var trigger = e.target.closest('.mpe-preview-trigger');
+        if (trigger) {
+          e.preventDefault();
+          var sel = trigger.getAttribute('data-target');
+          var modal = document.querySelector(sel);
+          if (modal) modal.classList.add('mpe-open');
+          return;
+        }
+        if (e.target.closest('.mpe-preview-close') || e.target.classList.contains('mpe-preview-backdrop')) {
+          var open = document.querySelector('.mpe-preview-modal.mpe-open');
+          if (open) open.classList.remove('mpe-open');
+        }
+      });
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+          var open = document.querySelector('.mpe-preview-modal.mpe-open');
+          if (open) open.classList.remove('mpe-open');
+        }
+      });
+
       if (typeof prestashop !== 'undefined') {
         prestashop.on('updateCart', function(e) {
           if (e && e.resp && e.resp.cart) {

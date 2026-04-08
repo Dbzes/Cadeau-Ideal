@@ -39,9 +39,7 @@
         {/foreach}
       {/if}
       {if $mpeCustomImg}
-        <a href="#" data-toggle="modal" data-target="#product-customizations-modal-{$mpeCustomId}" style="display:block;cursor:zoom-in;">
-          <img src="{$mpeCustomImg}" alt="{$product.name|escape:'quotes'}" loading="lazy" style="width:100%;height:auto;border-radius:4px;">
-        </a>
+        <img src="{$mpeCustomImg}" alt="{$product.name|escape:'quotes'}" loading="lazy" style="width:100%;height:auto;border-radius:4px;">
       {elseif $product.default_image}
         <picture>
           {if !empty($product.default_image.bySize.cart_default.sources.avif)}<source srcset="{$product.default_image.bySize.cart_default.sources.avif}" type="image/avif">{/if}
@@ -98,8 +96,10 @@
     {/foreach}
 
     {if is_array($product.customizations) && $product.customizations|count}
+      <br>
       {block name='cart_detailed_product_line_customization'}
         {foreach from=$product.customizations item="customization"}
+          <a href="#" class="mpe-preview-trigger" data-target="#mpe-preview-modal-{$customization.id_customization}">Aperçu de la création</a>
           <div class="modal fade customization-modal js-customization-modal" id="product-customizations-modal-{$customization.id_customization}" tabindex="-1" role="dialog" aria-hidden="true">
             <div class="modal-dialog" role="document">
               <div class="modal-content">
@@ -132,6 +132,14 @@
               </div>
             </div>
           </div>
+          {* Modal custom fullscreen pour l'aperçu *}
+          {if $mpeCustomImg}
+            <div id="mpe-preview-modal-{$customization.id_customization}" class="mpe-preview-modal" style="display:none;">
+              <div class="mpe-preview-backdrop"></div>
+              <button type="button" class="mpe-preview-close" aria-label="Fermer">&times;</button>
+              <img src="{$mpeCustomImg}" alt="Aperçu de la création" class="mpe-preview-img" />
+            </div>
+          {/if}
         {/foreach}
       {/block}
     {/if}
