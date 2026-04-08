@@ -138,7 +138,8 @@
               <div class="mpe-preview-backdrop"></div>
               <button type="button" class="mpe-preview-close" aria-label="Fermer">&times;</button>
               <div class="mpe-preview-viewport">
-                <img src="{$mpeCustomImg}" alt="Aperçu de la création" class="mpe-preview-img" draggable="false" />
+                <div class="mpe-preview-loader">Chargement…</div>
+                <img alt="Aperçu de la création" class="mpe-preview-img" draggable="false" style="display:none;" />
               </div>
               <div class="mpe-preview-hint">Faites glisser pour inspecter</div>
             </div>

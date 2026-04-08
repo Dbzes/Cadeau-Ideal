@@ -335,6 +335,30 @@
       user-select: none;
       box-shadow: 0 0 40px rgba(0,0,0,.5);
     }
+    .mpe-preview-loader {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 14px;
+      letter-spacing: 1px;
+    }
+    .mpe-preview-loader::after {
+      content: '';
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      margin-left: 10px;
+      border: 3px solid rgba(255,255,255,.3);
+      border-top-color: #ee7a03;
+      border-radius: 50%;
+      animation: mpe-spin 0.8s linear infinite;
+    }
+    @keyframes mpe-spin {
+      to { transform: rotate(360deg); }
+    }
     .mpe-preview-close {
       position: absolute;
       top: 15px;
@@ -372,23 +396,49 @@
         modal.classList.add('mpe-open');
         var img = modal.querySelector('.mpe-preview-img');
         var viewport = modal.querySelector('.mpe-preview-viewport');
+        var loader = modal.querySelector('.mpe-preview-loader');
         if (!img || !viewport) return;
-        // Swap vers la version HD via le controller mousepadeditor/preview
-        if (!img.dataset.hdLoaded) {
-          var thumbUrl = modal.dataset.thumb || '';
-          var m = thumbUrl.match(/\/upload\/([a-f0-9_]+)_small/i);
-          if (m && m[1]) {
-            var hdUrl = '/index.php?fc=module&module=mousepadeditor&controller=preview&hash=' + encodeURIComponent(m[1]);
-            var hd = new Image();
-            hd.onload = function() {
-              img.src = hdUrl;
-              img.dataset.hdLoaded = '1';
-              mpeFitImage(viewport, img);
-            };
-            hd.src = hdUrl;
-          }
+
+        if (img.dataset.hdLoaded) {
+          // déjà chargé : juste afficher
+          if (loader) loader.style.display = 'none';
+          img.style.display = '';
+          mpeFitImage(viewport, img);
+          return;
         }
-        mpeFitImage(viewport, img);
+
+        // Afficher le loader, cacher l'image, charger le HD
+        if (loader) loader.style.display = '';
+        img.style.display = 'none';
+
+        var thumbUrl = modal.dataset.thumb || '';
+        var m = thumbUrl.match(/\/upload\/([a-f0-9_]+)_small/i);
+        if (!m || !m[1]) {
+          // fallback : afficher quand même le thumb
+          img.src = thumbUrl;
+          img.style.display = '';
+          if (loader) loader.style.display = 'none';
+          img.onload = function() { mpeFitImage(viewport, img); };
+          return;
+        }
+
+        var hdUrl = '/index.php?fc=module&module=mousepadeditor&controller=preview&hash=' + encodeURIComponent(m[1]);
+        var hd = new Image();
+        hd.onload = function() {
+          img.src = hdUrl;
+          img.dataset.hdLoaded = '1';
+          img.style.display = '';
+          if (loader) loader.style.display = 'none';
+          mpeFitImage(viewport, img);
+        };
+        hd.onerror = function() {
+          // fallback sur le thumb
+          img.src = thumbUrl;
+          img.style.display = '';
+          if (loader) loader.style.display = 'none';
+          img.onload = function() { mpeFitImage(viewport, img); };
+        };
+        hd.src = hdUrl;
       }
       function mpeFitImage(viewport, img) {
         // Place l'image centrée, à sa taille naturelle (ou contain si plus petite que viewport)
