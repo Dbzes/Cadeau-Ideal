@@ -9,6 +9,7 @@ class MousepadeditorAttachcustomModuleFrontController extends ModuleFrontControl
     public function postProcess()
     {
         header('Content-Type: application/json');
+        @file_put_contents('/tmp/mpe_attach.log', '--- attach ' . date('H:i:s') . ' ---' . PHP_EOL, FILE_APPEND);
         try {
             $pid = (int) Tools::getValue('id_product');
             $hdUrl = Tools::getValue('hd_url');
@@ -22,8 +23,10 @@ class MousepadeditorAttachcustomModuleFrontController extends ModuleFrontControl
                 throw new Exception('Aperçu HD introuvable');
             }
 
+            @file_put_contents('/tmp/mpe_attach.log', 'pid=' . $pid . ' hdUrl=' . $hdUrl . PHP_EOL, FILE_APPEND);
             // S'assurer que le produit a un champ de personnalisation
             $fieldId = $this->ensureCustomField($pid);
+            @file_put_contents('/tmp/mpe_attach.log', 'fieldId=' . $fieldId . PHP_EOL, FILE_APPEND);
 
             // Copier dans /upload/ avec nom hashé
             $hash = md5_file($src) . '_' . substr(md5(microtime(true)), 0, 6);
@@ -58,6 +61,7 @@ class MousepadeditorAttachcustomModuleFrontController extends ModuleFrontControl
                 $ctx->cookie->write();
             }
 
+            @file_put_contents('/tmp/mpe_attach.log', 'cart=' . $ctx->cart->id . PHP_EOL, FILE_APPEND);
             // Créer la customization
             $customization = new Customization();
             $customization->id_cart = (int) $ctx->cart->id;
@@ -67,6 +71,7 @@ class MousepadeditorAttachcustomModuleFrontController extends ModuleFrontControl
             $customization->quantity = 0;
             $customization->in_cart = 0;
             $customization->add();
+            @file_put_contents('/tmp/mpe_attach.log', 'customization added id=' . $customization->id . PHP_EOL, FILE_APPEND);
 
             // Ajouter l'entrée customized_data
             Db::getInstance()->insert('customized_data', [
@@ -81,7 +86,13 @@ class MousepadeditorAttachcustomModuleFrontController extends ModuleFrontControl
                 'id_customization' => (int) $customization->id,
             ]);
         } catch (Exception $e) {
+            @file_put_contents('/tmp/mpe_attach.log', 'EXCEPTION: ' . $e->getMessage() . PHP_EOL . $e->getTraceAsString() . PHP_EOL, FILE_APPEND);
             echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+        }
+        // Aussi capturer les erreurs DB silencieuses
+        $dbErr = Db::getInstance()->getMsgError();
+        if ($dbErr) {
+            @file_put_contents('/tmp/mpe_attach.log', 'DB ERROR: ' . $dbErr . PHP_EOL, FILE_APPEND);
         }
         exit;
     }
