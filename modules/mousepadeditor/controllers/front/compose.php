@@ -120,14 +120,18 @@ class MousepadeditorComposeModuleFrontController extends ModuleFrontController
 
         // Utiliser la version HD pré-cachée si disponible (gain ~6s)
         $hdCache = $this->ensureHdCache($src, $W, $H);
-        $bgImg = new Imagick($hdCache ?: $src);
+        $isCached = $hdCache && file_exists($hdCache);
+        $bgImg = new Imagick($isCached ? $hdCache : $src);
         // Échelle : base cover + zoom user
         $baseScale = max($W / $bgImg->getImageWidth(), $H / $bgImg->getImageHeight());
         $zoom = isset($bg['zoom']) ? (float) $bg['zoom'] : 1;
         $finalScale = $baseScale * $zoom;
         $newW = $bgImg->getImageWidth() * $finalScale;
         $newH = $bgImg->getImageHeight() * $finalScale;
-        $bgImg->resizeImage((int) $newW, (int) $newH, Imagick::FILTER_LANCZOS, 1);
+        // Skip resize si déjà à la bonne taille (cache hit + zoom 1)
+        if (abs($finalScale - 1.0) > 0.01) {
+            $bgImg->resizeImage((int) $newW, (int) $newH, Imagick::FILTER_LANCZOS, 1);
+        }
 
         // Position : left/top du centre de l'image (en coordonnées éditeur), convertie
         $cx = isset($bg['left']) ? $bg['left'] * $ratio : $W / 2;
