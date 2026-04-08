@@ -872,7 +872,7 @@ function mpeInit() {
         }
         var fd = new FormData();
         fd.append('id_product', window.MPE_PRODUCT_ID);
-        fd.append('hd_url', res.previewUrl);
+        fd.append('hd_url', res.cleanUrl || res.previewUrl);
         fetch(window.MPE_ATTACH_URL, { method:'POST', body: fd, credentials:'same-origin' })
           .then(function(r){ return r.json(); })
           .then(function(d){
