@@ -249,6 +249,28 @@
         width: 100% !important;
       }
     }
+    /* Panier mobile : qty touchspin inline forcé */
+    @media (max-width: 767px) {
+      .product-line-grid-right .qty {
+        white-space: nowrap;
+        padding-right: 0;
+      }
+      .product-line-grid-right .qty .bootstrap-touchspin {
+        display: inline-flex !important;
+        align-items: center;
+        flex-wrap: nowrap;
+        width: auto;
+      }
+      .product-line-grid-right .qty .bootstrap-touchspin input.js-cart-line-product-quantity {
+        width: 42px !important;
+        min-width: 42px;
+        flex: 0 0 42px;
+      }
+      .product-line-grid-right .qty .bootstrap-touchspin .input-group-btn-vertical {
+        display: table-cell !important;
+        flex-shrink: 0;
+      }
+    }
     /* Modal aperçu de la création */
     .mpe-preview-modal {
       position: fixed;
