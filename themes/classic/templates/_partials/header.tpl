@@ -41,9 +41,7 @@
           </a>
           <a href="{$urls.pages.cart}" rel="nofollow" class="mobile-cart-link">
             <img src="/img/template/icon-basket-mobile.png" alt="Mon panier" />
-            {if $cart.products_count > 0}
-              <span class="mobile-cart-badge">{$cart.products_count}</span>
-            {/if}
+            <span class="mobile-cart-badge" {if $cart.products_count <= 0}style="display:none;"{/if}>{$cart.products_count}</span>
           </a>
         </div>
       </div>

@@ -259,6 +259,11 @@
             var text = count + ' ' + (count > 1 ? 'produits' : 'produit');
             var el = document.getElementById('header-cart-count');
             if (el) el.textContent = text;
+            var badge = document.querySelector('.mobile-cart-badge');
+            if (badge) {
+              badge.textContent = count;
+              badge.style.display = count > 0 ? '' : 'none';
+            }
           }
         });
       }
