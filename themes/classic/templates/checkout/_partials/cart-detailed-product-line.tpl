@@ -85,7 +85,7 @@
       <br>
       {block name='cart_detailed_product_line_customization'}
         {foreach from=$product.customizations item="customization"}
-          <a href="#" data-toggle="modal" data-target="#product-customizations-modal-{$customization.id_customization}">{l s='Product customization' d='Shop.Theme.Catalog'}</a>
+          <a href="#" data-toggle="modal" data-target="#product-customizations-modal-{$customization.id_customization}">Aperçu de la création</a>
           <div class="modal fade customization-modal js-customization-modal" id="product-customizations-modal-{$customization.id_customization}" tabindex="-1" role="dialog" aria-hidden="true">
             <div class="modal-dialog" role="document">
               <div class="modal-content">
@@ -93,7 +93,7 @@
                   <button type="button" class="close" data-dismiss="modal" aria-label="{l s='Close' d='Shop.Theme.Global'}">
                     <span aria-hidden="true">&times;</span>
                   </button>
-                  <h4 class="modal-title">{l s='Product customization' d='Shop.Theme.Catalog'}</h4>
+                  <h4 class="modal-title">Aperçu de la création</h4>
                 </div>
                 <div class="modal-body">
                   {foreach from=$customization.fields item="field"}
@@ -109,7 +109,7 @@
                             {$field.text}
                           {/if}
                         {elseif $field.type == 'image'}
-                          <img src="{$field.image.small.url}" loading="lazy">
+                          <img src="{if isset($field.image.large.url)}{$field.image.large.url}{else}{$field.image.small.url}{/if}" loading="lazy" style="max-width:100%;height:auto;border-radius:4px;">
                         {/if}
                       </div>
                     </div>

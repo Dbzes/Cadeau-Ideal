@@ -144,7 +144,6 @@ class Mousepadeditor extends Module
     {
         $this->context->controller->addCSS($this->_path . 'views/css/mousepadeditor.css');
         $this->context->controller->addJS($this->_path . 'views/js/fabric.min.js');
-        $this->context->controller->addJS($this->_path . 'views/js/mpe-cart-modal.js');
     }
 
     public function getContent()
