@@ -34,10 +34,14 @@ class MousepadeditorAttachcustomModuleFrontController extends ModuleFrontControl
             $previewSrc = preg_replace('/\.jpg$/', '_preview.jpg', $src);
             $thumbSource = file_exists($previewSrc) ? $previewSrc : $src;
 
+            // Thumbnail à 1200px pour un affichage net dans le modal panier
             if (extension_loaded('imagick')) {
                 try {
                     $thumb = new Imagick($thumbSource);
-                    $thumb->thumbnailImage(300, 0);
+                    $thumb->thumbnailImage(1200, 0);
+                    $thumb->setImageCompressionQuality(90);
+                    $thumb->setImageFormat('jpeg');
+                    $thumb->stripImage();
                     $thumb->writeImage($dest . '_small');
                     $thumb->clear();
                 } catch (Exception $e) {
@@ -45,11 +49,6 @@ class MousepadeditorAttachcustomModuleFrontController extends ModuleFrontControl
                 }
             } else {
                 @copy($thumbSource, $dest . '_small');
-            }
-
-            // Copier aussi le preview pleine taille pour le modal
-            if (file_exists($previewSrc)) {
-                @copy($previewSrc, _PS_UPLOAD_DIR_ . $hash . '_full');
             }
 
             // Contexte / panier

@@ -297,13 +297,14 @@
       height: auto !important;
       object-fit: contain !important;
     }
-    /* Modal aperçu de la création HD avec drag-to-pan */
+    /* Modal aperçu de la création (simple, centré) */
     .mpe-preview-modal {
       position: fixed;
       inset: 0;
       z-index: 99999;
       align-items: center;
       justify-content: center;
+      padding: 20px;
     }
     .mpe-preview-modal.mpe-open {
       display: flex !important;
@@ -313,51 +314,13 @@
       inset: 0;
       background: rgba(0,0,0,.9);
     }
-    .mpe-preview-viewport {
-      position: relative;
-      width: 92vw;
-      height: 86vh;
-      overflow: hidden;
-      background: transparent;
-      cursor: grab;
-      user-select: none;
-    }
-    .mpe-preview-viewport.mpe-dragging {
-      cursor: grabbing;
-    }
     .mpe-preview-img {
-      position: absolute;
-      top: 0;
-      left: 0;
-      max-width: none;
-      max-height: none;
-      pointer-events: none;
-      user-select: none;
+      position: relative;
+      max-width: 92vw;
+      max-height: 90vh;
+      width: auto;
+      height: auto;
       box-shadow: 0 0 40px rgba(0,0,0,.5);
-    }
-    .mpe-preview-loader {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #fff;
-      font-size: 14px;
-      letter-spacing: 1px;
-    }
-    .mpe-preview-loader::after {
-      content: '';
-      display: inline-block;
-      width: 24px;
-      height: 24px;
-      margin-left: 10px;
-      border: 3px solid rgba(255,255,255,.3);
-      border-top-color: #ee7a03;
-      border-radius: 50%;
-      animation: mpe-spin 0.8s linear infinite;
-    }
-    @keyframes mpe-spin {
-      to { transform: rotate(360deg); }
     }
     .mpe-preview-close {
       position: absolute;
@@ -372,99 +335,21 @@
       z-index: 2;
       padding: 0;
     }
-    .mpe-preview-hint {
-      position: absolute;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      color: #fff;
-      font-size: 13px;
-      background: rgba(0,0,0,.5);
-      padding: 6px 14px;
-      border-radius: 20px;
-      pointer-events: none;
-      opacity: .8;
-    }
     @media (max-width: 767px) {
-      .mpe-preview-viewport { width: 100vw; height: 88vh; }
+      .mpe-preview-modal { padding: 0; }
+      .mpe-preview-img { max-width: 100vw; max-height: 100vh; }
     }
   </style>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // Modal aperçu de la création HD + drag-to-pan (delegated pour survivre aux refreshs ajax)
-      function mpeOpenPreview(modal) {
-        modal.classList.add('mpe-open');
-        var img = modal.querySelector('.mpe-preview-img');
-        var viewport = modal.querySelector('.mpe-preview-viewport');
-        var loader = modal.querySelector('.mpe-preview-loader');
-        if (!img || !viewport) return;
-
-        if (img.dataset.hdLoaded) {
-          // déjà chargé : juste afficher
-          if (loader) loader.style.display = 'none';
-          img.style.display = '';
-          mpeFitImage(viewport, img);
-          return;
-        }
-
-        // Afficher le loader, cacher l'image, charger le HD
-        if (loader) loader.style.display = '';
-        img.style.display = 'none';
-
-        var thumbUrl = modal.dataset.thumb || '';
-        var m = thumbUrl.match(/\/upload\/([a-f0-9_]+)_small/i);
-        if (!m || !m[1]) {
-          // fallback : afficher quand même le thumb
-          img.src = thumbUrl;
-          img.style.display = '';
-          if (loader) loader.style.display = 'none';
-          img.onload = function() { mpeFitImage(viewport, img); };
-          return;
-        }
-
-        var hdUrl = '/index.php?fc=module&module=mousepadeditor&controller=preview&hash=' + encodeURIComponent(m[1]);
-        var hd = new Image();
-        hd.onload = function() {
-          img.src = hdUrl;
-          img.dataset.hdLoaded = '1';
-          img.style.display = '';
-          if (loader) loader.style.display = 'none';
-          mpeFitImage(viewport, img);
-        };
-        hd.onerror = function() {
-          // fallback sur le thumb
-          img.src = thumbUrl;
-          img.style.display = '';
-          if (loader) loader.style.display = 'none';
-          img.onload = function() { mpeFitImage(viewport, img); };
-        };
-        hd.src = hdUrl;
-      }
-      function mpeFitImage(viewport, img) {
-        // Place l'image centrée, à sa taille naturelle (ou contain si plus petite que viewport)
-        var vw = viewport.clientWidth, vh = viewport.clientHeight;
-        var iw = img.naturalWidth || img.clientWidth, ih = img.naturalHeight || img.clientHeight;
-        if (!iw || !ih) return;
-        // Si l'image est plus petite que le viewport, on l'agrandit pour permettre le drag
-        var scale = 1;
-        if (iw < vw && ih < vh) {
-          scale = Math.max(vw / iw, vh / ih) * 1.2;
-        }
-        var w = iw * scale, h = ih * scale;
-        img.style.width = w + 'px';
-        img.style.height = h + 'px';
-        img.style.left = ((vw - w) / 2) + 'px';
-        img.style.top = ((vh - h) / 2) + 'px';
-      }
-
-      var mpeDrag = null;
+      // Modal aperçu de la création (simple, delegated pour survivre aux refreshs ajax)
       document.addEventListener('click', function(e) {
         var trigger = e.target.closest('.mpe-preview-trigger');
         if (trigger) {
           e.preventDefault();
           var sel = trigger.getAttribute('data-target');
           var modal = document.querySelector(sel);
-          if (modal) mpeOpenPreview(modal);
+          if (modal) modal.classList.add('mpe-open');
           return;
         }
         if (e.target.closest('.mpe-preview-close') || e.target.classList.contains('mpe-preview-backdrop')) {
@@ -478,61 +363,6 @@
           if (open) open.classList.remove('mpe-open');
         }
       });
-
-      // Drag-to-pan
-      function mpeStart(e, viewport) {
-        var img = viewport.querySelector('.mpe-preview-img');
-        if (!img) return;
-        viewport.classList.add('mpe-dragging');
-        var pt = e.touches ? e.touches[0] : e;
-        mpeDrag = {
-          viewport: viewport,
-          img: img,
-          startX: pt.clientX,
-          startY: pt.clientY,
-          baseLeft: parseFloat(img.style.left) || 0,
-          baseTop: parseFloat(img.style.top) || 0
-        };
-        e.preventDefault();
-      }
-      function mpeMove(e) {
-        if (!mpeDrag) return;
-        var pt = e.touches ? e.touches[0] : e;
-        var dx = pt.clientX - mpeDrag.startX;
-        var dy = pt.clientY - mpeDrag.startY;
-        var vw = mpeDrag.viewport.clientWidth;
-        var vh = mpeDrag.viewport.clientHeight;
-        var iw = mpeDrag.img.clientWidth;
-        var ih = mpeDrag.img.clientHeight;
-        var nextLeft = mpeDrag.baseLeft + dx;
-        var nextTop = mpeDrag.baseTop + dy;
-        // Clamp : l'image ne peut pas sortir du viewport (on garde au moins un bord visible)
-        var minLeft = vw - iw;
-        var maxLeft = 0;
-        var minTop = vh - ih;
-        var maxTop = 0;
-        if (iw <= vw) { minLeft = maxLeft = (vw - iw) / 2; }
-        if (ih <= vh) { minTop = maxTop = (vh - ih) / 2; }
-        mpeDrag.img.style.left = Math.min(maxLeft, Math.max(minLeft, nextLeft)) + 'px';
-        mpeDrag.img.style.top = Math.min(maxTop, Math.max(minTop, nextTop)) + 'px';
-        if (e.cancelable) e.preventDefault();
-      }
-      function mpeEnd() {
-        if (mpeDrag) mpeDrag.viewport.classList.remove('mpe-dragging');
-        mpeDrag = null;
-      }
-      document.addEventListener('mousedown', function(e) {
-        var vp = e.target.closest('.mpe-preview-viewport');
-        if (vp) mpeStart(e, vp);
-      });
-      document.addEventListener('touchstart', function(e) {
-        var vp = e.target.closest('.mpe-preview-viewport');
-        if (vp) mpeStart(e, vp);
-      }, { passive: false });
-      document.addEventListener('mousemove', mpeMove);
-      document.addEventListener('touchmove', mpeMove, { passive: false });
-      document.addEventListener('mouseup', mpeEnd);
-      document.addEventListener('touchend', mpeEnd);
 
       if (typeof prestashop !== 'undefined') {
         prestashop.on('updateCart', function(e) {
