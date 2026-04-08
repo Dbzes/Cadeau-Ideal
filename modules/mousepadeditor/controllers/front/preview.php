@@ -35,7 +35,7 @@ class MousepadeditorPreviewModuleFrontController extends ModuleFrontController
                 WHERE (c.id_customer = ' . (int) $cart->id_customer . '
                    OR c.id_guest = ' . (int) $cart->id_guest . ')
                   AND cd.type = 0
-                  AND cd.value = "' . pSQL($hash) . '"
+                  AND cd.value = \'' . pSQL($hash) . '\'
                 LIMIT 1';
             $exists = Db::getInstance()->getValue($sql);
             @file_put_contents('/tmp/mpe_preview.log', date('H:i:s') . ' exists=' . var_export($exists, true) . PHP_EOL, FILE_APPEND);
