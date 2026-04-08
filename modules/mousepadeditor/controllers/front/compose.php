@@ -29,8 +29,17 @@ class MousepadeditorComposeModuleFrontController extends ModuleFrontController
         exit;
     }
 
+    protected function prof($label, $t0)
+    {
+        $ms = round((microtime(true) - $t0) * 1000, 1);
+        @file_put_contents('/tmp/mpe_perf.log', date('H:i:s') . ' ' . str_pad($label, 20) . ' ' . $ms . ' ms' . PHP_EOL, FILE_APPEND);
+        return microtime(true);
+    }
+
     protected function composeMockup(array $state)
     {
+        $tAll = microtime(true);
+        @file_put_contents('/tmp/mpe_perf.log', '--- compose ' . date('H:i:s') . ' ---' . PHP_EOL, FILE_APPEND);
         // Dimensions cible HD
         $canvasW = isset($state['canvasW']) ? (float) $state['canvasW'] : 600;
         $canvasH = isset($state['canvasH']) ? (float) $state['canvasH'] : 491;
@@ -40,27 +49,36 @@ class MousepadeditorComposeModuleFrontController extends ModuleFrontController
         // Ratio canvas éditeur → HD
         $ratio = $targetW / $canvasW;
 
+        $t = microtime(true);
         $img = new Imagick();
         $img->newImage($targetW, $targetH, new ImagickPixel('#ffffff'), 'png');
         $img->setImageFormat('png');
+        $t = $this->prof('init_canvas', $t);
 
         // Fond
         if (!empty($state['bg'])) {
             $this->drawBackground($img, $state['bg'], $targetW, $targetH, $ratio);
+            $t = $this->prof('draw_background', $t);
         }
 
         // Images
+        $nImg = 0;
         if (!empty($state['images']) && is_array($state['images'])) {
             foreach ($state['images'] as $imgData) {
                 $this->drawImage($img, $imgData, $ratio);
+                $nImg++;
             }
+            $t = $this->prof('draw_images_' . $nImg, $t);
         }
 
         // Textes
+        $nTxt = 0;
         if (!empty($state['texts']) && is_array($state['texts'])) {
             foreach ($state['texts'] as $txtData) {
                 $this->drawText($img, $txtData, $ratio);
+                $nTxt++;
             }
+            $t = $this->prof('draw_texts_' . $nTxt, $t);
         }
 
         // Flatten + sauvegarde
@@ -70,7 +88,9 @@ class MousepadeditorComposeModuleFrontController extends ModuleFrontController
         if (!is_dir($dir)) { @mkdir($dir, 0755, true); }
         $filename = $hash . '.png';
         $img->writeImage($dir . $filename);
+        $t = $this->prof('write_image', $t);
         $img->clear();
+        $this->prof('TOTAL', $tAll);
 
         return [
             'previewUrl' => _MODULE_DIR_ . 'mousepadeditor/uploads/previews/' . $filename,
