@@ -83,10 +83,10 @@ class MousepadeditorAttachcustomModuleFrontController extends ModuleFrontControl
             $customization->add();
             @file_put_contents('/tmp/mpe_attach.log', 'customization added id=' . $customization->id . PHP_EOL, FILE_APPEND);
 
-            // Ajouter l'entrée customized_data
+            // Ajouter l'entrée customized_data (type 0 = file en PS, 1 = text)
             Db::getInstance()->insert('customized_data', [
                 'id_customization' => (int) $customization->id,
-                'type' => 1, // file
+                'type' => 0, // file
                 'index' => (int) $fieldId,
                 'value' => pSQL($hash),
             ]);
@@ -143,10 +143,10 @@ class MousepadeditorAttachcustomModuleFrontController extends ModuleFrontControl
         }
         $label = 'Aperçu de la création';
 
-        // Créer le champ
+        // Créer le champ (type 0 = file en PS, 1 = text)
         $db->insert('customization_field', [
             'id_product' => (int) $pid,
-            'type' => 1, // file
+            'type' => 0, // file
             'required' => 0,
             'is_module' => 0,
             'is_deleted' => 0,

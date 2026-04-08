@@ -36,13 +36,6 @@
           {/foreach}
         {/foreach}
       {/if}
-      {if $product.id_product == 20}
-        <!-- MPE-DUMP-START
-        mpeCustomImg={$mpeCustomImg}
-        customizations_count={if is_array($product.customizations)}{$product.customizations|count}{else}NOT_ARRAY{/if}
-        customizations={$product.customizations|@var_export}
-        MPE-DUMP-END -->
-      {/if}
       {if $mpeCustomImg}
         <img src="{$mpeCustomImg}" alt="{$product.name|escape:'quotes'}" loading="lazy" style="width:100%;height:auto;border-radius:4px;">
       {elseif $product.default_image}
