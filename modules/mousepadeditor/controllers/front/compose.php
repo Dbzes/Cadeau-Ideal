@@ -105,6 +105,7 @@ class MousepadeditorComposeModuleFrontController extends ModuleFrontController
 
     protected function drawBackground(Imagick $canvas, array $bg, $W, $H, $ratio)
     {
+        $t = microtime(true);
         if (!empty($bg['color'])) {
             $canvas->setImageBackgroundColor(new ImagickPixel($bg['color']));
             $canvas->compositeImage(
@@ -120,8 +121,10 @@ class MousepadeditorComposeModuleFrontController extends ModuleFrontController
 
         // Utiliser la version HD pré-cachée si disponible (gain ~6s)
         $hdCache = $this->ensureHdCache($src, $W, $H);
+        $t = $this->prof('bg.ensureHdCache', $t);
         $isCached = $hdCache && file_exists($hdCache);
         $bgImg = new Imagick($isCached ? $hdCache : $src);
+        $t = $this->prof('bg.load ' . ($isCached ? 'CACHE' : 'SRC'), $t);
         // Échelle : base cover + zoom user
         $baseScale = max($W / $bgImg->getImageWidth(), $H / $bgImg->getImageHeight());
         $zoom = isset($bg['zoom']) ? (float) $bg['zoom'] : 1;
@@ -131,6 +134,9 @@ class MousepadeditorComposeModuleFrontController extends ModuleFrontController
         // Skip resize si déjà à la bonne taille (cache hit + zoom 1)
         if (abs($finalScale - 1.0) > 0.01) {
             $bgImg->resizeImage((int) $newW, (int) $newH, Imagick::FILTER_LANCZOS, 1);
+            $t = $this->prof('bg.resize', $t);
+        } else {
+            $t = $this->prof('bg.resize SKIP', $t);
         }
 
         // Position : left/top du centre de l'image (en coordonnées éditeur), convertie
@@ -140,6 +146,7 @@ class MousepadeditorComposeModuleFrontController extends ModuleFrontController
         $y = (int) ($cy - $newH / 2);
 
         $canvas->compositeImage($bgImg, Imagick::COMPOSITE_OVER, $x, $y);
+        $this->prof('bg.composite', $t);
         $bgImg->clear();
     }
 
