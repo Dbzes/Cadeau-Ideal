@@ -121,15 +121,14 @@ class MousepadeditorAttachcustomModuleFrontController extends ModuleFrontControl
 
         // Chercher champ existant "Aperçu personnalisé"
         $label = 'Aperçu personnalisé';
-        $fieldId = $db->getValue('
-            SELECT cf.id_customization_field
-            FROM ' . _DB_PREFIX_ . 'customization_field cf
-            JOIN ' . _DB_PREFIX_ . 'customization_field_lang cfl ON cf.id_customization_field = cfl.id_customization_field
-            WHERE cf.id_product = ' . (int) $pid . '
-              AND cf.type = 1
-              AND cfl.name = \'' . pSQL($label) . '\'
-            LIMIT 1
-        ');
+        $sql = 'SELECT cf.id_customization_field FROM ' . _DB_PREFIX_ . 'customization_field cf'
+            . ' INNER JOIN ' . _DB_PREFIX_ . 'customization_field_lang cfl ON cf.id_customization_field = cfl.id_customization_field'
+            . ' WHERE cf.id_product = ' . (int) $pid
+            . ' AND cf.type = 1'
+            . ' AND cfl.name = \'' . pSQL($label) . '\''
+            . ' LIMIT 1';
+        @file_put_contents('/tmp/mpe_attach.log', 'SQL: ' . $sql . PHP_EOL, FILE_APPEND);
+        $fieldId = $db->getValue($sql);
 
         if ($fieldId) return (int) $fieldId;
 
