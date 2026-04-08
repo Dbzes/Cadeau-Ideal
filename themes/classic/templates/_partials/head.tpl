@@ -280,7 +280,6 @@
       width: 100%;
       aspect-ratio: 1 / 1;
       border: 1px solid #ee7a03;
-      border-radius: 4px;
       overflow: hidden;
       background: #fff;
       padding: 4px;
