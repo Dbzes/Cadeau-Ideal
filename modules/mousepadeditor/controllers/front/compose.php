@@ -29,17 +29,8 @@ class MousepadeditorComposeModuleFrontController extends ModuleFrontController
         exit;
     }
 
-    protected function prof($label, $t0)
-    {
-        $ms = round((microtime(true) - $t0) * 1000, 1);
-        @file_put_contents('/tmp/mpe_perf.log', date('H:i:s') . ' ' . str_pad($label, 20) . ' ' . $ms . ' ms' . PHP_EOL, FILE_APPEND);
-        return microtime(true);
-    }
-
     protected function composeMockup(array $state)
     {
-        $tAll = microtime(true);
-        @file_put_contents('/tmp/mpe_perf.log', '--- compose ' . date('H:i:s') . ' ---' . PHP_EOL, FILE_APPEND);
         // Dimensions cible HD
         $canvasW = isset($state['canvasW']) ? (float) $state['canvasW'] : 600;
         $canvasH = isset($state['canvasH']) ? (float) $state['canvasH'] : 491;
@@ -49,36 +40,27 @@ class MousepadeditorComposeModuleFrontController extends ModuleFrontController
         // Ratio canvas éditeur → HD
         $ratio = $targetW / $canvasW;
 
-        $t = microtime(true);
         $img = new Imagick();
         $img->newImage($targetW, $targetH, new ImagickPixel('#ffffff'), 'png');
         $img->setImageFormat('png');
-        $t = $this->prof('init_canvas', $t);
 
         // Fond
         if (!empty($state['bg'])) {
             $this->drawBackground($img, $state['bg'], $targetW, $targetH, $ratio);
-            $t = $this->prof('draw_background', $t);
         }
 
         // Images
-        $nImg = 0;
         if (!empty($state['images']) && is_array($state['images'])) {
             foreach ($state['images'] as $imgData) {
                 $this->drawImage($img, $imgData, $ratio);
-                $nImg++;
             }
-            $t = $this->prof('draw_images_' . $nImg, $t);
         }
 
         // Textes
-        $nTxt = 0;
         if (!empty($state['texts']) && is_array($state['texts'])) {
             foreach ($state['texts'] as $txtData) {
                 $this->drawText($img, $txtData, $ratio);
-                $nTxt++;
             }
-            $t = $this->prof('draw_texts_' . $nTxt, $t);
         }
 
         // Flatten + sauvegarde (JPG 100% = ~10x plus rapide que PNG)
@@ -91,9 +73,7 @@ class MousepadeditorComposeModuleFrontController extends ModuleFrontController
         if (!is_dir($dir)) { @mkdir($dir, 0755, true); }
         $filename = $hash . '.jpg';
         $img->writeImage($dir . $filename);
-        $t = $this->prof('write_image', $t);
         $img->clear();
-        $this->prof('TOTAL', $tAll);
 
         return [
             'previewUrl' => _MODULE_DIR_ . 'mousepadeditor/uploads/previews/' . $filename,
@@ -105,7 +85,6 @@ class MousepadeditorComposeModuleFrontController extends ModuleFrontController
 
     protected function drawBackground(Imagick $canvas, array $bg, $W, $H, $ratio)
     {
-        $t = microtime(true);
         if (!empty($bg['color'])) {
             $canvas->setImageBackgroundColor(new ImagickPixel($bg['color']));
             $canvas->compositeImage(
@@ -119,12 +98,10 @@ class MousepadeditorComposeModuleFrontController extends ModuleFrontController
         $src = $this->resolveLocalPath($bg['url']);
         if (!$src || !file_exists($src)) return;
 
-        // Utiliser la version HD pré-cachée si disponible (gain ~6s)
+        // Utiliser la version HD pré-cachée si disponible
         $hdCache = $this->ensureHdCache($src, $W, $H);
-        $t = $this->prof('bg.ensureHdCache', $t);
         $isCached = $hdCache && file_exists($hdCache);
         $bgImg = new Imagick($isCached ? $hdCache : $src);
-        $t = $this->prof('bg.load ' . ($isCached ? 'CACHE' : 'SRC'), $t);
         // Échelle : base cover + zoom user
         $baseScale = max($W / $bgImg->getImageWidth(), $H / $bgImg->getImageHeight());
         $zoom = isset($bg['zoom']) ? (float) $bg['zoom'] : 1;
@@ -134,9 +111,6 @@ class MousepadeditorComposeModuleFrontController extends ModuleFrontController
         // Skip resize si déjà à la bonne taille (cache hit + zoom 1)
         if (abs($finalScale - 1.0) > 0.01) {
             $bgImg->resizeImage((int) $newW, (int) $newH, Imagick::FILTER_LANCZOS, 1);
-            $t = $this->prof('bg.resize', $t);
-        } else {
-            $t = $this->prof('bg.resize SKIP', $t);
         }
 
         // Position : left/top du centre de l'image (en coordonnées éditeur), convertie
@@ -146,7 +120,6 @@ class MousepadeditorComposeModuleFrontController extends ModuleFrontController
         $y = (int) ($cy - $newH / 2);
 
         $canvas->compositeImage($bgImg, Imagick::COMPOSITE_OVER, $x, $y);
-        $this->prof('bg.composite', $t);
         $bgImg->clear();
     }
 

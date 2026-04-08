@@ -297,14 +297,12 @@ function mpeInit() {
         }
       }
       localStorage.setItem(STORAGE_KEY, JSON.stringify({ bg: bg, images: images, texts: texts }));
-      console.log('[mpe] saveState', { key: STORAGE_KEY, bg: !!bg, imgs: images.length, txts: texts.length });
-    } catch(e) { console.warn('[mpe] saveState err', e); }
+    } catch(e) {}
   }
 
   function restoreState() {
     var raw;
     try { raw = localStorage.getItem(STORAGE_KEY); } catch(e) { restoring = false; restoreDone = true; return; }
-    console.log('[mpe] restoreState raw=', raw ? raw.length + ' chars' : 'EMPTY', 'key=', STORAGE_KEY);
     if (!raw) { restoring = false; restoreDone = true; return; }
     var state;
     try { state = JSON.parse(raw); } catch(e) { restoring = false; restoreDone = true; return; }
@@ -346,7 +344,6 @@ function mpeInit() {
         canvas.renderAll();
         restoring = false;
         restoreDone = true;
-        console.log('[mpe] restore done');
       }
       nextImg();
     }
