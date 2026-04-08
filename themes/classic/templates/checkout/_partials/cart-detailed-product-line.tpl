@@ -26,7 +26,19 @@
   <!--  product line left content: image-->
   <div class="product-line-grid-left col-md-3 col-xs-4">
     <span class="product-image media-middle">
-      {if $product.default_image}
+      {assign var='mpeCustomImg' value=''}
+      {if is_array($product.customizations) && $product.customizations|count}
+        {foreach from=$product.customizations item="mpeCust"}
+          {foreach from=$mpeCust.fields item="mpeField"}
+            {if $mpeField.type == 'image' && $mpeField.image.small.url}
+              {assign var='mpeCustomImg' value=$mpeField.image.small.url}
+            {/if}
+          {/foreach}
+        {/foreach}
+      {/if}
+      {if $mpeCustomImg}
+        <img src="{$mpeCustomImg}" alt="{$product.name|escape:'quotes'}" loading="lazy" style="width:100%;height:auto;border-radius:4px;">
+      {elseif $product.default_image}
         <picture>
           {if !empty($product.default_image.bySize.cart_default.sources.avif)}<source srcset="{$product.default_image.bySize.cart_default.sources.avif}" type="image/avif">{/if}
           {if !empty($product.default_image.bySize.cart_default.sources.webp)}<source srcset="{$product.default_image.bySize.cart_default.sources.webp}" type="image/webp">{/if}
