@@ -116,7 +116,7 @@ class MousepadeditorAttachcustomModuleFrontController extends ModuleFrontControl
             JOIN ' . _DB_PREFIX_ . 'customization_field_lang cfl ON cf.id_customization_field = cfl.id_customization_field
             WHERE cf.id_product = ' . (int) $pid . '
               AND cf.type = 1
-              AND cfl.name = "' . pSQL($label) . '"
+              AND cfl.name = \'' . pSQL($label) . '\'
             LIMIT 1
         ');
 
