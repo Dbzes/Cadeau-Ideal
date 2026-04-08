@@ -193,10 +193,27 @@ class MousepadeditorComposeModuleFrontController extends ModuleFrontController
     protected function drawImage(Imagick $canvas, array $data, $ratio)
     {
         if (empty($data['url'])) return;
-        $src = $this->resolveLocalPath($data['url']);
-        if (!$src || !file_exists($src)) return;
 
-        $el = new Imagick($src);
+        $url = $data['url'];
+        $el = new Imagick();
+
+        // Cas 1 : dataURL base64 (canvas FileReader)
+        if (strpos($url, 'data:') === 0) {
+            $parts = explode(',', $url, 2);
+            if (count($parts) !== 2) return;
+            $binary = base64_decode($parts[1]);
+            if ($binary === false) return;
+            try {
+                $el->readImageBlob($binary);
+            } catch (Exception $e) {
+                return;
+            }
+        } else {
+            // Cas 2 : URL fichier local
+            $src = $this->resolveLocalPath($url);
+            if (!$src || !file_exists($src)) return;
+            $el = new Imagick($src);
+        }
         $scaleX = isset($data['scaleX']) ? (float) $data['scaleX'] : 1;
         $scaleY = isset($data['scaleY']) ? (float) $data['scaleY'] : 1;
         $angle = isset($data['angle']) ? (float) $data['angle'] : 0;
