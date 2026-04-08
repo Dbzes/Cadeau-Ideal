@@ -103,10 +103,34 @@ class MousepadeditorUploadModuleFrontController extends ModuleFrontController
             }
         }
 
+        // Pré-génération du cache HD (évite les 6s de resize au moment de la compose)
+        $this->preGenerateHdCache($dest, 1299, 1063);
+
         $this->json([
             'success' => true,
             'url' => $this->getCustomerUrl($key) . 'bg.' . $finalExt . '?t=' . time(),
         ]);
+    }
+
+    protected function preGenerateHdCache($src, $W, $H)
+    {
+        if (!extension_loaded('imagick') || !file_exists($src)) return;
+        try {
+            $info = pathinfo($src);
+            $cache = $info['dirname'] . '/' . $info['filename'] . '_hd.jpg';
+            $im = new Imagick($src);
+            $baseScale = max($W / $im->getImageWidth(), $H / $im->getImageHeight());
+            $nw = (int) ($im->getImageWidth() * $baseScale);
+            $nh = (int) ($im->getImageHeight() * $baseScale);
+            $im->resizeImage($nw, $nh, Imagick::FILTER_LANCZOS, 1);
+            $im->setImageFormat('jpeg');
+            $im->setImageCompressionQuality(100);
+            $im->stripImage();
+            $im->writeImage($cache);
+            $im->clear();
+        } catch (Exception $e) {
+            // fail silently, le cache sera régénéré à la compose
+        }
     }
 
     protected function handleDelete()

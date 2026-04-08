@@ -118,7 +118,9 @@ class MousepadeditorComposeModuleFrontController extends ModuleFrontController
         $src = $this->resolveLocalPath($bg['url']);
         if (!$src || !file_exists($src)) return;
 
-        $bgImg = new Imagick($src);
+        // Utiliser la version HD pré-cachée si disponible (gain ~6s)
+        $hdCache = $this->ensureHdCache($src, $W, $H);
+        $bgImg = new Imagick($hdCache ?: $src);
         // Échelle : base cover + zoom user
         $baseScale = max($W / $bgImg->getImageWidth(), $H / $bgImg->getImageHeight());
         $zoom = isset($bg['zoom']) ? (float) $bg['zoom'] : 1;
@@ -135,6 +137,35 @@ class MousepadeditorComposeModuleFrontController extends ModuleFrontController
 
         $canvas->compositeImage($bgImg, Imagick::COMPOSITE_OVER, $x, $y);
         $bgImg->clear();
+    }
+
+    /**
+     * Génère (ou réutilise) une version HD pré-dimensionnée du fond.
+     * Stockée à côté du fichier source avec suffixe _hd.jpg
+     * Taille : cover de W x H (=taille cible HD du canvas)
+     */
+    protected function ensureHdCache($src, $W, $H)
+    {
+        $info = pathinfo($src);
+        $cache = $info['dirname'] . '/' . $info['filename'] . '_hd.jpg';
+        if (file_exists($cache) && filemtime($cache) >= filemtime($src)) {
+            return $cache;
+        }
+        try {
+            $im = new Imagick($src);
+            $baseScale = max($W / $im->getImageWidth(), $H / $im->getImageHeight());
+            $nw = (int) ($im->getImageWidth() * $baseScale);
+            $nh = (int) ($im->getImageHeight() * $baseScale);
+            $im->resizeImage($nw, $nh, Imagick::FILTER_LANCZOS, 1);
+            $im->setImageFormat('jpeg');
+            $im->setImageCompressionQuality(100);
+            $im->stripImage();
+            $im->writeImage($cache);
+            $im->clear();
+            return $cache;
+        } catch (Exception $e) {
+            return null;
+        }
     }
 
     protected function createSolidLayer($w, $h, $color)
