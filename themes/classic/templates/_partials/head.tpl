@@ -337,7 +337,12 @@
     }
     @media (max-width: 767px) {
       .mpe-preview-modal { padding: 0; }
-      .mpe-preview-img { max-width: 100vw; max-height: 100vh; }
+      .mpe-preview-img {
+        width: 100vw !important;
+        max-width: 100vw;
+        height: auto;
+        max-height: 100vh;
+      }
     }
   </style>
   <script>
