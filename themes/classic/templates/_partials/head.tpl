@@ -185,14 +185,15 @@
     #authentication .page-header h1,
     body#authentication h1 {
       font-family: 'Bebas Neue', sans-serif;
-      color: #004774;
+      color: #000;
       letter-spacing: 1px;
+      font-size: 28px;
     }
     #login-form .form-control,
     .login-form .form-control,
     #authentication .form-control {
       border: 1px solid #ee7a03 !important;
-      border-radius: 4px;
+      border-radius: 0 !important;
     }
     #login-form .form-control:focus,
     .login-form .form-control:focus,
