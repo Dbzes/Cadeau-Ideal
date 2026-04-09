@@ -715,17 +715,41 @@ class Mousepadeditor extends Module
         </label>';
         $html .= '<div style="margin-top:15px;text-align:right;"><button type="submit" name="submitMousepadTemplateUpload" class="btn btn-primary"><i class="process-icon-save"></i> ' . $this->l('Uploader') . '</button></div>';
         $html .= '</form>';
+        $html .= '<div id="mpe-tpl-feedback" style="display:none;margin-top:10px;padding:12px;background:#e8f5e9;border:1px solid #a5d6a7;border-radius:4px;font-size:13px;color:#2e7d32;">
+            <strong>Fichier sélectionné :</strong> <span id="mpe-tpl-fname"></span>
+            <div id="mpe-tpl-fpreview" style="margin-top:8px;max-width:200px;max-height:120px;overflow:hidden;"></div>
+        </div>';
         $html .= '<script>
             (function(){
-                var dz=document.getElementById("mpe-tdz"),inp=document.getElementById("mpe-tfile");
+                var dz=document.getElementById("mpe-tdz"),inp=document.getElementById("mpe-tfile"),
+                    fb=document.getElementById("mpe-tpl-feedback"),fname=document.getElementById("mpe-tpl-fname"),
+                    fprev=document.getElementById("mpe-tpl-fpreview");
                 if(!dz)return;
+                function showFeedback(){
+                    if(!inp.files||!inp.files.length)return;
+                    var f=inp.files[0];
+                    fname.textContent=f.name+" ("+Math.round(f.size/1024)+" Ko)";
+                    fprev.innerHTML="";
+                    if(f.type.indexOf("image")===0){
+                        var img=document.createElement("img");
+                        img.style.cssText="max-width:200px;max-height:120px;border:1px solid #ccc;";
+                        img.src=URL.createObjectURL(f);
+                        fprev.appendChild(img);
+                    }
+                    fb.style.display="block";
+                    dz.querySelector(".mpe-dropzone-title").textContent="Fichier prêt — cliquez Uploader";
+                    dz.style.borderColor="#4caf50";
+                    dz.style.background="#f1f8e9";
+                }
                 ["dragenter","dragover"].forEach(function(e){dz.addEventListener(e,function(ev){ev.preventDefault();ev.stopPropagation();dz.classList.add("mpe-drag");});});
                 ["dragleave","drop"].forEach(function(e){dz.addEventListener(e,function(ev){ev.preventDefault();ev.stopPropagation();dz.classList.remove("mpe-drag");});});
                 dz.addEventListener("drop",function(ev){
                     var dt=new DataTransfer();
                     Array.from(ev.dataTransfer.files).forEach(function(f){dt.items.add(f);});
                     inp.files=dt.files;
+                    showFeedback();
                 });
+                inp.addEventListener("change",function(){showFeedback();});
                 inp.addEventListener("click",function(e){e.stopPropagation();});
             })();
         </script>';
