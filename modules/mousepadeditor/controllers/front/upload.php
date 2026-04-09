@@ -103,6 +103,9 @@ class MousepadeditorUploadModuleFrontController extends ModuleFrontController
             }
         }
 
+        // Réduire à 2000px max si nécessaire (économise RAM Imagick)
+        $this->downsizeIfNeeded($dest, 2000);
+
         // Pré-génération du cache HD (évite les 6s de resize au moment de la compose)
         $this->preGenerateHdCache($dest, 1299, 1063);
 
@@ -131,6 +134,22 @@ class MousepadeditorUploadModuleFrontController extends ModuleFrontController
         } catch (Exception $e) {
             // fail silently, le cache sera régénéré à la compose
         }
+    }
+
+    protected function downsizeIfNeeded($path, $maxPx)
+    {
+        if (!extension_loaded('imagick') || !file_exists($path)) return;
+        try {
+            $im = new \Imagick($path);
+            $w = $im->getImageWidth();
+            $h = $im->getImageHeight();
+            if ($w <= $maxPx && $h <= $maxPx) { $im->clear(); return; }
+            $im->thumbnailImage($maxPx, $maxPx, true);
+            $im->setImageCompressionQuality(92);
+            $im->stripImage();
+            $im->writeImage($path);
+            $im->clear();
+        } catch (\Exception $e) {}
     }
 
     protected function handleDelete()

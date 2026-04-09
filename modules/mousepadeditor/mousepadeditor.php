@@ -253,6 +253,21 @@ class Mousepadeditor extends Module
 
             $newName = uniqid('bg_', true) . '.' . $ext;
             if (move_uploaded_file($tmp, $dir . $newName)) {
+                // Réduire à 2000px max si nécessaire
+                if (extension_loaded('imagick')) {
+                    try {
+                        $im = new \Imagick($dir . $newName);
+                        $w = $im->getImageWidth();
+                        $h = $im->getImageHeight();
+                        if ($w > 2000 || $h > 2000) {
+                            $im->thumbnailImage(2000, 2000, true);
+                            $im->setImageCompressionQuality(92);
+                            $im->stripImage();
+                            $im->writeImage($dir . $newName);
+                        }
+                        $im->clear();
+                    } catch (\Exception $e) {}
+                }
                 $list[] = $newName;
                 $count++;
             }

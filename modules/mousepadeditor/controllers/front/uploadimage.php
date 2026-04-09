@@ -39,6 +39,22 @@ class MousepadeditorUploadimageModuleFrontController extends ModuleFrontControll
                 throw new Exception('Échec écriture fichier');
             }
 
+            // Réduire à 2000px max si nécessaire
+            if (extension_loaded('imagick')) {
+                try {
+                    $im = new \Imagick($dest);
+                    $w = $im->getImageWidth();
+                    $h = $im->getImageHeight();
+                    if ($w > 2000 || $h > 2000) {
+                        $im->thumbnailImage(2000, 2000, true);
+                        $im->setImageCompressionQuality(92);
+                        $im->stripImage();
+                        $im->writeImage($dest);
+                    }
+                    $im->clear();
+                } catch (\Exception $e) {}
+            }
+
             echo json_encode([
                 'success' => true,
                 'url' => _MODULE_DIR_ . 'mousepadeditor/uploads/customer/' . $key . '/images/' . $name,
