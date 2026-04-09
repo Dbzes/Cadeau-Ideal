@@ -31,6 +31,9 @@ class MousepadeditorComposeModuleFrontController extends ModuleFrontController
 
     protected function composeMockup(array $state)
     {
+        // Pas de timeout pour la composition HD
+        @set_time_limit(300);
+
         // Augmenter les limites Imagick pour les images lourdes
         Imagick::setResourceLimit(Imagick::RESOURCETYPE_MEMORY, 1024 * 1024 * 1024);  // 1 Go
         Imagick::setResourceLimit(Imagick::RESOURCETYPE_MAP, 1024 * 1024 * 1024);     // 1 Go
