@@ -202,12 +202,12 @@
       body#checkout .header-nav.hidden-md-up,
       body#order .header-nav.hidden-md-up,
       body[id*="order"] .header-nav.hidden-md-up {
-        margin-bottom: 140px;
+        margin-bottom: 160px;
       }
       body#checkout #content,
       body#order #content,
       body[id*="order"] #content {
-        padding-top: 15px;
+        padding-top: 20px;
       }
       .mobile-header-top {
         display: flex;
