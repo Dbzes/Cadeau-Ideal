@@ -199,6 +199,9 @@
       .header-nav.hidden-md-up {
         margin-bottom: 110px;
       }
+      body#checkout .header-nav.hidden-md-up {
+        margin-bottom: 120px;
+      }
       .mobile-header-top {
         display: flex;
         align-items: center;
