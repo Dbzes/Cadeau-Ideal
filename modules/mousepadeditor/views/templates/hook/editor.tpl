@@ -1,6 +1,12 @@
-<div id="mpe-loader" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:99999;align-items:center;justify-content:center;flex-direction:column;">
+<div id="mpe-loader" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:99999;align-items:center;justify-content:center;flex-direction:column;padding:20px;">
   <div style="width:70px;height:70px;border:6px solid rgba(255,255,255,.25);border-top-color:#ee7a03;border-radius:50%;animation:mpe-spin 1s linear infinite;"></div>
-  <div style="color:#fff;margin-top:18px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;">Génération de votre aperçu HD...</div>
+  <div style="color:#fff;margin-top:18px;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;">Génération de votre aperçu HD...</div>
+  {if isset($mpe_lsv_blocs) && $mpe_lsv_blocs|count > 0}
+    <div style="margin-top:30px;text-align:center;max-width:400px;">
+      <div style="color:#ee7a03;font-weight:700;font-size:16px;margin-bottom:8px;">Le saviez-vous ?</div>
+      <div id="mpe-lsv-text" style="color:#fff;font-size:14px;line-height:1.5;opacity:1;transition:opacity .5s;">{$mpe_lsv_blocs[0].text|escape:'htmlall':'UTF-8'}</div>
+    </div>
+  {/if}
 </div>
 {literal}<style>
 @keyframes mpe-spin { to { transform: rotate(360deg); } }
@@ -170,6 +176,7 @@ window.MPE_PRODUCT_ID = {$mpe_product_id};
 window.MPE_TEMPLATE_URL = {if isset($mpe_template) && $mpe_template}'{$mpe_template.url}'{else}null{/if};
 window.MPE_TEMPLATE_W = {if isset($mpe_template) && $mpe_template}{$mpe_template.width}{else}220{/if};
 window.MPE_TEMPLATE_H = {if isset($mpe_template) && $mpe_template}{$mpe_template.height}{else}180{/if};
+window.MPE_LSV_BLOCS = {if isset($mpe_lsv_blocs) && $mpe_lsv_blocs|count > 0}{$mpe_lsv_blocs|json_encode nofilter}{else}[]{/if};
 {literal}
 // Détection d'extensions navigateur interférant
 (function(){
@@ -913,6 +920,22 @@ function mpeInit() {
     setTimeout(restoreState, 300);
   }
 }
+// Rotation "Le saviez-vous ?" dans le loader
+(function(){
+  var blocs = window.MPE_LSV_BLOCS || [];
+  var el = document.getElementById('mpe-lsv-text');
+  if (!el || blocs.length < 2) return;
+  var idx = 0;
+  setInterval(function(){
+    el.style.opacity = '0';
+    setTimeout(function(){
+      idx = (idx + 1) % blocs.length;
+      el.textContent = blocs[idx].text;
+      el.style.opacity = '1';
+    }, 500);
+  }, 10000);
+})();
+
 (function waitFabric(tries){
   if (typeof fabric !== 'undefined') { mpeInit(); return; }
   if (tries > 50) { console.error('[mpe] Fabric.js failed to load'); mpeInit(); return; }

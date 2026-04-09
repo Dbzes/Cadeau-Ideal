@@ -959,6 +959,7 @@ class Mousepadeditor extends Module
             'mpe_compose_url' => $composeUrl,
             'mpe_attach_url' => $attachUrl,
             'mpe_product_id' => $productId,
+            'mpe_lsv_blocs' => class_exists('LeSaviezVous') ? LeSaviezVous::getBlocs() : [],
         ]);
 
         return $this->display(__FILE__, 'views/templates/hook/editor.tpl');
