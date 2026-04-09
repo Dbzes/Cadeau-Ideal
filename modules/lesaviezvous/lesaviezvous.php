@@ -138,13 +138,7 @@ class LeSaviezVous extends Module
                 $active = !empty($b['active']);
                 $html .= '<tr>';
                 $html .= '<td>' . ($i + 1) . '</td>';
-                $html .= '<td>';
-                $html .= '<form method="post" style="display:flex;gap:8px;align-items:center;">';
-                $html .= '<input type="hidden" name="lsv_edit_idx" value="' . $i . '" />';
-                $html .= '<input type="text" name="lsv_edit_text" value="' . htmlspecialchars($b['text']) . '" class="form-control" style="flex:1;" />';
-                $html .= '<button type="submit" name="submitEditBloc" class="btn btn-default btn-sm"><i class="icon-pencil"></i></button>';
-                $html .= '</form>';
-                $html .= '</td>';
+                $html .= '<td>' . htmlspecialchars($b['text']) . '</td>';
                 $html .= '<td><a href="' . $base . '&toggleBloc=' . $i . '" class="btn btn-sm ' . ($active ? 'btn-success' : 'btn-danger') . '">' . ($active ? $this->l('Actif') : $this->l('Inactif')) . '</a></td>';
                 $html .= '<td><a href="' . $base . '&deleteBloc=' . $i . '" class="btn btn-sm btn-danger" onclick="return confirm(\'' . $this->l('Supprimer ce bloc ?') . '\')"><i class="icon-trash"></i></a></td>';
                 $html .= '</tr>';
@@ -152,12 +146,15 @@ class LeSaviezVous extends Module
             $html .= '</tbody></table>';
         }
 
-        // Formulaire ajout
-        $html .= '<form method="post" style="margin-top:20px;display:flex;gap:10px;align-items:center;">';
-        $html .= '<input type="text" name="lsv_new_text" class="form-control" placeholder="' . $this->l('Nouveau texte...') . '" style="flex:1;" />';
-        $html .= '<button type="submit" name="submitAddBloc" class="btn btn-primary"><i class="icon-plus"></i> ' . $this->l('Ajouter') . '</button>';
-        $html .= '</form>';
+        $html .= '</div>';
 
+        // Formulaire ajout dans son propre panel
+        $html .= '<div class="panel">';
+        $html .= '<h3><i class="icon-plus"></i> ' . $this->l('Ajouter un bloc') . '</h3>';
+        $html .= '<form method="post" action="' . htmlspecialchars($base) . '" style="display:flex;gap:10px;align-items:center;">';
+        $html .= '<input type="text" name="lsv_new_text" class="form-control" placeholder="' . $this->l('Nouveau texte...') . '" style="flex:1;" required />';
+        $html .= '<button type="submit" name="submitAddBloc" value="1" class="btn btn-primary"><i class="icon-plus"></i> ' . $this->l('Ajouter') . '</button>';
+        $html .= '</form>';
         $html .= '</div>';
 
         // Aperçu live
