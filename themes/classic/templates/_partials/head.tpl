@@ -180,6 +180,52 @@
       word-wrap: break-word;
       overflow-wrap: break-word;
     }
+    /* Login / Authentication page styling */
+    #authentication h1,
+    #authentication .page-header h1,
+    body#authentication h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      color: #004774;
+      letter-spacing: 1px;
+    }
+    #login-form .form-control,
+    .login-form .form-control,
+    #authentication .form-control {
+      border: 1px solid #ee7a03 !important;
+      border-radius: 4px;
+    }
+    #login-form .form-control:focus,
+    .login-form .form-control:focus,
+    #authentication .form-control:focus {
+      border-color: #ee7a03 !important;
+      box-shadow: 0 0 0 2px rgba(238,122,3,.2);
+    }
+    #login-form .input-group-btn .btn,
+    .login-form .input-group-btn .btn,
+    #authentication .input-group-btn .btn {
+      background: #ee7a03 !important;
+      border-color: #ee7a03 !important;
+      color: #fff !important;
+    }
+    #submit-login,
+    #login-form .form-footer .btn-primary {
+      background: #004774 !important;
+      border-color: #004774 !important;
+      color: #fff !important;
+      display: block;
+      margin: 15px auto 0;
+      min-width: 200px;
+    }
+    .forgot-password a,
+    .no-account a {
+      color: #004774 !important;
+      font-weight: 600;
+    }
+    .forgot-password a:hover,
+    .no-account a:hover {
+      color: #ee7a03 !important;
+    }
+
     @media (max-width: 767px) {
       .header-top-bar {
         display: none;
