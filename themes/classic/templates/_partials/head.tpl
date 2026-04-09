@@ -199,8 +199,15 @@
       .header-nav.hidden-md-up {
         margin-bottom: 110px;
       }
-      body#checkout .header-nav.hidden-md-up {
-        margin-bottom: 120px;
+      body#checkout .header-nav.hidden-md-up,
+      body#order .header-nav.hidden-md-up,
+      body[id*="order"] .header-nav.hidden-md-up {
+        margin-bottom: 140px;
+      }
+      body#checkout #content,
+      body#order #content,
+      body[id*="order"] #content {
+        padding-top: 15px;
       }
       .mobile-header-top {
         display: flex;
