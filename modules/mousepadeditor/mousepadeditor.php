@@ -193,9 +193,6 @@ class Mousepadeditor extends Module
             $output .= $this->handleToggleFont(Tools::getValue('toggleFont'));
         }
 
-        // Debug ALL requests
-        @file_put_contents('/tmp/mpe_tpl_debug.log', date('H:i:s') . ' METHOD=' . $_SERVER['REQUEST_METHOD'] . ' POST=' . implode(',', array_keys($_POST)) . ' FILES=' . implode(',', array_keys($_FILES)) . ' isSubmitTPL=' . var_export(Tools::isSubmit('submitMousepadTemplateUpload'), true) . PHP_EOL, FILE_APPEND);
-
         if (Tools::isSubmit('submitMousepadTemplateUpload')) {
             $output .= $this->handleTemplateUpload();
         }
@@ -660,9 +657,8 @@ class Mousepadeditor extends Module
 
     protected function handleTemplateUpload()
     {
-        @file_put_contents('/tmp/mpe_tpl_debug.log', date('H:i:s') . ' handleTemplateUpload FILES=' . print_r($_FILES, true) . PHP_EOL, FILE_APPEND);
         if (empty($_FILES['mousepad_template']) || $_FILES['mousepad_template']['error'] !== UPLOAD_ERR_OK) {
-            return $this->displayWarning($this->l('Aucun fichier reçu (erreur: ') . (isset($_FILES['mousepad_template']) ? $_FILES['mousepad_template']['error'] : 'empty') . ').');
+            return $this->displayWarning($this->l('Aucun fichier reçu.'));
         }
         $f = $_FILES['mousepad_template'];
         $ext = strtolower(pathinfo($f['name'], PATHINFO_EXTENSION));
@@ -677,12 +673,10 @@ class Mousepadeditor extends Module
         // Purge ancien
         foreach (glob($dir . 'template.*') as $old) { @unlink($old); }
         $dest = $dir . 'template.png';
-        @file_put_contents('/tmp/mpe_tpl_debug.log', date('H:i:s') . ' tmp=' . $f['tmp_name'] . ' dest=' . $dest . ' tmp_exists=' . var_export(file_exists($f['tmp_name']), true) . ' dir_writable=' . var_export(is_writable($dir), true) . PHP_EOL, FILE_APPEND);
         if (!move_uploaded_file($f['tmp_name'], $dest)) {
             return $this->displayWarning($this->l('Échec écriture du fichier.'));
         }
         Configuration::updateValue('MOUSEPAD_TEMPLATE', 'template.png');
-        @file_put_contents('/tmp/mpe_tpl_debug.log', date('H:i:s') . ' SUCCESS dest_exists=' . var_export(file_exists($dest), true) . PHP_EOL, FILE_APPEND);
         return $this->displayConfirmation($this->l('Gabarit mis à jour.'));
     }
 
