@@ -32,9 +32,10 @@ class MousepadeditorComposeModuleFrontController extends ModuleFrontController
     protected function composeMockup(array $state)
     {
         // Augmenter les limites Imagick pour les images lourdes
-        Imagick::setResourceLimit(Imagick::RESOURCETYPE_MEMORY, 512 * 1024 * 1024);
-        Imagick::setResourceLimit(Imagick::RESOURCETYPE_MAP, 512 * 1024 * 1024);
-        Imagick::setResourceLimit(Imagick::RESOURCETYPE_DISK, 1024 * 1024 * 1024);
+        Imagick::setResourceLimit(Imagick::RESOURCETYPE_MEMORY, 1024 * 1024 * 1024);  // 1 Go
+        Imagick::setResourceLimit(Imagick::RESOURCETYPE_MAP, 1024 * 1024 * 1024);     // 1 Go
+        Imagick::setResourceLimit(Imagick::RESOURCETYPE_DISK, 2 * 1024 * 1024 * 1024); // 2 Go
+        Imagick::setResourceLimit(Imagick::RESOURCETYPE_AREA, 100 * 1024 * 1024);     // 100 Mpx
 
         // Dimensions cible HD
         $canvasW = isset($state['canvasW']) ? (float) $state['canvasW'] : 600;
