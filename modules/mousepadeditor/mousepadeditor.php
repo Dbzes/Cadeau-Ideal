@@ -48,6 +48,21 @@ class Mousepadeditor extends Module
             @mkdir($dir, 0755, true);
         }
 
+        // Table queue de composition HD async
+        Db::getInstance()->execute('CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'mpe_compose_queue` (
+            `id_queue` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+            `id_customization` INT UNSIGNED NOT NULL DEFAULT 0,
+            `hash` VARCHAR(64) NOT NULL,
+            `state_json` LONGTEXT NOT NULL,
+            `status` ENUM("pending","processing","done","error") NOT NULL DEFAULT "pending",
+            `error_msg` VARCHAR(255) DEFAULT NULL,
+            `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            `processed_at` DATETIME DEFAULT NULL,
+            PRIMARY KEY (`id_queue`),
+            KEY `status` (`status`),
+            KEY `hash` (`hash`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;');
+
         return parent::install()
             && $this->registerHook('displayMousepadEditor')
             && $this->registerHook('header')
@@ -60,6 +75,7 @@ class Mousepadeditor extends Module
 
     public function uninstall()
     {
+        Db::getInstance()->execute('DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'mpe_compose_queue`');
         Configuration::deleteByName('MOUSEPAD_PRODUCT_IDS');
         Configuration::deleteByName('MOUSEPAD_BACKGROUNDS');
         Configuration::deleteByName('MOUSEPAD_FONTS');

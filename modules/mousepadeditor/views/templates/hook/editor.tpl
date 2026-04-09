@@ -1,7 +1,7 @@
 <style>.product-customization{ldelim}display:none!important{rdelim}</style>
 <div id="mpe-loader" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:99999;align-items:center;justify-content:center;flex-direction:column;padding:20px;">
   <div style="width:70px;height:70px;border:6px solid rgba(255,255,255,.25);border-top-color:#ee7a03;border-radius:50%;animation:mpe-spin 1s linear infinite;"></div>
-  <div style="color:#fff;margin-top:18px;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;">Génération de votre aperçu HD...</div>
+  <div style="color:#fff;margin-top:18px;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;">Ajout au panier en cours...</div>
   {if isset($mpe_lsv_blocs) && $mpe_lsv_blocs|count > 0}
     <div style="margin-top:30px;text-align:center;max-width:400px;">
       <div style="color:#ee7a03;font-weight:700;font-size:16px;margin-bottom:8px;">Le saviez-vous ?</div>
@@ -855,7 +855,7 @@ function mpeInit() {
     if (el) el.style.display = 'none';
   }
 
-  // Interception ajout panier : génère HD puis attache la customization
+  // Interception ajout panier : envoie state + low-res, HD en arrière-plan serveur
   (function interceptAddToCart(){
     var form = document.getElementById('add-to-cart-or-refresh');
     if (!form) return;
@@ -873,25 +873,26 @@ function mpeInit() {
       e.preventDefault();
       e.stopImmediatePropagation();
 
-      window.mpeComposeHD(function(res){
-        if (!res || !res.success) {
-          alert('Erreur génération aperçu : ' + (res && res.error || 'inconnue'));
-          return;
-        }
-        var fd = new FormData();
-        fd.append('id_product', window.MPE_PRODUCT_ID);
-        fd.append('hd_url', res.cleanUrl || res.previewUrl);
-        fetch(window.MPE_ATTACH_URL, { method:'POST', body: fd, credentials:'same-origin' })
-          .then(function(r){ return r.json(); })
-          .then(function(d){
-            if (!d.success) { alert('Erreur attachement : ' + d.error); return; }
-            var customField = document.getElementById('product_customization_id');
-            if (customField) customField.value = d.id_customization;
-            bypass = true;
-            btn.click();
-          })
-          .catch(function(err){ alert('Erreur réseau : ' + err); });
-      });
+      // Générer une vignette low-res depuis le canvas (avec overlay inclus visuellement)
+      showLoader();
+      var lowres = '';
+      try { lowres = canvas.toDataURL('image/jpeg', 0.85); } catch(ex) {}
+
+      var fd = new FormData();
+      fd.append('id_product', window.MPE_PRODUCT_ID);
+      fd.append('state_json', JSON.stringify(state));
+      fd.append('lowres', lowres);
+      fetch(window.MPE_ATTACH_URL, { method:'POST', body: fd, credentials:'same-origin' })
+        .then(function(r){ return r.json(); })
+        .then(function(d){
+          hideLoader();
+          if (!d.success) { alert('Erreur : ' + d.error); return; }
+          var customField = document.getElementById('product_customization_id');
+          if (customField) customField.value = d.id_customization;
+          bypass = true;
+          btn.click();
+        })
+        .catch(function(err){ hideLoader(); alert('Erreur réseau : ' + err); });
     }, true);
   })();
 

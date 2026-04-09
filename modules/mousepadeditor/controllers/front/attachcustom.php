@@ -1,6 +1,8 @@
 <?php
 /**
- * Front controller AJAX — attache l'aperçu HD à une customization PrestaShop
+ * Front controller AJAX — attache une customization au panier
+ * Mode ASYNC : sauvegarde le state JSON en queue, utilise le toDataURL low-res
+ * comme vignette temporaire. La composition HD se fait en arrière-plan (cron).
  */
 class MousepadeditorAttachcustomModuleFrontController extends ModuleFrontController
 {
@@ -11,44 +13,43 @@ class MousepadeditorAttachcustomModuleFrontController extends ModuleFrontControl
         header('Content-Type: application/json');
         try {
             $pid = (int) Tools::getValue('id_product');
-            $hdUrl = Tools::getValue('hd_url');
-            if (!$pid || !$hdUrl) {
-                throw new Exception('Paramètres manquants');
-            }
+            $stateJson = Tools::getValue('state_json');
+            $lowres = Tools::getValue('lowres'); // dataURL base64 du canvas
 
-            // Résoudre le fichier HD local
-            $src = $this->resolveLocal($hdUrl);
-            if (!$src || !file_exists($src)) {
-                throw new Exception('Aperçu HD introuvable');
+            if (!$pid || !$stateJson) {
+                throw new Exception('Paramètres manquants');
             }
 
             // S'assurer que le produit a un champ de personnalisation
             $fieldId = $this->ensureCustomField($pid);
 
-            // Copier dans /upload/ avec nom hashé (fichier clean pour impression)
-            $hash = md5_file($src) . '_' . substr(md5(microtime(true)), 0, 6);
+            // Générer un hash unique pour ce job
+            $hash = md5($stateJson . microtime(true)) . '_' . substr(md5(uniqid('', true)), 0, 6);
             $dest = _PS_UPLOAD_DIR_ . $hash;
-            copy($src, $dest);
 
-            // Version preview avec template overlay → utilisée pour affichage panier
-            $previewSrc = preg_replace('/\.jpg$/', '_preview.jpg', $src);
-            $thumbSource = file_exists($previewSrc) ? $previewSrc : $src;
-
-            // Thumbnail à 1200px pour un affichage net dans le modal panier
-            if (extension_loaded('imagick')) {
-                try {
-                    $thumb = new Imagick($thumbSource);
-                    $thumb->thumbnailImage(1200, 0);
-                    $thumb->setImageCompressionQuality(90);
-                    $thumb->setImageFormat('jpeg');
-                    $thumb->stripImage();
-                    $thumb->writeImage($dest . '_small');
-                    $thumb->clear();
-                } catch (Exception $e) {
-                    @copy($thumbSource, $dest . '_small');
+            // Sauvegarder la vignette low-res comme fichier principal temporaire
+            if ($lowres && strpos($lowres, 'data:') === 0) {
+                $parts = explode(',', $lowres, 2);
+                if (count($parts) === 2) {
+                    $binary = base64_decode($parts[1]);
+                    if ($binary !== false) {
+                        file_put_contents($dest, $binary);
+                        file_put_contents($dest . '_small', $binary);
+                    }
                 }
-            } else {
-                @copy($thumbSource, $dest . '_small');
+            }
+
+            // Fallback : si pas de lowres, créer un placeholder
+            if (!file_exists($dest)) {
+                $placeholder = _PS_MODULE_DIR_ . 'mousepadeditor/views/img/placeholder.jpg';
+                if (file_exists($placeholder)) {
+                    copy($placeholder, $dest);
+                    copy($placeholder, $dest . '_small');
+                } else {
+                    // Créer une image vide minimale
+                    file_put_contents($dest, '');
+                    file_put_contents($dest . '_small', '');
+                }
             }
 
             // Contexte / panier
@@ -77,12 +78,20 @@ class MousepadeditorAttachcustomModuleFrontController extends ModuleFrontControl
             $customization->in_cart = 0;
             $customization->add();
 
-            // Ajouter l'entrée customized_data (type 0 = file en PS, 1 = text)
+            // Ajouter l'entrée customized_data (type 0 = file)
             Db::getInstance()->insert('customized_data', [
                 'id_customization' => (int) $customization->id,
-                'type' => 0, // file
+                'type' => 0,
                 'index' => (int) $fieldId,
                 'value' => pSQL($hash),
+            ]);
+
+            // Insérer le job dans la queue de composition HD
+            Db::getInstance()->insert('mpe_compose_queue', [
+                'id_customization' => (int) $customization->id,
+                'hash' => pSQL($hash),
+                'state_json' => pSQL($stateJson, true),
+                'status' => 'pending',
             ]);
 
             echo json_encode([
@@ -92,70 +101,44 @@ class MousepadeditorAttachcustomModuleFrontController extends ModuleFrontControl
         } catch (Exception $e) {
             echo json_encode(['success' => false, 'error' => $e->getMessage()]);
         }
-        // Aussi capturer les erreurs DB silencieuses
-        $dbErr = Db::getInstance()->getMsgError();
-        if ($dbErr) {
-        }
         exit;
-    }
-
-    protected function resolveLocal($url)
-    {
-        $parsed = parse_url($url);
-        $path = isset($parsed['path']) ? $parsed['path'] : $url;
-        if (strpos($path, '/modules/mousepadeditor/') !== false) {
-            $rel = substr($path, strpos($path, '/modules/mousepadeditor/') + strlen('/modules/mousepadeditor/'));
-            return _PS_MODULE_DIR_ . 'mousepadeditor/' . $rel;
-        }
-        if (strpos($path, '/') === 0) {
-            return _PS_ROOT_DIR_ . $path;
-        }
-        return null;
     }
 
     protected function ensureCustomField($pid)
     {
         $db = Db::getInstance();
 
-        // Activer customizable
         $db->update('product', ['customizable' => 2, 'uploadable_files' => 1], 'id_product = ' . (int) $pid);
         $db->update('product_shop', ['customizable' => 2, 'uploadable_files' => 1], 'id_product = ' . (int) $pid);
 
-        // Chercher champ existant via Configuration (évite charset issues avec l'accent)
         $confKey = 'MOUSEPAD_FIELD_' . (int) $pid;
         $fieldId = (int) Configuration::get($confKey);
         if ($fieldId) {
-            // Vérifier qu'il existe toujours
             $exists = $db->getValue('SELECT id_customization_field FROM ' . _DB_PREFIX_ . 'customization_field WHERE id_customization_field = ' . $fieldId . ' AND is_deleted = 0');
             if ($exists) {
-                // Sync du label (au cas où modifié)
                 $db->update('customization_field_lang', ['name' => pSQL('Aperçu de la création')], 'id_customization_field = ' . $fieldId);
                 return (int) $fieldId;
             }
         }
+
         $label = 'Aperçu de la création';
 
-        // Créer le champ (type 0 = file en PS, 1 = text)
         $db->insert('customization_field', [
             'id_product' => (int) $pid,
-            'type' => 0, // file
+            'type' => 0,
             'required' => 0,
             'is_module' => 0,
             'is_deleted' => 0,
         ]);
         $newId = (int) $db->Insert_ID();
 
-        // Shop link (table créée manuellement si absente)
         try {
             $db->insert('customization_field_shop', [
                 'id_customization_field' => $newId,
                 'id_shop' => (int) Context::getContext()->shop->id,
             ]);
-        } catch (Exception $e) {
-            // table peut ne pas exister sur certaines installs
-        }
+        } catch (Exception $e) {}
 
-        // Labels par langue
         foreach (Language::getLanguages() as $lang) {
             $db->insert('customization_field_lang', [
                 'id_customization_field' => $newId,
