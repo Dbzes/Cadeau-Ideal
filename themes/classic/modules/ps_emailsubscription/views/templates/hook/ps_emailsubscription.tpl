@@ -32,8 +32,8 @@
     .block_newsletter .nw-header img {
       display: block;
       margin: 0 auto 8px;
-      max-height: 50px;
-      width: auto;
+      width: 100%;
+      height: auto;
     }
     .block_newsletter #block-newsletter-label {
       font-family: 'Bebas Neue', sans-serif !important;

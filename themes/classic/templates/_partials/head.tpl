@@ -108,6 +108,9 @@
     .breadcrumb {
       font-size: 0.8rem;
     }
+    #footer {
+      padding-top: 0 !important;
+    }
     .header-top-bar {
       width: 100%;
       height: 18px;
