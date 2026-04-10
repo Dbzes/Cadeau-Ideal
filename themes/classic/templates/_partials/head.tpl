@@ -227,6 +227,13 @@
       color: #ee7a03 !important;
     }
     /* Forgot password page styling */
+    body#password h1,
+    body#password .page-header h1 {
+      font-family: 'Bebas Neue', sans-serif !important;
+      color: #000 !important;
+      letter-spacing: 1px;
+      font-size: 28px !important;
+    }
     .forgotten-password .form-control {
       border: 1px solid #ee7a03 !important;
       border-radius: 0 !important;
@@ -242,14 +249,31 @@
       color: #fff !important;
       border-radius: 0 !important;
     }
-    .forgotten-password .form-group label,
-    .forgotten-password .form-control-label {
-      white-space: normal;
-      overflow: visible;
-      text-overflow: unset;
-      width: 100%;
+    .forgotten-password .center-email-fields {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .forgotten-password .center-email-fields .form-control-label {
+      white-space: normal !important;
+      overflow: visible !important;
+      text-overflow: unset !important;
       text-align: center;
       display: block;
+      width: 100% !important;
+      max-width: 100% !important;
+      flex: 0 0 100% !important;
+      margin-bottom: 8px;
+    }
+    .forgotten-password .center-email-fields .email {
+      width: 100% !important;
+      max-width: 100% !important;
+      flex: 0 0 100% !important;
+      padding: 0 !important;
+      margin-bottom: 10px;
+    }
+    .forgotten-password .center-email-fields .email .form-control {
+      width: 100% !important;
     }
     #back-to-login,
     a.account-link {
