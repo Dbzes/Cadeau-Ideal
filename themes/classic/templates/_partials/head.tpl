@@ -560,6 +560,17 @@
       if (bday) {
         bday.setAttribute('placeholder', 'JJ/MM/AAAA');
         bday.setAttribute('maxlength', '10');
+        bday.addEventListener('keydown', function(e) {
+          if (e.key === 'Backspace') {
+            var pos = this.selectionStart;
+            if (pos > 0 && this.value[pos - 1] === '/') {
+              e.preventDefault();
+              this.value = this.value.substring(0, pos - 2) + this.value.substring(pos);
+              this.setSelectionRange(pos - 2, pos - 2);
+              this.dispatchEvent(new Event('input'));
+            }
+          }
+        });
         bday.addEventListener('input', function(e) {
           var v = this.value.replace(/[^0-9]/g, '');
           if (v.length > 8) v = v.substring(0, 8);
