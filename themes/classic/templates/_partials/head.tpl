@@ -121,6 +121,9 @@
     .product-price-and-shipping .product-price {
       color: #ee7a03 !important;
     }
+    .product-miniature .highlighted-informations {
+      display: none !important;
+    }
     .product-miniature .product-title a {
       white-space: normal !important;
       overflow: visible !important;
