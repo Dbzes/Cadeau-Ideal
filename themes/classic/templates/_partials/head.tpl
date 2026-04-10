@@ -125,6 +125,7 @@
       white-space: normal !important;
       overflow: visible !important;
       text-overflow: unset !important;
+      color: #000 !important;
     }
     .header-top-bar {
       width: 100%;
