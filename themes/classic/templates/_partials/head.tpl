@@ -121,6 +121,11 @@
     .product-price-and-shipping .product-price {
       color: #ee7a03 !important;
     }
+    .product-miniature .product-title a {
+      white-space: normal !important;
+      overflow: visible !important;
+      text-overflow: unset !important;
+    }
     .header-top-bar {
       width: 100%;
       height: 18px;
