@@ -25,10 +25,22 @@
 
 <div class="block_newsletter col-lg-8 col-md-12 col-sm-12" id="blockEmailSubscription_{$hookName}">
   <style>
+    .block_newsletter .nw-header {
+      text-align: center;
+      width: 100%;
+    }
+    .block_newsletter .nw-header img {
+      display: block;
+      margin: 0 auto 8px;
+      max-height: 50px;
+      width: auto;
+    }
     .block_newsletter #block-newsletter-label {
       font-family: 'Bebas Neue', sans-serif !important;
       font-size: 1.6rem;
       letter-spacing: 1px;
+      text-align: center;
+      width: 100%;
     }
     .block_newsletter .nw-form-inline {
       display: flex;
@@ -65,8 +77,11 @@
     }
   </style>
   <div class="row">
-    <p id="block-newsletter-label" class="col-md-5 col-xs-12">Inscription à la newsletter</p>
-    <div class="col-md-7 col-xs-12">
+    <div class="col-xs-12 nw-header">
+      <img src="/img/template/header-newsletters.png" alt="Newsletter" />
+      <p id="block-newsletter-label">Inscription à la newsletter</p>
+    </div>
+    <div class="col-md-12 col-xs-12">
       <form action="{$urls.current_url}#blockEmailSubscription_{$hookName}" method="post">
         <div class="row">
           <div class="col-xs-12">
