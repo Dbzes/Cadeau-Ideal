@@ -33,6 +33,7 @@
       display: block;
       margin: 0 auto 8px;
       width: 100%;
+      max-width: max-content;
       height: auto;
     }
     .block_newsletter #block-newsletter-label {
