@@ -111,6 +111,16 @@
     #footer {
       padding-top: 0 !important;
     }
+    .featured-products h2,
+    .new-products h2,
+    .products-section-title {
+      font-size: 1.8rem !important;
+    }
+    .product-price-and-shipping .price,
+    .product-miniature .price,
+    .product-price-and-shipping .product-price {
+      color: #ee7a03 !important;
+    }
     .header-top-bar {
       width: 100%;
       height: 18px;
