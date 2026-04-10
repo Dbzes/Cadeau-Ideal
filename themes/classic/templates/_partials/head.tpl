@@ -105,6 +105,9 @@
     .material-icons {
       font-family: 'Material Icons' !important;
     }
+    .breadcrumb {
+      font-size: 0.8rem;
+    }
     .header-top-bar {
       width: 100%;
       height: 18px;
