@@ -555,6 +555,22 @@
         }
       });
 
+      // Auto-format date de naissance JJ/MM/AAAA
+      var bday = document.getElementById('field-birthday');
+      if (bday) {
+        bday.setAttribute('placeholder', 'JJ/MM/AAAA');
+        bday.setAttribute('maxlength', '10');
+        bday.addEventListener('input', function(e) {
+          var v = this.value.replace(/[^0-9]/g, '');
+          if (v.length > 8) v = v.substring(0, 8);
+          var parts = [];
+          if (v.length > 0) parts.push(v.substring(0, Math.min(2, v.length)));
+          if (v.length > 2) parts.push(v.substring(2, Math.min(4, v.length)));
+          if (v.length > 4) parts.push(v.substring(4));
+          this.value = parts.join('/');
+        });
+      }
+
       if (typeof prestashop !== 'undefined') {
         prestashop.on('updateCart', function(e) {
           if (e && e.resp && e.resp.cart) {
