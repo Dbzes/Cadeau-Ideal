@@ -27,7 +27,7 @@
   <style>
     .block_newsletter #block-newsletter-label {
       font-family: 'Bebas Neue', sans-serif !important;
-      font-size: 1.4rem;
+      font-size: 1.6rem;
       letter-spacing: 1px;
     }
     .block_newsletter .nw-form-inline {
@@ -49,6 +49,8 @@
       border-radius: 0 !important;
       white-space: nowrap;
       padding: 8px 20px;
+      text-transform: uppercase;
+      font-weight: 700;
     }
     .block_newsletter .nw-conditions {
       text-align: center;
