@@ -265,6 +265,10 @@
       color: #ee7a03 !important;
     }
     /* Registration page styling */
+    body#registration .form-group:has([name="id_gender"]),
+    body#registration label[for="field-id_gender"] {
+      display: none !important;
+    }
     body#registration .form-control {
       border: 1px solid #ee7a03 !important;
       border-radius: 0 !important;
