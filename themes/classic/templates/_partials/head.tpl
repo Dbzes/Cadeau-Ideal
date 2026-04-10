@@ -563,11 +563,13 @@
         bday.addEventListener('input', function(e) {
           var v = this.value.replace(/[^0-9]/g, '');
           if (v.length > 8) v = v.substring(0, 8);
-          var parts = [];
-          if (v.length > 0) parts.push(v.substring(0, Math.min(2, v.length)));
-          if (v.length > 2) parts.push(v.substring(2, Math.min(4, v.length)));
-          if (v.length > 4) parts.push(v.substring(4));
-          this.value = parts.join('/');
+          if (v.length >= 4) {
+            this.value = v.substring(0,2) + '/' + v.substring(2,4) + '/' + v.substring(4);
+          } else if (v.length >= 2) {
+            this.value = v.substring(0,2) + '/' + v.substring(2);
+          } else {
+            this.value = v;
+          }
         });
       }
 
