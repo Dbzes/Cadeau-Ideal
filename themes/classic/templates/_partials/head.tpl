@@ -114,12 +114,18 @@
     .featured-products h2,
     .new-products h2,
     .products-section-title {
-      font-size: 1.8rem !important;
+      font-size: 2.4rem !important;
     }
     .product-price-and-shipping .price,
     .product-miniature .price,
     .product-price-and-shipping .product-price {
       color: #ee7a03 !important;
+    }
+    .product-miniature .product-title a,
+    .product-miniature h3 a {
+      font-family: 'Bebas Neue', sans-serif !important;
+      color: #000 !important;
+      letter-spacing: 0.5px;
     }
     .header-top-bar {
       width: 100%;
