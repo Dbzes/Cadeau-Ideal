@@ -24,39 +24,72 @@
  *}
 
 <div class="block_newsletter col-lg-8 col-md-12 col-sm-12" id="blockEmailSubscription_{$hookName}">
+  <style>
+    .block_newsletter #block-newsletter-label {
+      font-family: 'Bebas Neue', sans-serif !important;
+      font-size: 1.4rem;
+      letter-spacing: 1px;
+    }
+    .block_newsletter .nw-form-inline {
+      display: flex;
+      gap: 10px;
+      align-items: stretch;
+    }
+    .block_newsletter .nw-form-inline .input-wrapper {
+      flex: 1;
+    }
+    .block_newsletter .nw-form-inline .input-wrapper input {
+      width: 100%;
+      height: 100%;
+    }
+    .block_newsletter .nw-btn-subscribe {
+      background: #ee7a03 !important;
+      border-color: #ee7a03 !important;
+      color: #fff !important;
+      border-radius: 0 !important;
+      white-space: nowrap;
+      padding: 8px 20px;
+    }
+    .block_newsletter .nw-conditions {
+      text-align: center;
+    }
+    @media (max-width: 767px) {
+      .block_newsletter .nw-form-inline {
+        flex-direction: column;
+      }
+      .block_newsletter .nw-btn-subscribe {
+        width: 100%;
+      }
+    }
+  </style>
   <div class="row">
-    <p id="block-newsletter-label" class="col-md-5 col-xs-12">{l s='Get our latest news and special sales' d='Shop.Theme.Global'}</p>
+    <p id="block-newsletter-label" class="col-md-5 col-xs-12">Inscription à la newsletter</p>
     <div class="col-md-7 col-xs-12">
       <form action="{$urls.current_url}#blockEmailSubscription_{$hookName}" method="post">
         <div class="row">
           <div class="col-xs-12">
-            <input
-              class="btn btn-primary float-xs-right hidden-xs-down"
-              name="submitNewsletter"
-              type="submit"
-              value="{l s='Subscribe' d='Shop.Theme.Actions'}"
-            >
-            <input
-              class="btn btn-primary float-xs-right hidden-sm-up"
-              name="submitNewsletter"
-              type="submit"
-              value="{l s='OK' d='Shop.Theme.Actions'}"
-            >
-            <div class="input-wrapper">
+            <div class="nw-form-inline">
+              <div class="input-wrapper">
+                <input
+                  name="email"
+                  type="email"
+                  value="{$value}"
+                  placeholder="{l s='Your email address' d='Shop.Forms.Labels'}"
+                  aria-labelledby="block-newsletter-label"
+                  required
+                >
+              </div>
               <input
-                name="email"
-                type="email"
-                value="{$value}"
-                placeholder="{l s='Your email address' d='Shop.Forms.Labels'}"
-                aria-labelledby="block-newsletter-label"
-                required
+                class="btn nw-btn-subscribe"
+                name="submitNewsletter"
+                type="submit"
+                value="S'abonner"
               >
             </div>
             <input type="hidden" name="blockHookName" value="{$hookName}" />
             <input type="hidden" name="action" value="0">
-            <div class="clearfix"></div>
           </div>
-          <div class="col-xs-12">
+          <div class="col-xs-12 nw-conditions">
               {if $conditions}
                 <p>{$conditions}</p>
               {/if}
