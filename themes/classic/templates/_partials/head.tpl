@@ -262,6 +262,8 @@
       overflow: visible;
       text-overflow: unset;
       width: 100%;
+      text-align: center;
+      display: block;
     }
     #password a[href*="login"],
     #password .account-link a,
