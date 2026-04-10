@@ -265,6 +265,14 @@
       color: #ee7a03 !important;
     }
     /* Registration page styling */
+    body#registration .form-control {
+      border: 1px solid #ee7a03 !important;
+      border-radius: 0 !important;
+    }
+    body#registration .form-control:focus {
+      border-color: #ee7a03 !important;
+      box-shadow: 0 0 0 2px rgba(238,122,3,.2);
+    }
     body#registration .register-form a {
       color: #004774 !important;
       font-weight: 600;
