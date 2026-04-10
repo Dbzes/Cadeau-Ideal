@@ -226,6 +226,59 @@
     .no-account a:hover {
       color: #ee7a03 !important;
     }
+    /* Forgot password page styling */
+    #password h1,
+    #password .page-header h1,
+    body#password h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      color: #000;
+      letter-spacing: 1px;
+      font-size: 28px;
+    }
+    #password .form-control,
+    .forgotten-password .form-control {
+      border: 1px solid #ee7a03 !important;
+      border-radius: 0 !important;
+    }
+    #password .form-control:focus,
+    .forgotten-password .form-control:focus {
+      border-color: #ee7a03 !important;
+      box-shadow: 0 0 0 2px rgba(238,122,3,.2);
+    }
+    #password .form-footer .btn-primary,
+    .forgotten-password .form-footer .btn-primary,
+    #send-reset-link {
+      background: #004774 !important;
+      border-color: #004774 !important;
+      color: #fff !important;
+      display: block;
+      margin: 15px auto 0;
+      min-width: 200px;
+      border-radius: 0 !important;
+    }
+    #password .form-group label,
+    .forgotten-password .form-group label {
+      white-space: normal;
+      overflow: visible;
+      text-overflow: unset;
+      width: 100%;
+    }
+    #password a[href*="login"],
+    #password .account-link a,
+    .forgotten-password a,
+    a.account-link[href*="login"] {
+      color: #004774 !important;
+      font-weight: 600;
+    }
+    #password a[href*="login"]:hover,
+    .forgotten-password a:hover {
+      color: #ee7a03 !important;
+    }
+    #password .form-group input[type="email"] {
+      width: 100% !important;
+      min-width: 0 !important;
+      box-sizing: border-box;
+    }
 
     @media (max-width: 767px) {
       .header-top-bar {
