@@ -264,6 +264,27 @@
     .no-account a:hover {
       color: #ee7a03 !important;
     }
+    /* Registration page styling */
+    body#registration .register-form a {
+      color: #004774 !important;
+      font-weight: 600;
+    }
+    body#registration .register-form a:hover {
+      color: #ee7a03 !important;
+    }
+    body#registration .input-group-btn .btn,
+    body#registration .form-control-submit {
+      background: #ee7a03 !important;
+      border-color: #ee7a03 !important;
+      color: #fff !important;
+      border-radius: 0 !important;
+    }
+    body#registration .form-footer .btn-primary {
+      background: #ee7a03 !important;
+      border-color: #ee7a03 !important;
+      color: #fff !important;
+      border-radius: 0 !important;
+    }
     /* Forgot password page styling */
     body#password h1,
     body#password .page-header h1 {
