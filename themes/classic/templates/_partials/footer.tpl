@@ -43,7 +43,7 @@
     </div>
     <div class="row">
       <div class="col-md-12">
-        <p class="text-sm-center">
+        <p class="text-sm-center" style="text-align:center;width:100%">
           {block name='copyright_link'}
             © {'Y'|date} Le Cadeau Idéal
           {/block}
