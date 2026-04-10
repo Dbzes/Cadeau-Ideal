@@ -91,7 +91,20 @@
 {block name='hook_extra'}{/block}
 
 {block name='custom_css'}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
   <style>
+    body, body * {
+      font-family: 'Montserrat', sans-serif !important;
+    }
+    h1, h2, h3, h4, h5, h6,
+    .h1, .h2, .h3, .h4, .h5, .h6 {
+      font-family: 'Montserrat', sans-serif !important;
+    }
+    .material-icons {
+      font-family: 'Material Icons' !important;
+    }
     .header-top-bar {
       width: 100%;
       height: 18px;
@@ -144,7 +157,7 @@
       height: 48px;
     }
     .header-action-text {
-      font-family: 'Open Sans', sans-serif;
+      font-family: 'Montserrat', sans-serif;
       font-size: 0.85rem;
       line-height: 1.4;
       color: #333;
