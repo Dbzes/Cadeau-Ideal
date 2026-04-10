@@ -98,9 +98,9 @@
     body, body * {
       font-family: 'Montserrat', sans-serif !important;
     }
-    h1, h2, h3, h4, h5, h6,
-    .h1, .h2, .h3, .h4, .h5, .h6 {
-      font-family: 'Montserrat', sans-serif !important;
+    h1, h2, .h1, .h2 {
+      font-family: 'Bebas Neue', sans-serif !important;
+      letter-spacing: 1px;
     }
     .material-icons {
       font-family: 'Material Icons' !important;
