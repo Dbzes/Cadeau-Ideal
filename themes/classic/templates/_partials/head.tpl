@@ -392,6 +392,30 @@
     a.account-link:hover {
       color: #ee7a03 !important;
     }
+    /* Reset password page (password-new) */
+    .renew-password .form-control {
+      border: 1px solid #ee7a03 !important;
+      border-radius: 0 !important;
+    }
+    .renew-password .form-control:focus {
+      border-color: #ee7a03 !important;
+      box-shadow: 0 0 0 2px rgba(238,122,3,.2);
+    }
+    .renew-password .btn-primary {
+      background: #004774 !important;
+      border-color: #004774 !important;
+      color: #fff !important;
+      border-radius: 0 !important;
+    }
+    body#password #page-footer a,
+    body#password .page-footer a {
+      color: #004774 !important;
+      font-weight: 600;
+    }
+    body#password #page-footer a:hover,
+    body#password .page-footer a:hover {
+      color: #ee7a03 !important;
+    }
 
     @media (max-width: 767px) {
       .header-top-bar {
