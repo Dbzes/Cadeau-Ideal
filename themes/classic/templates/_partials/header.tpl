@@ -77,24 +77,28 @@
             </div>
             <div class="header-right-actions">
               <div class="header-action-block header-action-block--account">
-                <a class="header-action-item" href="{$urls.pages.my_account}" rel="nofollow">
-                  <img src="/img/template/icon-account.png" alt="Mon compte" class="header-action-icon" />
+                <a class="header-action-item" href="{if $customer.is_logged}{$urls.pages.my_account}{else}{$urls.pages.authentication}{/if}" rel="nofollow">
+                  {if $customer.is_logged}
+                    <img src="/img/template/icon-account-mobile.png" alt="Mon compte" class="header-action-icon" />
+                  {else}
+                    <img src="/img/template/icon-account-disabled.png" alt="Mon compte" class="header-action-icon" />
+                  {/if}
                   <span class="header-action-text">
                     <strong>Mon compte</strong><br/>
                     {if $customer.is_logged}
-                      <span class="header-action-sub">{$customerName}</span>
+                      <span class="header-action-sub">Voir mon profil</span>
                     {else}
-                      <span class="header-action-sub">Connexion/Inscription</span>
+                      <span class="header-action-sub">Connexion</span>
                     {/if}
                   </span>
                 </a>
               </div>
               <div class="header-action-block header-action-block--cart">
                 <a class="header-action-item" href="{$urls.pages.cart}" rel="nofollow">
-                  <img src="/img/template/icon-basket.png" alt="Mon panier" class="header-action-icon" />
+                  <img src="/img/template/icon-basket-mobile.png" alt="Mon panier" class="header-action-icon" />
                   <span class="header-action-text">
                     <strong>Mon panier</strong><br/>
-                    <span class="header-action-sub" id="header-cart-count">{$cart.products_count} {if $cart.products_count > 1}produits{else}produit{/if}</span>
+                    <strong><span class="header-action-sub" id="header-cart-count">{$cart.products_count} {if $cart.products_count > 1}produits{else}produit{/if}</span></strong>
                   </span>
                 </a>
               </div>

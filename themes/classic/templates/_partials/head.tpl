@@ -173,13 +173,16 @@
       text-decoration: none;
       color: #333;
     }
+    .header-action-item .header-action-icon {
+      flex-shrink: 0;
+    }
     .header-action-item:hover {
       text-decoration: none;
       color: #ee7a03;
     }
     .header-action-icon {
-      width: 48px;
-      height: 48px;
+      width: auto;
+      height: auto;
     }
     .header-action-text {
       font-family: 'Montserrat', sans-serif;
