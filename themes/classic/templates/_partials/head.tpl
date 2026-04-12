@@ -197,6 +197,15 @@
     .header-action-sub {
       color: #004774;
     }
+    a.header-action-sub,
+    a.header-action-sub strong {
+      color: #004774;
+      text-decoration: none;
+    }
+    a.header-action-sub:hover,
+    a.header-action-sub:hover strong {
+      color: #ee7a03;
+    }
     body {
       overflow-x: hidden;
     }
