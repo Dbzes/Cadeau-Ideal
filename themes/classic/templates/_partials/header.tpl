@@ -77,7 +77,7 @@
             </div>
             <div class="header-right-actions">
               <div class="header-action-block header-action-block--account">
-                <a class="header-action-item" href="{if $customer.is_logged}{$urls.pages.my_account}{else}{$urls.pages.authentication}{/if}" rel="nofollow">
+                <div class="header-action-item">
                   {if $customer.is_logged}
                     <img src="/img/template/icon-account-mobile.png" alt="Mon compte" class="header-action-icon" />
                   {else}
@@ -86,12 +86,12 @@
                   <span class="header-action-text">
                     <strong>Mon compte</strong><br/>
                     {if $customer.is_logged}
-                      <span class="header-action-sub">Voir mon profil</span>
+                      <a href="{$urls.actions.logout}" class="header-action-sub" rel="nofollow"><strong>Déconnexion</strong></a>
                     {else}
-                      <span class="header-action-sub">Connexion</span>
+                      <a href="{$urls.pages.authentication}" class="header-action-sub" rel="nofollow"><strong>Connexion</strong></a>
                     {/if}
                   </span>
-                </a>
+                </div>
               </div>
               <div class="header-action-block header-action-block--cart">
                 <a class="header-action-item" href="{$urls.pages.cart}" rel="nofollow">
