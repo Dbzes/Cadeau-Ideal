@@ -358,6 +358,31 @@
     .forgotten-password .center-email-fields .email .form-control {
       width: 100% !important;
     }
+    @media (min-width: 768px) {
+      .forgotten-password .center-email-fields {
+        flex-direction: column;
+        align-items: center;
+        max-width: 500px;
+        margin: 0 auto;
+      }
+      .forgotten-password .center-email-fields .form-control-label {
+        text-align: center;
+        max-width: 100% !important;
+        flex: 0 0 100% !important;
+        width: 100% !important;
+      }
+      .forgotten-password .center-email-fields .email {
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        padding: 0 !important;
+      }
+      .forgotten-password .center-email-fields #send-reset-link {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin-top: 10px;
+      }
+    }
     #back-to-login,
     a.account-link {
       color: #004774 !important;
