@@ -32,7 +32,16 @@
   <style>
     .page-my-account #content .links a span.link-item {
       border: 1px solid #ff9a52;
-      border-radius: 8px;
+    }
+    .page-my-account a,
+    .page-my-account .page-footer a,
+    .page-my-account #content .links a {
+      color: #004774;
+    }
+    .page-my-account a:hover,
+    .page-my-account .page-footer a:hover,
+    .page-my-account #content .links a:hover {
+      color: #004774;
     }
   </style>
   <div class="row">
