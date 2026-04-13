@@ -52,9 +52,9 @@
     .page-my-account .page-footer a[href*="logout"] {
       font-weight: 700;
     }
-    .page-my-account #wishlist-link,
-    .page-my-account #emailsalerts {
-      display: none;
+    #wishlist-link,
+    #emailsalerts {
+      display: none !important;
     }
     @media (min-width: 992px) {
       .page-my-account #content .links a:nth-last-child(2) {
