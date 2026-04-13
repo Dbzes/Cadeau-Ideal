@@ -52,6 +52,11 @@
     .page-my-account .page-footer a[href*="logout"] {
       font-weight: 700;
     }
+    @media (max-width: 991px) {
+      .page-my-account .page-footer .text-sm-center {
+        text-align: center;
+      }
+    }
     #wishlist-link,
     #emailsalerts {
       display: none !important;
