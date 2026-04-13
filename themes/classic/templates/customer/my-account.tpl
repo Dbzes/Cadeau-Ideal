@@ -33,6 +33,12 @@
     .page-my-account #content .links a span.link-item {
       border: 1px solid #ff9a52;
     }
+    .page-my-account #content .links a i {
+      color: #ff9a52;
+    }
+    .page-my-account #content .links a:hover i {
+      color: #004774;
+    }
     .page-my-account a,
     .page-my-account .page-footer a,
     .page-my-account #content .links a {
@@ -42,6 +48,9 @@
     .page-my-account .page-footer a:hover,
     .page-my-account #content .links a:hover {
       color: #004774;
+    }
+    .page-my-account .page-footer a[href*="logout"] {
+      font-weight: 700;
     }
   </style>
   <div class="row">
