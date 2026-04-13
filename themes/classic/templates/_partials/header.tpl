@@ -78,13 +78,15 @@
             <div class="header-right-actions">
               <div class="header-action-block header-action-block--account">
                 <div class="header-action-item">
-                  {if $customer.is_logged}
-                    <img src="/img/template/icon-account-mobile.png" alt="Mon compte" class="header-action-icon" />
-                  {else}
-                    <img src="/img/template/icon-account-disabled.png" alt="Mon compte" class="header-action-icon" />
-                  {/if}
+                  <a href="{if $customer.is_logged}{$urls.pages.my_account}{else}{$urls.pages.authentication}{/if}" rel="nofollow">
+                    {if $customer.is_logged}
+                      <img src="/img/template/icon-account-mobile.png" alt="Mon compte" class="header-action-icon" />
+                    {else}
+                      <img src="/img/template/icon-account-disabled.png" alt="Mon compte" class="header-action-icon" />
+                    {/if}
+                  </a>
                   <span class="header-action-text">
-                    <strong>Mon compte</strong><br/>
+                    <a href="{if $customer.is_logged}{$urls.pages.my_account}{else}{$urls.pages.authentication}{/if}" rel="nofollow" style="text-decoration:none;color:inherit;"><strong>Mon compte</strong></a><br/>
                     {if $customer.is_logged}
                       <a href="{$urls.actions.logout}" class="header-action-sub" rel="nofollow"><strong>Déconnexion</strong></a>
                     {else}
