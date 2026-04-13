@@ -57,10 +57,7 @@
       display: none !important;
     }
     @media (min-width: 992px) {
-      .page-my-account #content .links a:nth-last-child(2) {
-        margin-left: 0;
-      }
-      .page-my-account #content .links a:last-child {
+      #psgdpr-link {
         margin-left: auto;
       }
     }
