@@ -29,6 +29,12 @@
 {/block}
 
 {block name='page_content'}
+  <style>
+    .page-my-account #content .links a span.link-item {
+      border: 1px solid #ff9a52;
+      border-radius: 8px;
+    }
+  </style>
   <div class="row">
     <div class="links">
 
@@ -50,7 +56,7 @@
         <a class="col-lg-4 col-md-6 col-sm-6 col-xs-12" id="address-link" href="{$urls.pages.address}">
           <span class="link-item">
             <i class="material-icons">&#xE567;</i>
-            {l s='Add first address' d='Shop.Theme.Customeraccount'}
+            Ajouter adresse
           </span>
         </a>
       {/if}
@@ -59,7 +65,7 @@
         <a class="col-lg-4 col-md-6 col-sm-6 col-xs-12" id="history-link" href="{$urls.pages.history}">
           <span class="link-item">
             <i class="material-icons">&#xE916;</i>
-            {l s='Order history and details' d='Shop.Theme.Customeraccount'}
+            Historique commandes
           </span>
         </a>
       {/if}
