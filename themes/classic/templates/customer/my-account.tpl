@@ -34,7 +34,7 @@
       border: 1px solid #ff9a52;
     }
     .page-my-account #content .links a i {
-      color: #ff9a52;
+      color: #004774;
     }
     .page-my-account #content .links a:hover i {
       color: #004774;
@@ -51,6 +51,18 @@
     }
     .page-my-account .page-footer a[href*="logout"] {
       font-weight: 700;
+    }
+    .page-my-account #wishlist-link,
+    .page-my-account #emailsalerts {
+      display: none;
+    }
+    @media (min-width: 992px) {
+      .page-my-account #content .links a:nth-last-child(2) {
+        margin-left: 0;
+      }
+      .page-my-account #content .links a:last-child {
+        margin-left: auto;
+      }
     }
   </style>
   <div class="row">
