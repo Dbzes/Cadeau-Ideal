@@ -39,7 +39,7 @@
           <a href="{$urls.pages.my_account}" rel="nofollow">
             <img src="/img/template/icon-account-mobile.png" alt="Mon compte" />
           </a>
-          <a href="{$urls.pages.cart}" rel="nofollow" class="mobile-cart-link">
+          <a href="{$urls.pages.cart}?action=show" rel="nofollow" class="mobile-cart-link">
             <img src="/img/template/icon-basket-mobile.png" alt="Mon panier" />
             <span class="mobile-cart-badge" {if $cart.products_count <= 0}style="display:none;"{/if}>{$cart.products_count}</span>
           </a>
@@ -96,7 +96,7 @@
                 </div>
               </div>
               <div class="header-action-block header-action-block--cart">
-                <a class="header-action-item" href="{$urls.pages.cart}" rel="nofollow">
+                <a class="header-action-item" href="{$urls.pages.cart}?action=show" rel="nofollow">
                   <img src="/img/template/icon-basket-mobile.png" alt="Mon panier" class="header-action-icon" />
                   <span class="header-action-text">
                     <strong>Mon panier</strong><br/>
