@@ -107,6 +107,10 @@
     .wishlist-button-add, .wishlist-button-product {
       display: none !important;
     }
+    /* Masquer les boutons de partage réseaux sociaux */
+    .social-sharing {
+      display: none !important;
+    }
   </style>
 
   <section id="main">
