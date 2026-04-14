@@ -981,19 +981,23 @@ function mpeInit() {
   btnWrap.appendChild(customBtn);
   addToCart.parentNode.insertBefore(btnWrap, addToCart);
 
-  // Déplacer le vrai bloc quantité + panier dans la zone éditeur, centré
+  // Déplacer le vrai bloc quantité + panier dans la zone éditeur, centré en colonne
   cartZone.appendChild(addToCart);
-  addToCart.style.display = '';
-  addToCart.style.marginBottom = '15px';
-  addToCart.style.textAlign = 'center';
-  // Garder le label Quantité au-dessus, centré
+  addToCart.style.cssText = 'display:flex !important;flex-direction:column !important;align-items:center !important;margin-bottom:15px;';
+  // Label Quantité en bloc au-dessus
   var qtyLabel = addToCart.querySelector('.control-label');
-  if (qtyLabel) qtyLabel.style.cssText = 'display:block !important;width:100%;text-align:center;margin-bottom:8px;';
+  if (qtyLabel) qtyLabel.style.cssText = 'display:block !important;width:auto !important;float:none !important;text-align:center !important;margin-bottom:8px;';
+  // Ligne quantité + bouton centrée
   var prodQty = addToCart.querySelector('.product-quantity');
   if (prodQty) {
-    prodQty.style.cssText = 'display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;float:none !important;';
+    prodQty.style.cssText = 'display:flex !important;justify-content:center !important;align-items:center !important;gap:10px !important;float:none !important;width:auto !important;';
     prodQty.classList.remove('clearfix');
   }
+  // Retirer les floats sur les enfants
+  var qtyDiv = addToCart.querySelector('.qty');
+  if (qtyDiv) qtyDiv.style.cssText = 'float:none !important;';
+  var addDiv = addToCart.querySelector('.add');
+  if (addDiv) addDiv.style.cssText = 'float:none !important;';
 
   // Ajouter le texte explicatif sous le bloc panier
   var helpText = document.createElement('p');
