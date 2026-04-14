@@ -29,6 +29,37 @@
 {/block}
 
 {block name='page_content'}
+  <style>
+    /* Encart adresse : bordure orange */
+    .page-addresses .address {
+      border: 1px solid #ee7a03 !important;
+    }
+    /* Mettre à jour et Supprimer en bleu gras */
+    .page-addresses .address-footer a {
+      color: #004774 !important;
+      font-weight: 700 !important;
+    }
+    .page-addresses .address-footer a i {
+      color: #004774 !important;
+    }
+    /* Créer une nouvelle adresse en bouton bleu */
+    .page-addresses .addresses-footer a {
+      display: inline-block;
+      background-color: #004774 !important;
+      color: #fff !important;
+      padding: 10px 20px;
+      text-decoration: none !important;
+      font-weight: 700;
+      border: none;
+    }
+    .page-addresses .addresses-footer a:hover {
+      background-color: #003359 !important;
+    }
+    .page-addresses .addresses-footer a i,
+    .page-addresses .addresses-footer a span {
+      color: #fff !important;
+    }
+  </style>
   {if $customer.addresses}
     {foreach $customer.addresses as $address}
       <div class="col-lg-4 col-md-6 col-sm-6">
