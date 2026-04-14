@@ -60,6 +60,12 @@
       color: #fff !important;
     }
   </style>
+  <div class="addresses-footer" style="margin-bottom: 1.5rem;">
+    <a href="{$urls.pages.address}" data-link-action="add-address">
+      <i class="material-icons">&#xE145;</i>
+      <span>{l s='Create new address' d='Shop.Theme.Actions'}</span>
+    </a>
+  </div>
   {if $customer.addresses}
     {foreach $customer.addresses as $address}
       <div class="col-lg-4 col-md-6 col-sm-6">
@@ -74,10 +80,4 @@
     </div>
   {/if}
   <div class="clearfix"></div>
-  <div class="addresses-footer">
-    <a href="{$urls.pages.address}" data-link-action="add-address">
-      <i class="material-icons">&#xE145;</i>
-      <span>{l s='Create new address' d='Shop.Theme.Actions'}</span>
-    </a>
-  </div>
 {/block}
