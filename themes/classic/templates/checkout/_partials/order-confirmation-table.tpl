@@ -49,13 +49,11 @@
       </style>
       {foreach from=$products item=product}
         {assign var='mpeCustomImg' value=''}
-        {assign var='mpeCustomLarge' value=''}
         {if is_array($product.customizations) && $product.customizations|count}
           {foreach from=$product.customizations item="mpeCust"}
             {foreach from=$mpeCust.fields item="mpeField"}
               {if $mpeField.type == 'image' && $mpeField.image.small.url}
                 {assign var='mpeCustomImg' value=$mpeField.image.small.url}
-                {assign var='mpeCustomLarge' value=$mpeField.image.large.url|default:$mpeField.image.small.url}
               {/if}
             {/foreach}
           {/foreach}
@@ -93,7 +91,7 @@
                   <div id="mpe-oc-preview-{$customization.id_customization}" class="mpe-preview-modal" style="display:none;">
                     <div class="mpe-preview-backdrop"></div>
                     <button type="button" class="mpe-preview-close" aria-label="Fermer">&times;</button>
-                    <img src="{$mpeCustomLarge}" alt="Aperçu de la création" class="mpe-preview-img" />
+                    <img src="{$mpeCustomImg}" alt="Aperçu de la création" class="mpe-preview-img" />
                   </div>
                 {/if}
               {/foreach}
