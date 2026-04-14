@@ -52,7 +52,11 @@
     }
     @media (min-width: 992px) {
       body#address .form-footer {
-        text-align: right;
+        display: flex;
+        justify-content: flex-end;
+      }
+      body#address .form-footer .btn-primary {
+        float: none;
       }
     }
   </style>
