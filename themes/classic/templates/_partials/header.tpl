@@ -266,32 +266,40 @@
       }
     }, { passive: true });
 
-    // Synchroniser le badge panier du sticky avec le header original
+    // Synchroniser le badge panier du sticky
     var stickyBadge = sticky.querySelector('.desktop-sticky-badge');
-    function syncCartBadge() {
-      var origCount = document.querySelector('#header-cart-count');
-      var mobileBadge = document.querySelector('.mobile-cart-badge');
-      var count = 0;
-      if (origCount) {
-        var m = origCount.textContent.match(/(\d+)/);
-        if (m) count = parseInt(m[1], 10);
-      } else if (mobileBadge) {
-        count = parseInt(mobileBadge.textContent, 10) || 0;
+    function updateStickyBadge(count) {
+      if (!stickyBadge) return;
+      stickyBadge.textContent = count;
+      stickyBadge.style.display = count > 0 ? '' : 'none';
+    }
+    function readCountFromDOM() {
+      var el = document.querySelector('#header-cart-count');
+      if (el) {
+        var m = el.textContent.match(/(\d+)/);
+        if (m) return parseInt(m[1], 10);
       }
-      if (stickyBadge) {
-        stickyBadge.textContent = count;
-        stickyBadge.style.display = count > 0 ? '' : 'none';
+      var mb = document.querySelector('.mobile-cart-badge');
+      if (mb) return parseInt(mb.textContent, 10) || 0;
+      return 0;
+    }
+    // Écouter l'événement PrestaShop updateCart (disponible après chargement du core JS)
+    function listenCart() {
+      if (typeof prestashop !== 'undefined' && prestashop.on) {
+        prestashop.on('updateCart', function(e) {
+          var count = 0;
+          try { count = e.resp.cart.products_count; } catch(err) {}
+          if (!count && count !== 0) {
+            setTimeout(function(){ updateStickyBadge(readCountFromDOM()); }, 800);
+          } else {
+            updateStickyBadge(count);
+          }
+        });
+      } else {
+        setTimeout(listenCart, 500);
       }
     }
-    // PrestaShop déclenche un événement sur le body après mise à jour du panier
-    if (typeof prestashop !== 'undefined') {
-      prestashop.on('updateCart', function(){ setTimeout(syncCartBadge, 500); });
-    }
-    // Fallback : observer les mutations sur le compteur original
-    var origCartCount = document.querySelector('#header-cart-count');
-    if (origCartCount && window.MutationObserver) {
-      new MutationObserver(syncCartBadge).observe(origCartCount, { childList: true, characterData: true, subtree: true });
-    }
+    listenCart();
   })();
   </script>
   {/literal}
