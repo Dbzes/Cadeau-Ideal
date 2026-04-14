@@ -57,7 +57,7 @@
     <div id="mpe-cart-zone"></div>
 
     <div class="mpe-item">
-      <button type="button" class="mpe-head" data-target="mpe-fonds">
+      <button type="button" class="mpe-head" data-target="mpe-fonds" style="font-family:'Bebas Neue',sans-serif !important;">
         <span>Fonds</span>
         <span class="mpe-arrow">+</span>
       </button>
@@ -100,7 +100,7 @@
     </div>
 
     <div class="mpe-item">
-      <button type="button" class="mpe-head" data-target="mpe-images">
+      <button type="button" class="mpe-head" data-target="mpe-images" style="font-family:'Bebas Neue',sans-serif !important;">
         <span>Images</span>
         <span class="mpe-arrow">+</span>
       </button>
@@ -115,8 +115,8 @@
     </div>
 
     <div class="mpe-item">
-      <button type="button" class="mpe-head" data-target="mpe-texte">
-        <span>Texte</span>
+      <button type="button" class="mpe-head" data-target="mpe-texte" style="font-family:'Bebas Neue',sans-serif !important;">
+        <span>Textes</span>
         <span class="mpe-arrow">+</span>
       </button>
       <div class="mpe-body" id="mpe-texte">
