@@ -984,15 +984,14 @@ function mpeInit() {
   // Injecter du CSS ciblé pour forcer le layout dans la cart zone
   var cartStyle = document.createElement('style');
   cartStyle.textContent = '#mpe-cart-zone .product-add-to-cart { text-align:center !important; margin-bottom:15px; }'
-    + '#mpe-cart-zone .product-add-to-cart > .control-label { display:block !important; width:100% !important; float:none !important; text-align:center !important; margin-bottom:8px !important; }'
-    + '#mpe-cart-zone .product-quantity { display:inline-flex !important; justify-content:center !important; align-items:center !important; gap:10px !important; float:none !important; width:auto !important; clear:none !important; }'
-    + '#mpe-cart-zone .product-quantity .qty { float:none !important; }'
+    + '#mpe-cart-zone .product-add-to-cart > .control-label { display:none !important; }'
+    + '#mpe-cart-zone .product-quantity { display:inline-flex !important; justify-content:center !important; align-items:center !important; gap:10px !important; float:none !important; width:auto !important; }'
+    + '#mpe-cart-zone .product-quantity .qty { display:none !important; }'
     + '#mpe-cart-zone .product-quantity .add { float:none !important; }'
-    + '#mpe-cart-zone .product-quantity .qty input { float:none !important; }'
     + '#mpe-cart-zone .product-availability { display:block !important; text-align:center !important; }';
   document.head.appendChild(cartStyle);
 
-  // Déplacer le vrai bloc (avec curseurs +/-) dans la zone éditeur
+  // Déplacer le vrai bloc dans la zone éditeur
   cartZone.appendChild(addToCart);
 
   // Texte explicatif
