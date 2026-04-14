@@ -23,6 +23,11 @@
  * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License 3.0 (AFL-3.0)
  *}
 {block name='product_miniature_item'}
+<style>
+  .product-miniature .product-flag { background-color: #ee7a03 !important; }
+  .product-miniature .product-flag.on-sale { display: none !important; }
+  .product-miniature .wishlist-button-add, .product-miniature .wishlist-button-product { display: none !important; }
+</style>
 <div class="js-product product{if !empty($productClasses)} {$productClasses}{/if}">
   <article class="product-miniature js-product-miniature" data-id-product="{$product.id_product}" data-id-product-attribute="{$product.id_product_attribute}">
     <div class="thumbnail-container">
