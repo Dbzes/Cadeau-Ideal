@@ -9,6 +9,54 @@
 {/block}
 
 {block name="address_form_url"}
+    <style>
+      .js-address-form .form-control,
+      .js-address-form input[type="text"],
+      .js-address-form input[type="email"],
+      .js-address-form input[type="tel"],
+      .js-address-form input[type="password"],
+      .js-address-form textarea,
+      .js-address-form select {
+        border: 1px solid #ee7a03 !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+      }
+      .js-address-form .form-control:focus,
+      .js-address-form input:focus,
+      .js-address-form textarea:focus,
+      .js-address-form select:focus {
+        border-color: #004774 !important;
+        outline: none !important;
+      }
+      .js-address-form .js-cancel-address,
+      .js-address-form .cancel-address {
+        display: inline-block;
+        background-color: #004774 !important;
+        color: #fff !important;
+        padding: 10px 20px !important;
+        text-decoration: none !important;
+        font-weight: 700 !important;
+        border: none !important;
+        border-radius: 0 !important;
+        margin-right: 8px;
+      }
+      .js-address-form .js-cancel-address:hover,
+      .js-address-form .cancel-address:hover {
+        background-color: #003359 !important;
+        color: #fff !important;
+      }
+      .js-address-form .btn-primary {
+        background-color: #004774 !important;
+        border-color: #004774 !important;
+        color: #fff !important;
+        font-weight: 700 !important;
+        border-radius: 0 !important;
+      }
+      .js-address-form .btn-primary:hover {
+        background-color: #003359 !important;
+        border-color: #003359 !important;
+      }
+    </style>
     <form
       method="POST"
       action="{url entity='order' params=['id_address' => $id_address]}"

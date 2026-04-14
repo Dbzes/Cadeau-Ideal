@@ -24,6 +24,25 @@
  *}
 
  <div class="cart-summary-products js-cart-summary-products">
+  <style>
+    .cart-summary-products > p:first-child {
+      color: #000 !important;
+      font-weight: 700 !important;
+    }
+    .cart-summary-products .js-show-details {
+      color: #004774 !important;
+      font-weight: 700 !important;
+      text-decoration: none !important;
+      display: inline-flex;
+      align-items: center;
+    }
+    .cart-summary-products .js-show-details i {
+      color: #004774 !important;
+    }
+    .cart-summary-products .js-show-details:hover {
+      text-decoration: underline !important;
+    }
+  </style>
   <p>{$cart.summary_string}</p>
 
   <p>
