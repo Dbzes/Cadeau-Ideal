@@ -46,8 +46,16 @@
         font-weight: 700;
     }
     @media (min-width: 992px) {
-        .psgdprinfo17 {
+        .psgdprinfo17 .psgdprgetdatabtn17 {
+            display: inline-block;
+            margin: 10px auto;
+        }
+        .psgdprinfo17:first-child {
             text-align: center;
+        }
+        .psgdprinfo17:first-child h2,
+        .psgdprinfo17:first-child p {
+            text-align: left;
         }
     }
 </style>
