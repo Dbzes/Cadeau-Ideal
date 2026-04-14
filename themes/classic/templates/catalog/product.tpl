@@ -120,9 +120,11 @@
       color: #000 !important;
     }
     .product-description-block,
-    .product-description-block .product-description,
+    .product-description-block *,
     .product-description,
+    .product-description *,
     .product-information,
+    .product-information .product-description *,
     #product-description-short,
     [id^="product-description-short"],
     [id^="product-description-short"] * {
