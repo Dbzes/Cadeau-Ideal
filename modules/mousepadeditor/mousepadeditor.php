@@ -158,6 +158,18 @@ class Mousepadeditor extends Module
 
     public function hookHeader($params)
     {
+        $productId = (int) Tools::getValue('id_product');
+        if (!$productId) {
+            return;
+        }
+        $configIds = Configuration::get('MOUSEPAD_PRODUCT_IDS');
+        if (empty($configIds)) {
+            return;
+        }
+        $allowedIds = array_map('intval', array_filter(explode(',', $configIds)));
+        if (!in_array($productId, $allowedIds)) {
+            return;
+        }
         $this->context->controller->addCSS($this->_path . 'views/css/mousepadeditor.css');
         $this->context->controller->addJS($this->_path . 'views/js/fabric.min.js');
     }
