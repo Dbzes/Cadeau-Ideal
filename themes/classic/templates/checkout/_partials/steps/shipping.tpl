@@ -25,6 +25,23 @@
 {extends file='checkout/_partials/steps/checkout-step.tpl'}
 
 {block name='step_content'}
+  <style>
+    #checkout-delivery-step button.continue,
+    #checkout-delivery-step .btn-primary.continue {
+      background-color: #004774 !important;
+      border-color: #004774 !important;
+      color: #fff !important;
+      font-weight: 700 !important;
+      text-transform: uppercase !important;
+      border-radius: 0 !important;
+      padding: 10px 20px !important;
+    }
+    #checkout-delivery-step button.continue:hover,
+    #checkout-delivery-step .btn-primary.continue:hover {
+      background-color: #003359 !important;
+      border-color: #003359 !important;
+    }
+  </style>
   <div id="hook-display-before-carrier">
     {$hookDisplayBeforeCarrier nofilter}
   </div>

@@ -1,6 +1,34 @@
 {extends file='checkout/_partials/steps/checkout-step.tpl'}
 
 {block name='step_content'}
+  <style>
+    #checkout-payment-step a,
+    #checkout-payment-step label a,
+    #checkout-payment-step .condition-label a,
+    #checkout-payment-step .js-terms a {
+      color: #004774 !important;
+      font-weight: 700 !important;
+      text-decoration: none !important;
+    }
+    #checkout-payment-step a:hover {
+      text-decoration: underline !important;
+    }
+    #checkout-payment-step #payment-confirmation .btn-primary,
+    #checkout-payment-step button[type="submit"].btn-primary {
+      background-color: #ee7a03 !important;
+      border-color: #ee7a03 !important;
+      color: #fff !important;
+      font-weight: 700 !important;
+      text-transform: uppercase !important;
+      border-radius: 0 !important;
+      padding: 12px 28px !important;
+    }
+    #checkout-payment-step #payment-confirmation .btn-primary:hover,
+    #checkout-payment-step button[type="submit"].btn-primary:hover {
+      background-color: #d96d00 !important;
+      border-color: #d96d00 !important;
+    }
+  </style>
 
   {hook h='displayPaymentTop'}
 
