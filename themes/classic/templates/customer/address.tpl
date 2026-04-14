@@ -53,7 +53,7 @@
     @media (min-width: 992px) {
       body#address .form-footer {
         display: flex;
-        justify-content: flex-end;
+        justify-content: center;
       }
       body#address .form-footer .btn-primary {
         float: none;
