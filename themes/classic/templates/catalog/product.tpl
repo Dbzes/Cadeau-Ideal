@@ -119,8 +119,13 @@
     .product-description-block, .product-description-block * {
       color: #000 !important;
     }
-    .product-description-block {
+    .product-description-block,
+    .product-description-block .product-description,
+    .product-description,
+    #product-description-short,
+    [id^="product-description-short"] {
       background: transparent !important;
+      background-color: transparent !important;
     }
     /* Masquer le bandeau Promo! */
     .product-flags .product-flag.on-sale {
