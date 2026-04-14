@@ -115,9 +115,16 @@
     .product-comment-list-btn, .post-product-comment, #product-comments-list-header .btn-comment {
       display: none !important;
     }
-    /* Description produit en noir */
+    /* Description produit en noir, fond transparent */
     .product-description-block, .product-description-block * {
       color: #000 !important;
+    }
+    .product-description-block {
+      background: transparent !important;
+    }
+    /* Masquer le bandeau Promo! */
+    .product-flags .product-flag.on-sale {
+      display: none !important;
     }
   </style>
 
