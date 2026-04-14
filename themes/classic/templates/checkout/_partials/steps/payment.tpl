@@ -15,18 +15,29 @@
     }
     #checkout-payment-step #payment-confirmation .btn-primary,
     #checkout-payment-step button[type="submit"].btn-primary {
-      background-color: #ee7a03 !important;
-      border-color: #ee7a03 !important;
-      color: #fff !important;
       font-weight: 700 !important;
       text-transform: uppercase !important;
       border-radius: 0 !important;
       padding: 12px 28px !important;
     }
-    #checkout-payment-step #payment-confirmation .btn-primary:hover,
-    #checkout-payment-step button[type="submit"].btn-primary:hover {
+    #checkout-payment-step #payment-confirmation .btn-primary:not(.disabled),
+    #checkout-payment-step button[type="submit"].btn-primary:not(.disabled) {
+      background-color: #ee7a03 !important;
+      border-color: #ee7a03 !important;
+      color: #fff !important;
+    }
+    #checkout-payment-step #payment-confirmation .btn-primary:not(.disabled):hover,
+    #checkout-payment-step button[type="submit"].btn-primary:not(.disabled):hover {
       background-color: #d96d00 !important;
       border-color: #d96d00 !important;
+    }
+    #checkout-payment-step #payment-confirmation .btn-primary.disabled,
+    #checkout-payment-step button[type="submit"].btn-primary.disabled {
+      background-color: #cccccc !important;
+      border-color: #cccccc !important;
+      color: #fff !important;
+      cursor: not-allowed;
+      opacity: 1 !important;
     }
   </style>
 
