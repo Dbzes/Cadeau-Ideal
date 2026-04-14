@@ -54,8 +54,9 @@
       display: flex;
       justify-content: center;
     }
-    body#address .form-footer .btn-primary {
-      float: none;
+    body#address .form-footer .btn-primary,
+    body#address .form-footer .float-xs-right {
+      float: none !important;
     }
   </style>
   <div class="address-form">
