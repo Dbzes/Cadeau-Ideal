@@ -49,8 +49,8 @@
     body#identity .btn[data-action="show-password"],
     body#identity .btn-show-password,
     body#identity .field-password-policy .btn {
-      background-color: #ff9a52 !important;
-      border-color: #ff9a52 !important;
+      background-color: #ee7a03 !important;
+      border-color: #ee7a03 !important;
       color: #fff !important;
       border-radius: 0 !important;
     }
@@ -60,7 +60,7 @@
     body#identity input[type="email"],
     body#identity input[type="password"],
     body#identity select {
-      border: 1px solid #ff9a52 !important;
+      border: 1px solid #ee7a03 !important;
       border-radius: 0 !important;
     }
   </style>
