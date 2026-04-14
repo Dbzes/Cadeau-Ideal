@@ -23,6 +23,22 @@
  * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License 3.0 (AFL-3.0)
  *}
 {block name='step'}
+  <style>
+    .checkout-step .step-title .step-edit,
+    .checkout-step .step-title .step-edit.text-muted {
+      color: #004774 !important;
+      font-weight: 700 !important;
+      opacity: 1 !important;
+      cursor: pointer;
+    }
+    .checkout-step .step-title .step-edit i,
+    .checkout-step .step-title .step-edit.text-muted i {
+      color: #004774 !important;
+    }
+    .checkout-step .step-title .step-edit:hover {
+      text-decoration: underline !important;
+    }
+  </style>
   <section  id    = "{$identifier}"
             class = "{[
                         'checkout-step'   => true,

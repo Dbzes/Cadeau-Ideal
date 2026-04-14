@@ -38,25 +38,33 @@
       font-weight: 700 !important;
     }
     .address-item .address-footer {
+      display: flex !important;
+      visibility: visible !important;
       border-top: 1px solid #eee;
       padding-top: .75rem;
       margin-top: .75rem;
-      display: flex;
       gap: 1rem;
     }
-    .address-item .address-footer a {
+    .address-item .address-footer a,
+    .address-item .address-footer a.text-muted {
       color: #004774 !important;
       font-weight: 700 !important;
       text-decoration: none !important;
-      display: inline-flex;
+      display: inline-flex !important;
       align-items: center;
       gap: 4px;
+      visibility: visible !important;
+      opacity: 1 !important;
     }
-    .address-item .address-footer a i {
+    .address-item .address-footer a i,
+    .address-item .address-footer a.text-muted i {
       color: #004774 !important;
     }
     .address-item .address-footer a:hover {
       text-decoration: underline !important;
+    }
+    .address-item hr {
+      display: none !important;
     }
   </style>
   {foreach $addresses as $address}

@@ -35,6 +35,7 @@
       padding: 10px 20px !important;
       text-decoration: none !important;
       font-weight: 700 !important;
+      text-transform: uppercase !important;
       border: none !important;
       border-radius: 0 !important;
     }
