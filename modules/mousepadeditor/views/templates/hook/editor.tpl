@@ -955,7 +955,7 @@ function mpeInit() {
   var customBtn = document.createElement('a');
   customBtn.href = '#mpe-cart-zone';
   customBtn.textContent = 'JE PERSONNALISE MON PRODUIT';
-  customBtn.style.cssText = 'display:inline-block;background-color:#ee7a03;color:#fff;padding:12px 28px;font-weight:700;font-size:16px;text-decoration:none;text-align:center;cursor:pointer;width:100%;box-sizing:border-box;margin-top:10px;';
+  customBtn.style.cssText = 'display:inline-block;background-color:#ee7a03;color:#fff;padding:10px 20px;font-weight:700;font-size:14px;text-decoration:none;text-align:center;cursor:pointer;margin-top:10px;';
   customBtn.addEventListener('click', function(e){
     e.preventDefault();
     var target = document.getElementById('mpe-cart-zone');
