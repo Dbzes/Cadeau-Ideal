@@ -54,6 +54,7 @@
   </div>
 
   <div class="mue-accordion">
+    <div id="mue-cart-zone"></div>
 
     <div class="mue-item">
       <button type="button" class="mue-head" data-target="mue-fonds">
@@ -926,5 +927,27 @@ function mueInit() {
   if (tries > 50) { console.error('[mue] Fabric.js failed to load'); mueInit(); return; }
   setTimeout(function(){ waitFabric(tries+1); }, 100);
 })(0);
+
+// Déplacer quantité + ajout panier vers la zone éditeur, remplacer par bouton Personnaliser
+(function(){
+  var addToCart = document.querySelector('.product-add-to-cart');
+  var cartZone = document.getElementById('mue-cart-zone');
+  if (!addToCart || !cartZone) return;
+
+  var customBtn = document.createElement('a');
+  customBtn.href = '#mue-cart-zone';
+  customBtn.textContent = 'Personnaliser mon produit';
+  customBtn.style.cssText = 'display:inline-block;background-color:#ee7a03;color:#fff;padding:12px 28px;font-weight:700;font-size:16px;text-decoration:none;text-align:center;cursor:pointer;width:100%;box-sizing:border-box;margin-top:10px;';
+  customBtn.addEventListener('click', function(e){
+    e.preventDefault();
+    var target = document.getElementById('mue-cart-zone');
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+  addToCart.parentNode.insertBefore(customBtn, addToCart);
+
+  cartZone.appendChild(addToCart);
+  addToCart.style.display = '';
+  addToCart.style.marginBottom = '15px';
+})();
 {/literal}
 </script>

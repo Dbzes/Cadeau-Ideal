@@ -54,6 +54,7 @@
   </div>
 
   <div class="mpe-accordion">
+    <div id="mpe-cart-zone"></div>
 
     <div class="mpe-item">
       <button type="button" class="mpe-head" data-target="mpe-fonds">
@@ -943,5 +944,29 @@ function mpeInit() {
   if (tries > 50) { console.error('[mpe] Fabric.js failed to load'); mpeInit(); return; }
   setTimeout(function(){ waitFabric(tries+1); }, 100);
 })(0);
+
+// Déplacer quantité + ajout panier vers la zone éditeur, remplacer par bouton Personnaliser
+(function(){
+  var addToCart = document.querySelector('.product-add-to-cart');
+  var cartZone = document.getElementById('mpe-cart-zone');
+  if (!addToCart || !cartZone) return;
+
+  // Créer le bouton "Personnaliser mon produit" à la place originale
+  var customBtn = document.createElement('a');
+  customBtn.href = '#mpe-cart-zone';
+  customBtn.textContent = 'Personnaliser mon produit';
+  customBtn.style.cssText = 'display:inline-block;background-color:#ee7a03;color:#fff;padding:12px 28px;font-weight:700;font-size:16px;text-decoration:none;text-align:center;cursor:pointer;width:100%;box-sizing:border-box;margin-top:10px;';
+  customBtn.addEventListener('click', function(e){
+    e.preventDefault();
+    var target = document.getElementById('mpe-cart-zone');
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+  addToCart.parentNode.insertBefore(customBtn, addToCart);
+
+  // Déplacer le vrai bloc quantité + panier dans la zone éditeur
+  cartZone.appendChild(addToCart);
+  addToCart.style.display = '';
+  addToCart.style.marginBottom = '15px';
+})();
 {/literal}
 </script>
