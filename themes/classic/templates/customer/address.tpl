@@ -50,14 +50,12 @@
       background-color: #003359 !important;
       border-color: #003359 !important;
     }
-    @media (min-width: 992px) {
-      body#address .form-footer {
-        display: flex;
-        justify-content: center;
-      }
-      body#address .form-footer .btn-primary {
-        float: none;
-      }
+    body#address .form-footer {
+      display: flex;
+      justify-content: center;
+    }
+    body#address .form-footer .btn-primary {
+      float: none;
     }
   </style>
   <div class="address-form">
