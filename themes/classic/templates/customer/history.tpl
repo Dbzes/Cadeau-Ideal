@@ -29,6 +29,28 @@
 {/block}
 
 {block name='page_content'}
+  <style>
+    .page-customer-account #content a,
+    .page-order-detail #content a,
+    #history a,
+    .orders a {
+      color: #004774 !important;
+      font-weight: 700 !important;
+      text-decoration: none !important;
+    }
+    .page-customer-account #content a:hover,
+    .page-order-detail #content a:hover,
+    #history a:hover,
+    .orders a:hover {
+      text-decoration: underline !important;
+    }
+    .page-customer-account #content a i,
+    .page-order-detail #content a i,
+    #history a i,
+    .orders a i {
+      color: #004774 !important;
+    }
+  </style>
   <h6>{l s='Here are the orders you\'ve placed since your account was created.' d='Shop.Theme.Customeraccount'}</h6>
 
   {if $orders}
