@@ -283,17 +283,17 @@ function mpeInit() {
         if (o.type === 'image') {
           images.push({
             src: o.getSrc ? o.getSrc() : o._element.src,
-            left: o.left, top: o.top,
-            scaleX: o.scaleX, scaleY: o.scaleY,
+            leftR: o.left / W, topR: o.top / H,
+            scaleXR: o.scaleX / W, scaleYR: o.scaleY / W,
             angle: o.angle || 0
           });
         } else if (o.type === 'i-text' || o.type === 'text' || o.type === 'textbox') {
           texts.push({
             text: o.text,
-            fontFamily: o.fontFamily, fontSize: o.fontSize, fill: o.fill,
+            fontFamily: o.fontFamily, fontSizeR: o.fontSize / W, fill: o.fill,
             fontWeight: o.fontWeight, fontStyle: o.fontStyle,
-            left: o.left, top: o.top, angle: o.angle || 0,
-            scaleX: o.scaleX, scaleY: o.scaleY
+            leftR: o.left / W, topR: o.top / H, angle: o.angle || 0,
+            scaleXR: o.scaleX / W, scaleYR: o.scaleY / W
           });
         }
       });
@@ -301,11 +301,11 @@ function mpeInit() {
       if (bgValue) {
         bg = { value: bgValue, zoom: bgZoom };
         if (bgImage && bgImage.type !== 'rect') {
-          bg.left = bgImage.left;
-          bg.top = bgImage.top;
+          bg.leftR = bgImage.left / W;
+          bg.topR = bgImage.top / H;
         }
       }
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ bg: bg, images: images, texts: texts }));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ v: 2, bg: bg, images: images, texts: texts }));
     } catch(e) {}
   }
 
@@ -317,6 +317,7 @@ function mpeInit() {
     try { state = JSON.parse(raw); } catch(e) { restoring = false; restoreDone = true; return; }
     if (!state) { restoring = false; restoreDone = true; return; }
 
+    var isV2 = state.v === 2;
     var pendingImages = (state.images || []).slice();
     var pendingTexts = (state.texts || []).slice();
 
@@ -324,11 +325,15 @@ function mpeInit() {
       function nextImg() {
         if (!pendingImages.length) { loadTexts(); return; }
         var d = pendingImages.shift();
+        var iLeft = isV2 ? d.leftR * W : d.left;
+        var iTop = isV2 ? d.topR * H : d.top;
+        var iScaleX = isV2 ? d.scaleXR * W : d.scaleX;
+        var iScaleY = isV2 ? d.scaleYR * W : d.scaleY;
         fabric.Image.fromURL(d.src, function(img){
           img.set({
-            left: d.left, top: d.top,
+            left: iLeft, top: iTop,
             originX: 'center', originY: 'center',
-            scaleX: d.scaleX, scaleY: d.scaleY, angle: d.angle,
+            scaleX: iScaleX, scaleY: iScaleY, angle: d.angle,
             cornerColor: '#ee7a03', borderColor: '#ee7a03', cornerSize: 10, transparentCorners: false
           });
           canvas.add(img);
@@ -338,12 +343,17 @@ function mpeInit() {
       }
       function loadTexts() {
         pendingTexts.forEach(function(d){
+          var tLeft = isV2 ? d.leftR * W : d.left;
+          var tTop = isV2 ? d.topR * H : d.top;
+          var tFontSize = isV2 ? d.fontSizeR * W : d.fontSize;
+          var tScaleX = isV2 ? (d.scaleXR ? d.scaleXR * W : 1) : (d.scaleX || 1);
+          var tScaleY = isV2 ? (d.scaleYR ? d.scaleYR * W : 1) : (d.scaleY || 1);
           var t = new fabric.IText(d.text, {
-            left: d.left, top: d.top,
+            left: tLeft, top: tTop,
             originX: 'center', originY: 'center',
-            fontFamily: d.fontFamily, fontSize: d.fontSize, fill: d.fill,
+            fontFamily: d.fontFamily, fontSize: tFontSize, fill: d.fill,
             fontWeight: d.fontWeight, fontStyle: d.fontStyle,
-            scaleX: d.scaleX, scaleY: d.scaleY, angle: d.angle,
+            scaleX: tScaleX, scaleY: tScaleY, angle: d.angle,
             cornerColor: '#ee7a03', borderColor: '#ee7a03', cornerSize: 10, transparentCorners: false
           });
           canvas.add(t);
@@ -364,8 +374,13 @@ function mpeInit() {
           var baseScale = Math.max(W / obj.width, H / obj.height);
           obj.scaleX = baseScale * bgZoom;
           obj.scaleY = baseScale * bgZoom;
-          if (state.bg.left != null) obj.left = state.bg.left;
-          if (state.bg.top != null) obj.top = state.bg.top;
+          if (isV2) {
+            if (state.bg.leftR != null) obj.left = state.bg.leftR * W;
+            if (state.bg.topR != null) obj.top = state.bg.topR * H;
+          } else {
+            if (state.bg.left != null) obj.left = state.bg.left;
+            if (state.bg.top != null) obj.top = state.bg.top;
+          }
           if (bgZoom > 1) {
             obj.lockMovementX = false;
             obj.lockMovementY = false;
