@@ -118,8 +118,7 @@
       <div class="cookie-consent-inner">
         <div class="cookie-consent-text">
           <strong>Nous respectons votre vie privée</strong>
-          <p>Ce site utilise des cookies pour améliorer votre expérience de navigation, analyser le trafic et personnaliser le contenu. En cliquant sur « Tout accepter », vous consentez à l'utilisation de tous les cookies. Vous pouvez également choisir de les refuser.</p>
-          <a href="/content/3-conditions-generales-de-vente" class="cookie-consent-link">En savoir plus</a>
+          <p>Ce site utilise des cookies pour améliorer votre expérience de navigation, analyser le trafic et personnaliser le contenu. En cliquant sur « Tout accepter », vous consentez à l'utilisation de tous les cookies. Vous pouvez également choisir de les refuser. <a href="/content/3-conditions-generales-de-vente" class="cookie-consent-link">En savoir plus</a></p>
         </div>
         <div class="cookie-consent-actions">
           <button type="button" id="cookie-accept-all" class="cookie-btn cookie-btn-accept">TOUT ACCEPTER</button>
