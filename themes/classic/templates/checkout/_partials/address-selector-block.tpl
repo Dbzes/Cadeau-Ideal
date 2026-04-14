@@ -23,6 +23,42 @@
  * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License 3.0 (AFL-3.0)
  *}
 {block name='address_selector_blocks'}
+  <style>
+    .address-item {
+      border: 1px solid #ee7a03 !important;
+      padding: 1rem !important;
+      margin-bottom: 1rem !important;
+      background: #fff !important;
+    }
+    .address-item.selected {
+      border: 2px solid #ee7a03 !important;
+    }
+    .address-item .address-alias {
+      color: #004774 !important;
+      font-weight: 700 !important;
+    }
+    .address-item .address-footer {
+      border-top: 1px solid #eee;
+      padding-top: .75rem;
+      margin-top: .75rem;
+      display: flex;
+      gap: 1rem;
+    }
+    .address-item .address-footer a {
+      color: #004774 !important;
+      font-weight: 700 !important;
+      text-decoration: none !important;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .address-item .address-footer a i {
+      color: #004774 !important;
+    }
+    .address-item .address-footer a:hover {
+      text-decoration: underline !important;
+    }
+  </style>
   {foreach $addresses as $address}
     <article
       class="js-address-item address-item{if $address.id == $selected} selected{/if}"
