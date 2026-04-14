@@ -90,18 +90,17 @@
           <th class="hidden-md-down">{l s='Payment' d='Shop.Theme.Checkout'}</th>
           <th class="hidden-md-down">{l s='Status' d='Shop.Theme.Checkout'}</th>
           <th>{l s='Invoice' d='Shop.Theme.Checkout'}</th>
-          <th>{l s='Details' d='Shop.Theme.Customeraccount'}</th>
-          <th>{l s='Reorder' d='Shop.Theme.Actions'}</th>
+          <th>&nbsp;</th>
         </tr>
       </thead>
       <tbody>
         {foreach from=$orders item=order}
           <tr>
             <th scope="row">{$order.details.reference}</th>
-            <td>{$order.details.order_date}</td>
+            <td class="text-xs-center">{$order.details.order_date}</td>
             <td class="text-xs-right">{$order.totals.total.value}</td>
-            <td class="hidden-md-down">{$order.details.payment}</td>
-            <td>
+            <td class="text-xs-center hidden-md-down">{$order.details.payment}</td>
+            <td class="text-xs-center">
               <span
                 class="label label-pill {$order.history.current.contrast}"
                 style="background-color:{$order.history.current.color}"
@@ -120,13 +119,6 @@
               <a class="view-order-details-link" href="{$order.details.details_url}" data-link-action="view-order-details">
                 {l s='Details' d='Shop.Theme.Customeraccount'}
               </a>
-            </td>
-            <td class="text-sm-center order-actions">
-              {if $order.details.reorder_url}
-                <a class="reorder-link" href="{$order.details.reorder_url}">{l s='Reorder' d='Shop.Theme.Actions'}</a>
-              {else}
-                -
-              {/if}
             </td>
           </tr>
         {/foreach}
