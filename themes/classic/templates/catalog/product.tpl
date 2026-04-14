@@ -122,8 +122,10 @@
     .product-description-block,
     .product-description-block .product-description,
     .product-description,
+    .product-information,
     #product-description-short,
-    [id^="product-description-short"] {
+    [id^="product-description-short"],
+    [id^="product-description-short"] * {
       background: transparent !important;
       background-color: transparent !important;
     }
