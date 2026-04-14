@@ -89,22 +89,20 @@
       </header>
       <hr>
       <footer class="address-footer">
-        {if $interactive}
-          <a
-            class="edit-address text-muted"
-            data-link-action="edit-address"
-            href="{url entity='order' params=['id_address' => $address.id, 'editAddress' => $type, 'token' => $token]}"
-          >
-            <i class="material-icons edit">&#xE254;</i>{l s='Edit' d='Shop.Theme.Actions'}
-          </a>
-          <a
-            class="delete-address text-muted"
-            data-link-action="delete-address"
-            href="{url entity='order' params=['id_address' => $address.id, 'deleteAddress' => true, 'token' => $token]}"
-          >
-            <i class="material-icons delete">&#xE872;</i>{l s='Delete' d='Shop.Theme.Actions'}
-          </a>
-        {/if}
+        <a
+          class="edit-address text-muted"
+          data-link-action="edit-address"
+          href="{url entity='order' params=['id_address' => $address.id, 'editAddress' => $type, 'token' => $token]}"
+        >
+          <i class="material-icons edit">&#xE254;</i>{l s='Edit' d='Shop.Theme.Actions'}
+        </a>
+        <a
+          class="delete-address text-muted"
+          data-link-action="delete-address"
+          href="{url entity='order' params=['id_address' => $address.id, 'deleteAddress' => true, 'token' => $token]}"
+        >
+          <i class="material-icons delete">&#xE872;</i>{l s='Delete' d='Shop.Theme.Actions'}
+        </a>
       </footer>
     </article>
   {/foreach}

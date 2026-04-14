@@ -28,33 +28,39 @@
         border-color: #004774 !important;
         outline: none !important;
       }
+      .js-address-form .form-footer {
+        display: flex !important;
+        justify-content: flex-end !important;
+        align-items: stretch !important;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
       .js-address-form .js-cancel-address,
-      .js-address-form .cancel-address {
-        display: inline-block;
+      .js-address-form .cancel-address,
+      .js-address-form .btn-primary {
+        float: none !important;
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
         background-color: #004774 !important;
+        border: 1px solid #004774 !important;
         color: #fff !important;
         padding: 10px 20px !important;
+        height: 44px !important;
+        line-height: 1 !important;
         text-decoration: none !important;
         font-weight: 700 !important;
-        border: none !important;
+        text-transform: uppercase !important;
         border-radius: 0 !important;
-        margin-right: 8px;
+        font-size: 14px !important;
+        margin: 0 !important;
       }
       .js-address-form .js-cancel-address:hover,
-      .js-address-form .cancel-address:hover {
-        background-color: #003359 !important;
-        color: #fff !important;
-      }
-      .js-address-form .btn-primary {
-        background-color: #004774 !important;
-        border-color: #004774 !important;
-        color: #fff !important;
-        font-weight: 700 !important;
-        border-radius: 0 !important;
-      }
+      .js-address-form .cancel-address:hover,
       .js-address-form .btn-primary:hover {
         background-color: #003359 !important;
         border-color: #003359 !important;
+        color: #fff !important;
       }
     </style>
     <form
