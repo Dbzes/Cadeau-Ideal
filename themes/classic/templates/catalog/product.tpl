@@ -62,22 +62,36 @@
     .product-container h1.h1 {
       font-size: 2rem !important;
     }
-    /* Quantité en Bebas Neue */
+    /* Quantité en Bebas Neue noir */
     .product-add-to-cart > .control-label {
       font-family: 'Bebas Neue', sans-serif !important;
       font-size: 20px !important;
       letter-spacing: 1px !important;
-      color: #004774 !important;
+      color: #000 !important;
     }
-    /* Prix en gras orange */
+    /* Prix + TTC en gras orange, taille augmentée */
     .product-prices .current-price-value {
       font-weight: 700 !important;
       color: #ee7a03 !important;
+      font-size: 1.8rem !important;
     }
     .product-prices .current-price .price-ttc-label {
       font-weight: 700;
       color: #ee7a03;
-      font-size: inherit;
+      font-size: 1.8rem;
+    }
+    /* Bandeaux/flags produit en orange */
+    .product-flags .product-flag {
+      background-color: #ee7a03 !important;
+    }
+    /* Prix barré en gras */
+    .product-prices .product-discount .regular-price {
+      font-weight: 700 !important;
+    }
+    /* Bandeau économisez en orange */
+    .product-prices .discount {
+      background-color: #ee7a03 !important;
+      color: #fff !important;
     }
     /* Cacher le label tax-shipping redondant */
     .product-prices .tax-shipping-delivery-label {
