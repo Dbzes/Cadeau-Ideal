@@ -51,6 +51,15 @@
         gap: 10px;
         margin-top: 15px;
     }
+    @media (max-width: 991px) {
+        .psgdpr-buttons {
+            flex-direction: column;
+            align-items: center;
+        }
+        .psgdprgetdatabtn17 {
+            font-size: 12px !important;
+        }
+    }
 </style>
 <div class="container">
     <section class="page_content">
