@@ -74,6 +74,8 @@
       background-color: #004774 !important;
       color: #fff !important;
       border-right-color: #fff !important;
+      text-align: center !important;
+      vertical-align: middle !important;
     }
   </style>
   <h6>{l s='Here are the orders you\'ve placed since your account was created.' d='Shop.Theme.Customeraccount'}</h6>
@@ -82,13 +84,14 @@
     <table class="table table-striped table-bordered table-labeled hidden-sm-down">
       <thead class="thead-default">
         <tr>
-          <th>{l s='Order reference' d='Shop.Theme.Checkout'}</th>
+          <th>Référence commande</th>
           <th>{l s='Date' d='Shop.Theme.Checkout'}</th>
           <th>{l s='Total price' d='Shop.Theme.Checkout'}</th>
           <th class="hidden-md-down">{l s='Payment' d='Shop.Theme.Checkout'}</th>
           <th class="hidden-md-down">{l s='Status' d='Shop.Theme.Checkout'}</th>
           <th>{l s='Invoice' d='Shop.Theme.Checkout'}</th>
-          <th>&nbsp;</th>
+          <th>{l s='Details' d='Shop.Theme.Customeraccount'}</th>
+          <th>{l s='Reorder' d='Shop.Theme.Actions'}</th>
         </tr>
       </thead>
       <tbody>
@@ -117,8 +120,12 @@
               <a class="view-order-details-link" href="{$order.details.details_url}" data-link-action="view-order-details">
                 {l s='Details' d='Shop.Theme.Customeraccount'}
               </a>
+            </td>
+            <td class="text-sm-center order-actions">
               {if $order.details.reorder_url}
                 <a class="reorder-link" href="{$order.details.reorder_url}">{l s='Reorder' d='Shop.Theme.Actions'}</a>
+              {else}
+                -
               {/if}
             </td>
           </tr>
