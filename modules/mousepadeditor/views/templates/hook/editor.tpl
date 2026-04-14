@@ -986,7 +986,9 @@ function mpeInit() {
   cartStyle.textContent = '#mpe-cart-zone .product-add-to-cart { text-align:center !important; margin-bottom:15px; }'
     + '#mpe-cart-zone .product-add-to-cart > .control-label { display:none !important; }'
     + '#mpe-cart-zone .product-quantity { display:inline-flex !important; justify-content:center !important; align-items:center !important; gap:10px !important; float:none !important; width:auto !important; }'
-    + '#mpe-cart-zone .product-quantity .qty { display:none !important; }'
+    + '#mpe-cart-zone .product-quantity .qty { float:none !important; }'
+    + '#mpe-cart-zone .product-quantity .qty input { text-align:center !important; -moz-appearance:textfield !important; }'
+    + '#mpe-cart-zone .product-quantity .qty input::-webkit-outer-spin-button, #mpe-cart-zone .product-quantity .qty input::-webkit-inner-spin-button { -webkit-appearance:none !important; margin:0 !important; }'
     + '#mpe-cart-zone .product-quantity .add { float:none !important; }'
     + '#mpe-cart-zone .product-availability { display:block !important; text-align:center !important; }';
   document.head.appendChild(cartStyle);
