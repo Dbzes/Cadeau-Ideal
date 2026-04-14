@@ -23,6 +23,29 @@
 {/block}
 
 {block name='page_content'}
+<style>
+    .psgdprinfo17 {
+        border: 1px solid #ee7a03 !important;
+        padding: 20px !important;
+        margin-bottom: 15px !important;
+    }
+    .psgdprgetdatabtn17,
+    .psgdprinfo17 .btn-primary {
+        background-color: #004774 !important;
+        border-color: #004774 !important;
+        border-radius: 0 !important;
+        color: #fff !important;
+    }
+    .psgdprgetdatabtn17:hover,
+    .psgdprinfo17 .btn-primary:hover {
+        background-color: #003359 !important;
+        border-color: #003359 !important;
+    }
+    .psgdprinfo17 a:not(.btn) {
+        color: #004774 !important;
+        font-weight: 700;
+    }
+</style>
 <div class="container">
     <section class="page_content">
         <div class="col-xs-12 psgdprinfo17">
