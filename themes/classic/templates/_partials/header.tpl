@@ -123,4 +123,149 @@
     </div>
   </div>
   {hook h='displayNavFullWidth'}
+
+  <div class="desktop-sticky-header hidden-sm-down" id="desktop-sticky-header">
+    <div class="container">
+      <div class="desktop-sticky-inner">
+        <a href="{$urls.base_url}" class="desktop-sticky-logo">
+          <img src="/img/template/icone-lci-mobile.png" alt="{$shop.name}" />
+        </a>
+        <div class="desktop-sticky-search" id="desktop-sticky-search"></div>
+        <div class="desktop-sticky-icons">
+          <a href="{if $customer.is_logged}{$urls.pages.my_account}{else}{$urls.pages.authentication}{/if}" rel="nofollow">
+            {if $customer.is_logged}
+              <img src="/img/template/icon-account-mobile.png" alt="Mon compte" />
+            {else}
+              <img src="/img/template/icon-account-disabled.png" alt="Mon compte" />
+            {/if}
+          </a>
+          <a href="{$urls.pages.cart}?action=show" rel="nofollow" class="desktop-sticky-cart">
+            <img src="/img/template/icon-basket-mobile.png" alt="Mon panier" />
+            <span class="desktop-sticky-badge" {if $cart.products_count <= 0}style="display:none;"{/if}>{$cart.products_count}</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {literal}
+  <style>
+    .desktop-sticky-header {
+      position: fixed;
+      top: -60px;
+      left: 0;
+      right: 0;
+      height: 50px;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,.12);
+      z-index: 9999;
+      transition: top .3s ease;
+    }
+    .desktop-sticky-header.sticky-visible {
+      top: 0;
+    }
+    .desktop-sticky-inner {
+      display: flex;
+      align-items: center;
+      height: 50px;
+      gap: 20px;
+    }
+    .desktop-sticky-logo img {
+      height: 36px;
+      width: auto;
+    }
+    .desktop-sticky-search {
+      flex: 1;
+    }
+    .desktop-sticky-search form {
+      display: flex;
+      align-items: center;
+    }
+    .desktop-sticky-search input[type="text"] {
+      width: 100%;
+      height: 34px;
+      padding: 4px 12px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+      outline: none;
+    }
+    .desktop-sticky-search button {
+      height: 34px;
+      padding: 0 12px;
+      background: #004774;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+    .desktop-sticky-icons {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .desktop-sticky-icons img {
+      height: 24px;
+      width: auto;
+    }
+    .desktop-sticky-cart {
+      position: relative;
+    }
+    .desktop-sticky-badge {
+      position: absolute;
+      top: -6px;
+      right: -8px;
+      background: #ee7a03;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      min-width: 16px;
+      height: 16px;
+      line-height: 16px;
+      text-align: center;
+      border-radius: 50%;
+    }
+  </style>
+  <script>
+  (function(){
+    var sticky = document.getElementById('desktop-sticky-header');
+    var headerTop = document.querySelector('.header-top');
+    if (!sticky || !headerTop) return;
+
+    // Cloner la barre de recherche dans le sticky
+    var origSearch = document.querySelector('.header-top .header-right-search');
+    var stickySearch = document.getElementById('desktop-sticky-search');
+    if (origSearch && stickySearch) {
+      var searchClone = origSearch.cloneNode(true);
+      stickySearch.appendChild(searchClone);
+      // Synchroniser le formulaire cloné pour soumettre correctement
+      var cloneForm = stickySearch.querySelector('form');
+      var origForm = origSearch.querySelector('form');
+      if (cloneForm && origForm) {
+        cloneForm.addEventListener('submit', function(e){
+          e.preventDefault();
+          var input = cloneForm.querySelector('input[type="text"]');
+          var origInput = origForm.querySelector('input[type="text"]');
+          if (input && origInput) {
+            origInput.value = input.value;
+            origForm.submit();
+          }
+        });
+      }
+    }
+
+    // Afficher/masquer selon le scroll
+    var threshold = headerTop.offsetTop + headerTop.offsetHeight;
+    var visible = false;
+    window.addEventListener('scroll', function(){
+      var shouldShow = window.scrollY > threshold;
+      if (shouldShow && !visible) {
+        sticky.classList.add('sticky-visible');
+        visible = true;
+      } else if (!shouldShow && visible) {
+        sticky.classList.remove('sticky-visible');
+        visible = false;
+      }
+    }, { passive: true });
+  })();
+  </script>
+  {/literal}
 {/block}
