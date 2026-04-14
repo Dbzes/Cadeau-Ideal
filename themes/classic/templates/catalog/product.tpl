@@ -88,7 +88,13 @@
     .product-prices .product-discount .regular-price {
       font-weight: 700 !important;
     }
-    /* Bandeau économisez en orange */
+    /* Bandeau économisez en orange, aligné avec le prix */
+    .product-prices .current-price {
+      display: flex !important;
+      align-items: center !important;
+      flex-wrap: wrap !important;
+      gap: 8px !important;
+    }
     .product-prices .discount {
       background-color: #ee7a03 !important;
       color: #fff !important;
