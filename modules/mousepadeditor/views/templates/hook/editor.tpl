@@ -981,40 +981,25 @@ function mpeInit() {
   btnWrap.appendChild(customBtn);
   addToCart.parentNode.insertBefore(btnWrap, addToCart);
 
-  // Cacher le bloc original
-  addToCart.style.cssText = 'position:absolute !important;left:-9999px !important;opacity:0 !important;pointer-events:none !important;';
+  // Injecter du CSS ciblé pour forcer le layout dans la cart zone
+  var cartStyle = document.createElement('style');
+  cartStyle.textContent = '#mpe-cart-zone .product-add-to-cart { text-align:center !important; margin-bottom:15px; }'
+    + '#mpe-cart-zone .product-add-to-cart > .control-label { display:block !important; width:100% !important; float:none !important; text-align:center !important; margin-bottom:8px !important; }'
+    + '#mpe-cart-zone .product-quantity { display:inline-flex !important; justify-content:center !important; align-items:center !important; gap:10px !important; float:none !important; width:auto !important; clear:none !important; }'
+    + '#mpe-cart-zone .product-quantity .qty { float:none !important; }'
+    + '#mpe-cart-zone .product-quantity .add { float:none !important; }'
+    + '#mpe-cart-zone .product-quantity .qty input { float:none !important; }'
+    + '#mpe-cart-zone .product-availability { display:block !important; text-align:center !important; }';
+  document.head.appendChild(cartStyle);
 
-  // Récupérer les refs des éléments originaux
-  var origInput = addToCart.querySelector('#quantity_wanted');
-  var origBtn = addToCart.querySelector('[data-button-action="add-to-cart"]');
+  // Déplacer le vrai bloc (avec curseurs +/-) dans la zone éditeur
+  cartZone.appendChild(addToCart);
 
-  // Construire un bloc propre dans la cart zone
-  var cleanBlock = document.createElement('div');
-  cleanBlock.innerHTML = '<div style="text-align:center;margin-bottom:15px;">'
-    + '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:20px;color:#000;letter-spacing:1px;margin-bottom:10px;">Quantit\u00e9</div>'
-    + '<div style="display:inline-flex;align-items:center;gap:10px;margin-bottom:12px;">'
-    + '  <input type="number" id="mpe-qty-mirror" value="' + (origInput ? origInput.value : '1') + '" min="' + (origInput ? origInput.min : '1') + '" style="width:60px;height:42px;text-align:center;border:1px solid #ccc;font-size:16px;" />'
-    + '  <button type="button" id="mpe-add-btn" style="background-color:#ee7a03;color:#fff;border:none;padding:10px 20px;font-weight:700;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;">'
-    + '    <i class="material-icons" style="font-size:18px;">&#xE547;</i> AJOUTER AU PANIER'
-    + '  </button>'
-    + '</div>'
-    + '<p style="text-align:center;font-size:13px;color:#666;margin:0;">Cliquez sur "Ajouter au panier" une fois votre personnalisation termin\u00e9e.</p>'
-    + '</div>';
-  cartZone.appendChild(cleanBlock);
-
-  // Sync quantité et déclenchement du vrai bouton
-  var mirrorInput = document.getElementById('mpe-qty-mirror');
-  var mirrorBtn = document.getElementById('mpe-add-btn');
-  if (mirrorInput && origInput) {
-    mirrorInput.addEventListener('change', function(){ origInput.value = mirrorInput.value; });
-    mirrorInput.addEventListener('input', function(){ origInput.value = mirrorInput.value; });
-  }
-  if (mirrorBtn && origBtn) {
-    mirrorBtn.addEventListener('click', function(){
-      if (origInput && mirrorInput) origInput.value = mirrorInput.value;
-      origBtn.click();
-    });
-  }
+  // Texte explicatif
+  var helpText = document.createElement('p');
+  helpText.textContent = 'Cliquez sur "Ajouter au panier" une fois votre personnalisation terminée.';
+  helpText.style.cssText = 'text-align:center;font-size:13px;color:#666;margin-top:8px;';
+  cartZone.appendChild(helpText);
 })();
 {/literal}
 </script>
