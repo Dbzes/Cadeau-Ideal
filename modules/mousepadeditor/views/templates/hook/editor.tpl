@@ -986,11 +986,14 @@ function mpeInit() {
   addToCart.style.display = '';
   addToCart.style.marginBottom = '15px';
   addToCart.style.textAlign = 'center';
-  // Garder le label Quantité au-dessus du bloc
+  // Garder le label Quantité au-dessus, centré
   var qtyLabel = addToCart.querySelector('.control-label');
-  if (qtyLabel) qtyLabel.style.cssText += 'display:block;margin-bottom:8px;';
+  if (qtyLabel) qtyLabel.style.cssText = 'display:block !important;width:100%;text-align:center;margin-bottom:8px;';
   var prodQty = addToCart.querySelector('.product-quantity');
-  if (prodQty) prodQty.style.cssText = 'display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;';
+  if (prodQty) {
+    prodQty.style.cssText = 'display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;float:none !important;';
+    prodQty.classList.remove('clearfix');
+  }
 
   // Ajouter le texte explicatif sous le bloc panier
   var helpText = document.createElement('p');
