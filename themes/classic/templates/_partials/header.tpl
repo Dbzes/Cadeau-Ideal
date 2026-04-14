@@ -36,8 +36,12 @@
           <img src="/img/template/icone-lci-mobile.png" alt="{$shop.name}" />
         </a>
         <div class="mobile-header-icons">
-          <a href="{$urls.pages.my_account}" rel="nofollow">
-            <img src="/img/template/icon-account-mobile.png" alt="Mon compte" />
+          <a href="{if $customer.is_logged}{$urls.pages.my_account}{else}{$urls.pages.authentication}{/if}" rel="nofollow">
+            {if $customer.is_logged}
+              <img src="/img/template/icon-account-mobile.png" alt="Mon compte" />
+            {else}
+              <img src="/img/template/icon-account-disabled.png" alt="Mon compte" />
+            {/if}
           </a>
           <a href="{$urls.pages.cart}?action=show" rel="nofollow" class="mobile-cart-link">
             <img src="/img/template/icon-basket-mobile.png" alt="Mon panier" />
