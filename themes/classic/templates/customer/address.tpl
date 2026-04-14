@@ -33,6 +33,24 @@
 {/block}
 
 {block name='page_content'}
+  <style>
+    body#address .form-control,
+    body#address input[type="text"],
+    body#address input[type="tel"],
+    body#address select {
+      border: 1px solid #ee7a03 !important;
+      border-radius: 0 !important;
+    }
+    body#address .btn-primary {
+      background-color: #004774 !important;
+      border-color: #004774 !important;
+      border-radius: 0 !important;
+    }
+    body#address .btn-primary:hover {
+      background-color: #003359 !important;
+      border-color: #003359 !important;
+    }
+  </style>
   <div class="address-form">
     {render template="customer/_partials/address-form.tpl" ui=$address_form}
   </div>
