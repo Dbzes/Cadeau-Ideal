@@ -29,6 +29,25 @@
 {/block}
 
 {block name='page_content'}
+  <style>
+    #content a,
+    .page-order-detail a,
+    .order-items a,
+    #order-infos a,
+    #order-history a,
+    .mpe-preview-trigger {
+      color: #004774 !important;
+      font-weight: 700 !important;
+      text-decoration: none !important;
+    }
+    #content a:hover,
+    .page-order-detail a:hover,
+    .order-items a:hover,
+    #order-infos a:hover {
+      text-decoration: underline !important;
+    }
+    #content a i { color: #004774 !important; }
+  </style>
   {block name='order_infos'}
     <div id="order-infos">
       <div class="box">
