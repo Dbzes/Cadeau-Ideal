@@ -35,11 +35,37 @@
   <div class="order-confirmation-table">
 
     {block name='order_confirmation_table'}
+      <style>
+        #order-items .mpe-preview-trigger {
+          color: #004774 !important;
+          font-weight: 700 !important;
+          text-decoration: none !important;
+          display: inline-block;
+          margin-top: 4px;
+        }
+        #order-items .mpe-preview-trigger:hover {
+          text-decoration: underline !important;
+        }
+      </style>
       {foreach from=$products item=product}
+        {assign var='mpeCustomImg' value=''}
+        {assign var='mpeCustomLarge' value=''}
+        {if is_array($product.customizations) && $product.customizations|count}
+          {foreach from=$product.customizations item="mpeCust"}
+            {foreach from=$mpeCust.fields item="mpeField"}
+              {if $mpeField.type == 'image' && $mpeField.image.small.url}
+                {assign var='mpeCustomImg' value=$mpeField.image.small.url}
+                {assign var='mpeCustomLarge' value=$mpeField.image.large.url|default:$mpeField.image.small.url}
+              {/if}
+            {/foreach}
+          {/foreach}
+        {/if}
         <div class="order-line row">
           <div class="col-sm-2 col-xs-3">
             <span class="image">
-              {if !empty($product.default_image)}
+              {if $mpeCustomImg}
+                <img src="{$mpeCustomImg}" alt="{$product.name|escape:'quotes'}" loading="lazy" style="width:100%;height:auto;" />
+              {elseif !empty($product.default_image)}
                 <picture>
                   {if !empty($product.default_image.medium.sources.avif)}<source srcset="{$product.default_image.medium.sources.avif}" type="image/avif">{/if}
                   {if !empty($product.default_image.medium.sources.webp)}<source srcset="{$product.default_image.medium.sources.webp}" type="image/webp">{/if}
@@ -60,41 +86,16 @@
             {if $add_product_link}</a>{/if}
             {if is_array($product.customizations) && $product.customizations|count}
               {foreach from=$product.customizations item="customization"}
-                <div class="customizations">
-                  <a href="#" data-toggle="modal" data-target="#product-customizations-modal-{$customization.id_customization}">{l s='Product customization' d='Shop.Theme.Catalog'}</a>
-                </div>
-                <div class="modal fade customization-modal" id="product-customizations-modal-{$customization.id_customization}" tabindex="-1" role="dialog" aria-hidden="true">
-                  <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="{l s='Close' d='Shop.Theme.Global'}">
-                          <span aria-hidden="true">&times;</span>
-                        </button>
-                        <h4 class="modal-title">{l s='Product customization' d='Shop.Theme.Catalog'}</h4>
-                      </div>
-                      <div class="modal-body">
-                        {foreach from=$customization.fields item="field"}
-                          <div class="product-customization-line row">
-                            <div class="col-sm-3 col-xs-4 label">
-                              {$field.label}
-                            </div>
-                            <div class="col-sm-9 col-xs-8 value">
-                              {if $field.type == 'text'}
-                                {if (int)$field.id_module}
-                                  {$field.text nofilter}
-                                {else}
-                                  {$field.text}
-                                {/if}
-                              {elseif $field.type == 'image'}
-                                <img src="{$field.image.small.url}" loading="lazy">
-                              {/if}
-                            </div>
-                          </div>
-                        {/foreach}
-                      </div>
-                    </div>
+                {if $mpeCustomImg}
+                  <div class="customizations">
+                    <a href="#" class="mpe-preview-trigger" data-target="#mpe-oc-preview-{$customization.id_customization}">Aperçu de la création</a>
                   </div>
-                </div>
+                  <div id="mpe-oc-preview-{$customization.id_customization}" class="mpe-preview-modal" style="display:none;">
+                    <div class="mpe-preview-backdrop"></div>
+                    <button type="button" class="mpe-preview-close" aria-label="Fermer">&times;</button>
+                    <img src="{$mpeCustomLarge}" alt="Aperçu de la création" class="mpe-preview-img" />
+                  </div>
+                {/if}
               {/foreach}
             {/if}
             {hook h='displayProductPriceBlock' product=$product type="unit_price"}
