@@ -58,7 +58,7 @@
 
     <div class="mpe-item">
       <button type="button" class="mpe-head" data-target="mpe-fonds">
-        <span style="font-family:'Bebas Neue',sans-serif !important;font-size:20px;letter-spacing:1px;">Fonds</span>
+        <span style="font-family:'Bebas Neue',sans-serif !important;font-size:20px;font-weight:400;letter-spacing:1px;">Fonds</span>
         <span class="mpe-arrow">+</span>
       </button>
       <div class="mpe-body" id="mpe-fonds">
@@ -101,7 +101,7 @@
 
     <div class="mpe-item">
       <button type="button" class="mpe-head" data-target="mpe-images">
-        <span style="font-family:'Bebas Neue',sans-serif !important;font-size:20px;letter-spacing:1px;">Images</span>
+        <span style="font-family:'Bebas Neue',sans-serif !important;font-size:20px;font-weight:400;letter-spacing:1px;">Images</span>
         <span class="mpe-arrow">+</span>
       </button>
       <div class="mpe-body" id="mpe-images">
@@ -116,7 +116,7 @@
 
     <div class="mpe-item">
       <button type="button" class="mpe-head" data-target="mpe-texte">
-        <span style="font-family:'Bebas Neue',sans-serif !important;font-size:20px;letter-spacing:1px;">Textes</span>
+        <span style="font-family:'Bebas Neue',sans-serif !important;font-size:20px;font-weight:400;letter-spacing:1px;">Textes</span>
         <span class="mpe-arrow">+</span>
       </button>
       <div class="mpe-body" id="mpe-texte">
@@ -986,13 +986,16 @@ function mpeInit() {
   addToCart.style.display = '';
   addToCart.style.marginBottom = '15px';
   addToCart.style.textAlign = 'center';
+  // Garder le label Quantité au-dessus du bloc
+  var qtyLabel = addToCart.querySelector('.control-label');
+  if (qtyLabel) qtyLabel.style.cssText += 'display:block;margin-bottom:8px;';
   var prodQty = addToCart.querySelector('.product-quantity');
   if (prodQty) prodQty.style.cssText = 'display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;';
 
   // Ajouter le texte explicatif sous le bloc panier
   var helpText = document.createElement('p');
   helpText.textContent = 'Cliquez sur "Ajouter au panier" une fois votre personnalisation terminée.';
-  helpText.style.cssText = 'text-align:center;font-size:13px;color:#666;margin-top:8px;font-style:italic;';
+  helpText.style.cssText = 'text-align:center;font-size:13px;color:#666;margin-top:8px;';
   cartZone.appendChild(helpText);
 })();
 {/literal}
