@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module>
+  <name>stripepayment</name>
+  <displayName><![CDATA[Stripe Payment]]></displayName>
+  <version><![CDATA[1.0.0]]></version>
+  <description><![CDATA[Paiement Stripe — Carte bancaire + PayPal via Payment Element, remboursements depuis le BO.]]></description>
+  <author><![CDATA[Cadeau Idéal]]></author>
+  <tab><![CDATA[payments_gateways]]></tab>
+  <confirmUninstall><![CDATA[Êtes-vous sûr ? Les clés et l'historique seront supprimés.]]></confirmUninstall>
+  <is_configurable>1</is_configurable>
+  <need_instance>0</need_instance>
+  <limited_countries></limited_countries>
+</module>

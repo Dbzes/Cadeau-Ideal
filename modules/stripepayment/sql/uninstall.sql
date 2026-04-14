@@ -1,0 +1,2 @@
+DROP TABLE IF EXISTS `PREFIX_stripe_payment`;
+DROP TABLE IF EXISTS `PREFIX_stripe_refund`;
