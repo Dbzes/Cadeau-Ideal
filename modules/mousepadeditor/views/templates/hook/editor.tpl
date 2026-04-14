@@ -981,26 +981,43 @@ function mpeInit() {
   btnWrap.appendChild(customBtn);
   addToCart.parentNode.insertBefore(btnWrap, addToCart);
 
-  // Injecter du CSS ciblé pour forcer le layout dans la cart zone
-  var cartStyle = document.createElement('style');
-  cartStyle.textContent = '#mpe-cart-zone .product-add-to-cart { text-align:center !important; margin-bottom:15px; }'
-    + '#mpe-cart-zone .product-add-to-cart > .control-label { display:none !important; }'
-    + '#mpe-cart-zone .product-quantity { display:inline-flex !important; justify-content:center !important; align-items:center !important; gap:10px !important; float:none !important; width:auto !important; }'
-    + '#mpe-cart-zone .product-quantity .qty { float:none !important; }'
-    + '#mpe-cart-zone .product-quantity .qty input { text-align:center !important; -moz-appearance:textfield !important; }'
-    + '#mpe-cart-zone .product-quantity .qty input::-webkit-outer-spin-button, #mpe-cart-zone .product-quantity .qty input::-webkit-inner-spin-button { -webkit-appearance:none !important; margin:0 !important; }'
-    + '#mpe-cart-zone .product-quantity .add { float:none !important; }'
-    + '#mpe-cart-zone .product-availability { display:block !important; text-align:center !important; }';
-  document.head.appendChild(cartStyle);
+  // Cacher le vrai bloc (reste dans le form pour que le submit fonctionne)
+  addToCart.style.cssText = 'position:absolute !important;left:-9999px !important;opacity:0 !important;height:0 !important;overflow:hidden !important;';
 
-  // Déplacer le vrai bloc dans la zone éditeur
-  cartZone.appendChild(addToCart);
+  // Refs originales
+  var origInput = addToCart.querySelector('#quantity_wanted');
+  var origBtn = addToCart.querySelector('[data-button-action="add-to-cart"]');
 
-  // Texte explicatif
-  var helpText = document.createElement('p');
-  helpText.textContent = 'Cliquez sur "Ajouter au panier" une fois votre personnalisation terminée.';
-  helpText.style.cssText = 'text-align:center;font-size:13px;color:#666;margin-top:8px;';
-  cartZone.appendChild(helpText);
+  // Créer le bloc miroir dans la zone éditeur
+  var mirrorBlock = document.createElement('div');
+  mirrorBlock.style.cssText = 'text-align:center;margin-bottom:15px;';
+  mirrorBlock.innerHTML = '<div style="display:inline-flex;align-items:center;gap:10px;margin-bottom:10px;">'
+    + '<input type="number" id="mpe-qty-mirror" value="' + (origInput ? origInput.value : '1') + '" min="' + (origInput ? origInput.min : '1') + '" style="width:50px;height:42px;text-align:center;border:1px solid #ccc;font-size:16px;-moz-appearance:textfield;" />'
+    + '<button type="button" id="mpe-add-mirror" class="btn btn-primary add-to-cart" style="background-color:#ee7a03 !important;border-color:#ee7a03 !important;cursor:pointer;">'
+    + '<i class="material-icons shopping-cart">&#xE547;</i> Ajouter au panier</button>'
+    + '</div>'
+    + '<p style="text-align:center;font-size:13px;color:#666;margin:0;">Cliquez sur "Ajouter au panier" une fois votre personnalisation terminée.</p>';
+  cartZone.appendChild(mirrorBlock);
+
+  // Masquer les spinners du miroir
+  var spinStyle = document.createElement('style');
+  spinStyle.textContent = '#mpe-qty-mirror::-webkit-outer-spin-button,#mpe-qty-mirror::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}#mpe-qty-mirror{-moz-appearance:textfield;}';
+  document.head.appendChild(spinStyle);
+
+  // Sync et déclenchement du vrai bouton (qui est toujours dans le form)
+  var mirrorQty = document.getElementById('mpe-qty-mirror');
+  var mirrorBtn = document.getElementById('mpe-add-mirror');
+  if (mirrorQty && origInput) {
+    mirrorQty.addEventListener('input', function(){ origInput.value = mirrorQty.value; });
+    mirrorQty.addEventListener('change', function(){ origInput.value = mirrorQty.value; });
+  }
+  if (mirrorBtn && origBtn) {
+    mirrorBtn.addEventListener('click', function(e){
+      e.preventDefault();
+      if (origInput && mirrorQty) origInput.value = mirrorQty.value;
+      origBtn.click();
+    });
+  }
 })();
 {/literal}
 </script>
