@@ -42,7 +42,7 @@
 </div>
 
 <div class="mug-editor">
-  <h3 class="mue-title">Zone de personnalisation</h3>
+  <h3 class="mue-title" style="font-family:'Bebas Neue',sans-serif;font-size:32px;font-weight:400;letter-spacing:1px;color:#004774;text-align:center;margin:0;line-height:1;">Zone de personnalisation</h3>
   <p class="mue-canvas-caption">Aperçu de votre mug personnalisable</p>
 
   <div class="mue-layout">
