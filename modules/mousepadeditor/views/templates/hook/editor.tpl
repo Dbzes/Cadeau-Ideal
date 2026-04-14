@@ -57,8 +57,8 @@
     <div id="mpe-cart-zone"></div>
 
     <div class="mpe-item">
-      <button type="button" class="mpe-head" data-target="mpe-fonds" style="font-family:'Bebas Neue',sans-serif !important;">
-        <span>Fonds</span>
+      <button type="button" class="mpe-head" data-target="mpe-fonds">
+        <span style="font-family:'Bebas Neue',sans-serif !important;font-size:20px;letter-spacing:1px;">Fonds</span>
         <span class="mpe-arrow">+</span>
       </button>
       <div class="mpe-body" id="mpe-fonds">
@@ -100,8 +100,8 @@
     </div>
 
     <div class="mpe-item">
-      <button type="button" class="mpe-head" data-target="mpe-images" style="font-family:'Bebas Neue',sans-serif !important;">
-        <span>Images</span>
+      <button type="button" class="mpe-head" data-target="mpe-images">
+        <span style="font-family:'Bebas Neue',sans-serif !important;font-size:20px;letter-spacing:1px;">Images</span>
         <span class="mpe-arrow">+</span>
       </button>
       <div class="mpe-body" id="mpe-images">
@@ -115,8 +115,8 @@
     </div>
 
     <div class="mpe-item">
-      <button type="button" class="mpe-head" data-target="mpe-texte" style="font-family:'Bebas Neue',sans-serif !important;">
-        <span>Textes</span>
+      <button type="button" class="mpe-head" data-target="mpe-texte">
+        <span style="font-family:'Bebas Neue',sans-serif !important;font-size:20px;letter-spacing:1px;">Textes</span>
         <span class="mpe-arrow">+</span>
       </button>
       <div class="mpe-body" id="mpe-texte">
@@ -966,22 +966,34 @@ function mpeInit() {
   var cartZone = document.getElementById('mpe-cart-zone');
   if (!addToCart || !cartZone) return;
 
-  // Créer le bouton "Personnaliser mon produit" à la place originale
+  // Créer un wrapper centré pour le bouton Personnaliser
+  var btnWrap = document.createElement('div');
+  btnWrap.style.cssText = 'text-align:center;margin-top:10px;';
   var customBtn = document.createElement('a');
   customBtn.href = '#mpe-cart-zone';
   customBtn.textContent = 'JE PERSONNALISE MON PRODUIT';
-  customBtn.style.cssText = 'display:inline-block;background-color:#ee7a03;color:#fff;padding:10px 20px;font-weight:700;font-size:14px;text-decoration:none;text-align:center;cursor:pointer;margin-top:10px;';
+  customBtn.style.cssText = 'display:inline-block;background-color:#ee7a03;color:#fff;padding:10px 20px;font-weight:700;font-size:14px;text-decoration:none;text-align:center;cursor:pointer;';
   customBtn.addEventListener('click', function(e){
     e.preventDefault();
     var target = document.getElementById('mpe-cart-zone');
     if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
   });
-  addToCart.parentNode.insertBefore(customBtn, addToCart);
+  btnWrap.appendChild(customBtn);
+  addToCart.parentNode.insertBefore(btnWrap, addToCart);
 
-  // Déplacer le vrai bloc quantité + panier dans la zone éditeur
+  // Déplacer le vrai bloc quantité + panier dans la zone éditeur, centré
   cartZone.appendChild(addToCart);
   addToCart.style.display = '';
   addToCart.style.marginBottom = '15px';
+  addToCart.style.textAlign = 'center';
+  var prodQty = addToCart.querySelector('.product-quantity');
+  if (prodQty) prodQty.style.cssText = 'display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;';
+
+  // Ajouter le texte explicatif sous le bloc panier
+  var helpText = document.createElement('p');
+  helpText.textContent = 'Cliquez sur "Ajouter au panier" une fois votre personnalisation terminée.';
+  helpText.style.cssText = 'text-align:center;font-size:13px;color:#666;margin-top:8px;font-style:italic;';
+  cartZone.appendChild(helpText);
 })();
 {/literal}
 </script>
