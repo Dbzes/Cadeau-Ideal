@@ -981,29 +981,40 @@ function mpeInit() {
   btnWrap.appendChild(customBtn);
   addToCart.parentNode.insertBefore(btnWrap, addToCart);
 
-  // Déplacer le vrai bloc quantité + panier dans la zone éditeur, centré en colonne
-  cartZone.appendChild(addToCart);
-  addToCart.style.cssText = 'display:flex !important;flex-direction:column !important;align-items:center !important;margin-bottom:15px;';
-  // Label Quantité en bloc au-dessus
-  var qtyLabel = addToCart.querySelector('.control-label');
-  if (qtyLabel) qtyLabel.style.cssText = 'display:block !important;width:auto !important;float:none !important;text-align:center !important;margin-bottom:8px;';
-  // Ligne quantité + bouton centrée
-  var prodQty = addToCart.querySelector('.product-quantity');
-  if (prodQty) {
-    prodQty.style.cssText = 'display:flex !important;justify-content:center !important;align-items:center !important;gap:10px !important;float:none !important;width:auto !important;';
-    prodQty.classList.remove('clearfix');
-  }
-  // Retirer les floats sur les enfants
-  var qtyDiv = addToCart.querySelector('.qty');
-  if (qtyDiv) qtyDiv.style.cssText = 'float:none !important;';
-  var addDiv = addToCart.querySelector('.add');
-  if (addDiv) addDiv.style.cssText = 'float:none !important;';
+  // Cacher le bloc original
+  addToCart.style.cssText = 'position:absolute !important;left:-9999px !important;opacity:0 !important;pointer-events:none !important;';
 
-  // Ajouter le texte explicatif sous le bloc panier
-  var helpText = document.createElement('p');
-  helpText.textContent = 'Cliquez sur "Ajouter au panier" une fois votre personnalisation terminée.';
-  helpText.style.cssText = 'text-align:center;font-size:13px;color:#666;margin-top:8px;';
-  cartZone.appendChild(helpText);
+  // Récupérer les refs des éléments originaux
+  var origInput = addToCart.querySelector('#quantity_wanted');
+  var origBtn = addToCart.querySelector('[data-button-action="add-to-cart"]');
+
+  // Construire un bloc propre dans la cart zone
+  var cleanBlock = document.createElement('div');
+  cleanBlock.innerHTML = '<div style="text-align:center;margin-bottom:15px;">'
+    + '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:20px;color:#000;letter-spacing:1px;margin-bottom:10px;">Quantit\u00e9</div>'
+    + '<div style="display:inline-flex;align-items:center;gap:10px;margin-bottom:12px;">'
+    + '  <input type="number" id="mpe-qty-mirror" value="' + (origInput ? origInput.value : '1') + '" min="' + (origInput ? origInput.min : '1') + '" style="width:60px;height:42px;text-align:center;border:1px solid #ccc;font-size:16px;" />'
+    + '  <button type="button" id="mpe-add-btn" style="background-color:#ee7a03;color:#fff;border:none;padding:10px 20px;font-weight:700;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;">'
+    + '    <i class="material-icons" style="font-size:18px;">&#xE547;</i> AJOUTER AU PANIER'
+    + '  </button>'
+    + '</div>'
+    + '<p style="text-align:center;font-size:13px;color:#666;margin:0;">Cliquez sur "Ajouter au panier" une fois votre personnalisation termin\u00e9e.</p>'
+    + '</div>';
+  cartZone.appendChild(cleanBlock);
+
+  // Sync quantité et déclenchement du vrai bouton
+  var mirrorInput = document.getElementById('mpe-qty-mirror');
+  var mirrorBtn = document.getElementById('mpe-add-btn');
+  if (mirrorInput && origInput) {
+    mirrorInput.addEventListener('change', function(){ origInput.value = mirrorInput.value; });
+    mirrorInput.addEventListener('input', function(){ origInput.value = mirrorInput.value; });
+  }
+  if (mirrorBtn && origBtn) {
+    mirrorBtn.addEventListener('click', function(){
+      if (origInput && mirrorInput) origInput.value = mirrorInput.value;
+      origBtn.click();
+    });
+  }
 })();
 {/literal}
 </script>
