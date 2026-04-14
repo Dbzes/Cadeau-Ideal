@@ -45,18 +45,11 @@
         color: #004774 !important;
         font-weight: 700;
     }
-    @media (min-width: 992px) {
-        .psgdprinfo17 .psgdprgetdatabtn17 {
-            display: inline-block;
-            margin: 10px auto;
-        }
-        .psgdprinfo17:first-child {
-            text-align: center;
-        }
-        .psgdprinfo17:first-child h2,
-        .psgdprinfo17:first-child p {
-            text-align: left;
-        }
+    .psgdpr-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 15px;
     }
 </style>
 <div class="container">
@@ -64,8 +57,10 @@
         <div class="col-xs-12 psgdprinfo17">
             <h2>{l s='Access to my data' mod='psgdpr'}</h2>
             <p>{l s='At any time, you have the right to retrieve the data you have provided to our site. Click on "Get my data" to automatically download a copy of your personal data on a pdf or csv file.' mod='psgdpr'}</p>
-            <a id="exportDataToCsv" class="btn btn-primary psgdprgetdatabtn17" target="_blank" href="{$psgdpr_csv_controller|escape:'htmlall':'UTF-8'}">{l s='GET MY DATA TO CSV' mod='psgdpr'}</a>
-            <a id="exportDataToPdf" class="btn btn-primary psgdprgetdatabtn17" target="_blank" href="{$psgdpr_pdf_controller|escape:'htmlall':'UTF-8'}">{l s='GET MY DATA TO PDF' mod='psgdpr'}</a>
+            <div class="psgdpr-buttons">
+                <a id="exportDataToCsv" class="btn btn-primary psgdprgetdatabtn17" target="_blank" href="{$psgdpr_csv_controller|escape:'htmlall':'UTF-8'}">{l s='GET MY DATA TO CSV' mod='psgdpr'}</a>
+                <a id="exportDataToPdf" class="btn btn-primary psgdprgetdatabtn17" target="_blank" href="{$psgdpr_pdf_controller|escape:'htmlall':'UTF-8'}">{l s='GET MY DATA TO PDF' mod='psgdpr'}</a>
+            </div>
         </div>
         <div class="col-xs-12 psgdprinfo17">
             <h2>{l s='Rectification & Erasure requests' mod='psgdpr'}</h2>
