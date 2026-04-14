@@ -203,7 +203,7 @@
       gap: 16px;
     }
     .desktop-sticky-icons img {
-      height: 24px;
+      height: auto;
       width: auto;
     }
     .desktop-sticky-cart {
@@ -265,6 +265,33 @@
         visible = false;
       }
     }, { passive: true });
+
+    // Synchroniser le badge panier du sticky avec le header original
+    var stickyBadge = sticky.querySelector('.desktop-sticky-badge');
+    function syncCartBadge() {
+      var origCount = document.querySelector('#header-cart-count');
+      var mobileBadge = document.querySelector('.mobile-cart-badge');
+      var count = 0;
+      if (origCount) {
+        var m = origCount.textContent.match(/(\d+)/);
+        if (m) count = parseInt(m[1], 10);
+      } else if (mobileBadge) {
+        count = parseInt(mobileBadge.textContent, 10) || 0;
+      }
+      if (stickyBadge) {
+        stickyBadge.textContent = count;
+        stickyBadge.style.display = count > 0 ? '' : 'none';
+      }
+    }
+    // PrestaShop déclenche un événement sur le body après mise à jour du panier
+    if (typeof prestashop !== 'undefined') {
+      prestashop.on('updateCart', function(){ setTimeout(syncCartBadge, 500); });
+    }
+    // Fallback : observer les mutations sur le compteur original
+    var origCartCount = document.querySelector('#header-cart-count');
+    if (origCartCount && window.MutationObserver) {
+      new MutationObserver(syncCartBadge).observe(origCartCount, { childList: true, characterData: true, subtree: true });
+    }
   })();
   </script>
   {/literal}
