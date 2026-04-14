@@ -13,8 +13,8 @@ img/
 upload/
 download/
 
-# Dossier admin généré (renommé à l'install)
-admin*/
+# Dossier admin généré (renommé à l'install) — root uniquement
+/admin*/
 
 # Vendor (si Composer utilisé)
 vendor/
