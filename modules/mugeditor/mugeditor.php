@@ -168,6 +168,10 @@ class Mugeditor extends Module
         if (!in_array($productId, $allowedIds)) {
             return;
         }
+        $mousepadIds = Configuration::get('MOUSEPAD_PRODUCT_IDS');
+        if (!empty($mousepadIds) && in_array($productId, array_map('intval', array_filter(explode(',', $mousepadIds))))) {
+            return;
+        }
         $this->context->controller->addCSS($this->_path . 'views/css/mugeditor.css');
         $this->context->controller->addJS($this->_path . 'views/js/fabric.min.js');
     }
@@ -945,6 +949,15 @@ class Mugeditor extends Module
 
         if (!in_array($productId, $allowedIds)) {
             return '';
+        }
+
+        // Protection : si déjà pris par mousepadeditor, on ne s'affiche pas
+        $mousepadIds = Configuration::get('MOUSEPAD_PRODUCT_IDS');
+        if (!empty($mousepadIds)) {
+            $mousepadList = array_map('intval', array_filter(explode(',', $mousepadIds)));
+            if (in_array($productId, $mousepadList)) {
+                return '';
+            }
         }
 
         $backgrounds = $this->getBackgrounds();
