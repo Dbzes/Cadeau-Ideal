@@ -50,6 +50,31 @@
     .orders a i {
       color: #004774 !important;
     }
+    #history .table,
+    .page-customer-account .table {
+      border-collapse: separate !important;
+      border-spacing: 0;
+    }
+    #history .table th,
+    #history .table td,
+    .page-customer-account .table th,
+    .page-customer-account .table td {
+      border-right: 2px solid #fff !important;
+      border-bottom: 2px solid #fff !important;
+      vertical-align: middle !important;
+    }
+    #history .table th:last-child,
+    #history .table td:last-child,
+    .page-customer-account .table th:last-child,
+    .page-customer-account .table td:last-child {
+      border-right: none !important;
+    }
+    #history .table thead th,
+    .page-customer-account .table thead th {
+      background-color: #004774 !important;
+      color: #fff !important;
+      border-right-color: #fff !important;
+    }
   </style>
   <h6>{l s='Here are the orders you\'ve placed since your account was created.' d='Shop.Theme.Customeraccount'}</h6>
 
