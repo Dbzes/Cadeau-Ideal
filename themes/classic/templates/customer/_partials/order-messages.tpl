@@ -42,6 +42,34 @@
 {/block}
 
 {block name='order_message_form'}
+  <style>
+    .order-message-form .form-control,
+    .order-message-form select,
+    .order-message-form textarea {
+      border: 1px solid #ee7a03 !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+    }
+    .order-message-form .form-control:focus,
+    .order-message-form select:focus,
+    .order-message-form textarea:focus {
+      border-color: #004774 !important;
+      outline: none !important;
+    }
+    .order-message-form .btn-primary {
+      background-color: #004774 !important;
+      border-color: #004774 !important;
+      color: #fff !important;
+      font-weight: 700 !important;
+      text-transform: uppercase !important;
+      border-radius: 0 !important;
+      padding: 10px 24px !important;
+    }
+    .order-message-form .btn-primary:hover {
+      background-color: #003359 !important;
+      border-color: #003359 !important;
+    }
+  </style>
   <section class="order-message-form box">
     <form action="{$urls.pages.order_detail}" method="post">
 
