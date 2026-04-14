@@ -83,6 +83,10 @@
     .product-prices .tax-shipping-delivery-label {
       display: none !important;
     }
+    /* Masquer le bouton wishlist (coeur) */
+    .wishlist-button-add, .wishlist-button-product {
+      display: none !important;
+    }
   </style>
 
   <section id="main">
