@@ -1,6 +1,36 @@
 {extends file='checkout/_partials/steps/checkout-step.tpl'}
 
 {block name='step_content'}
+  <style>
+    #checkout-personal-information-step p,
+    #checkout-personal-information-step .identity,
+    #checkout-personal-information-step small {
+      color: #000 !important;
+    }
+    #checkout-personal-information-step p a,
+    #checkout-personal-information-step .identity a {
+      color: #004774 !important;
+      font-weight: 700 !important;
+      text-decoration: none !important;
+    }
+    #checkout-personal-information-step p a:hover,
+    #checkout-personal-information-step .identity a:hover {
+      text-decoration: underline !important;
+    }
+    #checkout-personal-information-step .btn-primary.continue,
+    #checkout-personal-information-step button.continue {
+      background-color: #004774 !important;
+      border-color: #004774 !important;
+      color: #fff !important;
+      font-weight: 700 !important;
+      border-radius: 0 !important;
+    }
+    #checkout-personal-information-step .btn-primary.continue:hover,
+    #checkout-personal-information-step button.continue:hover {
+      background-color: #003359 !important;
+      border-color: #003359 !important;
+    }
+  </style>
   {hook h='displayPersonalInformationTop' customer=$customer}
 
   {if $customer.is_logged && !$customer.is_guest}

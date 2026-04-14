@@ -25,6 +25,48 @@
 {extends file='checkout/_partials/steps/checkout-step.tpl'}
 
 {block name='step_content'}
+  <style>
+    #checkout-addresses-step .add-address a {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background-color: #004774 !important;
+      color: #fff !important;
+      padding: 10px 20px !important;
+      text-decoration: none !important;
+      font-weight: 700 !important;
+      border: none !important;
+      border-radius: 0 !important;
+    }
+    #checkout-addresses-step .add-address a:hover {
+      background-color: #003359 !important;
+    }
+    #checkout-addresses-step .add-address a i,
+    #checkout-addresses-step .add-address a span {
+      color: #fff !important;
+    }
+    #checkout-addresses-step a[data-link-action="different-invoice-address"] {
+      color: #004774 !important;
+      font-weight: 700 !important;
+      text-decoration: none !important;
+    }
+    #checkout-addresses-step a[data-link-action="different-invoice-address"]:hover {
+      text-decoration: underline !important;
+    }
+    #checkout-addresses-step .btn-primary.continue,
+    #checkout-addresses-step button.continue {
+      background-color: #004774 !important;
+      border-color: #004774 !important;
+      color: #fff !important;
+      font-weight: 700 !important;
+      border-radius: 0 !important;
+    }
+    #checkout-addresses-step .btn-primary.continue:hover,
+    #checkout-addresses-step button.continue:hover {
+      background-color: #003359 !important;
+      border-color: #003359 !important;
+    }
+  </style>
   <div class="js-address-form">
     <form
       method="POST"
