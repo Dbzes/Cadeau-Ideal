@@ -35,6 +35,7 @@
   </head>
 
   <body id="{$page.page_name}" class="{$page.body_classes|classnames}">
+    <style>.all-product-link { color: #004774 !important; font-weight: 700 !important; }</style>
 
     {block name='hook_after_body_opening_tag'}
       {hook h='displayAfterBodyOpeningTag'}
