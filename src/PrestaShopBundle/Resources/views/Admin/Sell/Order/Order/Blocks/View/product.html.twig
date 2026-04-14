@@ -24,9 +24,17 @@
  *#}
 
 {% set rowIsDisplayed =  (productIndex is defined and paginationNum is defined and productIndex > paginationNum) %}
+{% set firstCustomValue = null %}
+{% if product.customizations is not null and product.customizations.fileCustomizations %}
+  {% for c in product.customizations.fileCustomizations %}
+    {% if firstCustomValue is null %}{% set firstCustomValue = c.value %}{% endif %}
+  {% endfor %}
+{% endif %}
 <tr id="orderProduct_{{ product.orderDetailId }}" class="cellProduct{% if rowIsDisplayed %} d-none d-print-table-row{% endif %}">
   <td class="cellProductImg">
-    {% if product.imagePath %}
+    {% if firstCustomValue %}
+      <img src="{{ path('admin_orders_display_customization_image', {'orderId': orderForViewing.id, 'value': firstCustomValue ~ '_small'}) }}" alt="{{ product.name }}" style="max-width:60px;height:auto;" />
+    {% elseif product.imagePath %}
       <img src="{{ product.imagePath }}" alt="{{ product.name }}" />
     {% endif %}
   </td>
@@ -46,6 +54,16 @@
         </p>
       {% endif %}
     </a>
+    {% if firstCustomValue %}
+      <div class="mpe-custom-links mt-2 d-print-none">
+        <a href="#" class="mpe-bo-preview-trigger" data-img="{{ path('admin_orders_display_customization_image', {'orderId': orderForViewing.id, 'value': firstCustomValue ~ '_small'}) }}" data-title="Aperçu de la création" style="color:#004774;font-weight:700;text-decoration:none;margin-right:15px;">
+          <i class="material-icons" style="vertical-align:middle;font-size:18px;">visibility</i> Aperçu de la création
+        </a>
+        <a href="#" class="mpe-bo-preview-trigger" data-img="{{ path('admin_orders_display_customization_image', {'orderId': orderForViewing.id, 'value': firstCustomValue}) }}" data-title="Planche de la création" style="color:#004774;font-weight:700;text-decoration:none;">
+          <i class="material-icons" style="vertical-align:middle;font-size:18px;">insert_drive_file</i> Planche de la création
+        </a>
+      </div>
+    {% endif %}
     {% if product.type == constant('PrestaShop\\PrestaShop\\Core\\Domain\\Order\\QueryResult\\OrderProductForViewing::TYPE_PACK') and product.customizations is null %}
       <span class="btn-product-pack-modal d-print-none" data-toggle="modal" data-target="#product-pack-modal" data-pack-items="{{ product.packItems|json_encode }}">
         <strong>{{ 'View pack content'|trans({}, 'Admin.Actions') }}</strong>
@@ -147,27 +165,13 @@
     </div>
   </td>
 </tr>
-{% if product.customizations is not null %}
+{% if product.customizations is not null and (product.customizations.textCustomizations or product.type == constant('PrestaShop\\PrestaShop\\Core\\Domain\\Order\\QueryResult\\OrderProductForViewing::TYPE_PACK')) %}
   <tr class="order-product-customization{% if rowIsDisplayed %} d-none{% endif %}">
     <td class="border-top-0"></td>
     {% set colspan = 8 %}
     {% set colspan = (orderForViewing.hasInvoice() ? colspan + 1 : colspan) %}
     {% set colspan = (not orderForViewing.delivered ? colspan + 1 : colspan) %}
     <td colspan="{{ colspan }}" class="border-top-0 text-muted">
-      {% if product.customizations.fileCustomizations %}
-        <div class="d-flex flex-row flex-wrap">
-          {% for customization in product.customizations.fileCustomizations %}
-              <div class="mr-4">
-                <p><strong>{{ customization.name }}</strong></p>
-                <p>
-                  <a href="{{ path('admin_orders_display_customization_image', {'orderId': orderForViewing.id, "value": customization.value})}}" download>
-                    <img src="{{ customization.image }}" alt="{{ customization.name }}">
-                  </a>
-                </p>
-              </div>
-          {% endfor %}
-        </div>
-      {% endif %}
       {% for customization in product.customizations.textCustomizations %}
         <p><strong>{{ customization.name }} :</strong> {{ customization.value }}</p>
       {% endfor %}

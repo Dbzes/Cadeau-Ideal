@@ -284,3 +284,41 @@
     {{ form_end(cancelProductForm) }}
   </div>
 </div>
+
+<div id="mpe-bo-preview-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:99999;align-items:center;justify-content:center;">
+  <div class="mpe-bo-backdrop" style="position:absolute;inset:0;background:rgba(0,0,0,.85);"></div>
+  <button type="button" class="mpe-bo-close" aria-label="Fermer" style="position:absolute;top:20px;right:30px;background:none;border:none;color:#fff;font-size:48px;cursor:pointer;z-index:2;line-height:1;">&times;</button>
+  <div class="mpe-bo-title" style="position:absolute;top:25px;left:30px;color:#fff;font-size:18px;font-weight:700;z-index:2;"></div>
+  <img src="" alt="" class="mpe-bo-img" style="position:relative;z-index:1;max-width:92vw;max-height:90vh;width:auto;height:auto;box-shadow:0 0 40px rgba(0,0,0,.5);" />
+</div>
+<script>
+(function(){
+  var modal = document.getElementById('mpe-bo-preview-modal');
+  if (!modal) return;
+  var img = modal.querySelector('.mpe-bo-img');
+  var title = modal.querySelector('.mpe-bo-title');
+  function open(url, label) {
+    img.src = url;
+    title.textContent = label || '';
+    modal.style.display = 'flex';
+  }
+  function close() {
+    modal.style.display = 'none';
+    img.src = '';
+  }
+  document.addEventListener('click', function(e){
+    var trigger = e.target.closest('.mpe-bo-preview-trigger');
+    if (trigger) {
+      e.preventDefault();
+      open(trigger.getAttribute('data-img'), trigger.getAttribute('data-title'));
+      return;
+    }
+    if (e.target.closest('.mpe-bo-close') || e.target.classList.contains('mpe-bo-backdrop')) {
+      close();
+    }
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && modal.style.display === 'flex') close();
+  });
+})();
+</script>
