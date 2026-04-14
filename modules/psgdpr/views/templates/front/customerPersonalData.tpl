@@ -45,6 +45,11 @@
         color: #004774 !important;
         font-weight: 700;
     }
+    @media (min-width: 992px) {
+        .psgdprinfo17 {
+            text-align: center;
+        }
+    }
 </style>
 <div class="container">
     <section class="page_content">
