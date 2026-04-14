@@ -47,6 +47,43 @@
 {/block}
 
 {block name='content'}
+  <style>
+    /* Bouton ajouter au panier en orange */
+    .product-add-to-cart .btn-primary.add-to-cart {
+      background-color: #ee7a03 !important;
+      border-color: #ee7a03 !important;
+      border-radius: 0 !important;
+    }
+    .product-add-to-cart .btn-primary.add-to-cart:hover {
+      background-color: #d96d00 !important;
+      border-color: #d96d00 !important;
+    }
+    /* Nom du produit plus grand */
+    .product-container h1.h1 {
+      font-size: 2rem !important;
+    }
+    /* Quantité en Bebas Neue */
+    .product-add-to-cart > .control-label {
+      font-family: 'Bebas Neue', sans-serif !important;
+      font-size: 20px !important;
+      letter-spacing: 1px !important;
+      color: #004774 !important;
+    }
+    /* Prix en gras orange */
+    .product-prices .current-price-value {
+      font-weight: 700 !important;
+      color: #ee7a03 !important;
+    }
+    .product-prices .current-price .price-ttc-label {
+      font-weight: 700;
+      color: #ee7a03;
+      font-size: inherit;
+    }
+    /* Cacher le label tax-shipping redondant */
+    .product-prices .tax-shipping-delivery-label {
+      display: none !important;
+    }
+  </style>
 
   <section id="main">
     <meta content="{$product.url}">

@@ -46,6 +46,7 @@
               {$product.price}
             {/if}
           </span>
+          <span class="price-ttc-label">TTC</span>
 
           {if $product.has_discount}
             {if $product.discount_type === 'percentage'}
