@@ -439,6 +439,26 @@ abstract class PaymentModuleCore extends Module
 
                 $product_price = Product::getTaxCalculationMethod() == PS_TAX_EXC ? Tools::ps_round($price, Context::getContext()->getComputingPrecision()) : $price_wt;
 
+                // Build image URL : customization thumbnail (with overlay) if customized, else product cover
+                $imageUrl = '';
+                $customHash = null;
+                if (!empty($product['id_customization'])) {
+                    $row = Db::getInstance()->getRow('SELECT value FROM ' . _DB_PREFIX_ . 'customized_data WHERE id_customization = ' . (int) $product['id_customization'] . ' AND type = 0 LIMIT 1');
+                    if ($row && !empty($row['value'])) {
+                        $customHash = $row['value'];
+                        $imageUrl = rtrim($this->context->shop->getBaseURL(true), '/') . '/upload/' . $customHash . '_small';
+                    }
+                }
+                if (empty($imageUrl)) {
+                    $coverId = (int) Product::getCover((int) $product['id_product'])['id_image'];
+                    if ($coverId) {
+                        $imageUrl = $this->context->link->getImageLink($product['link_rewrite'] ?? $product['name'], $coverId, 'cart_default');
+                        if (strpos($imageUrl, 'http') !== 0) {
+                            $imageUrl = rtrim($this->context->shop->getBaseURL(true), '/') . '/' . ltrim($imageUrl, '/');
+                        }
+                    }
+                }
+
                 $product_var_tpl = [
                     'id_product' => $product['id_product'],
                     'id_product_attribute' => $product['id_product_attribute'],
@@ -446,6 +466,7 @@ abstract class PaymentModuleCore extends Module
                     'name' => $product['name'] . (isset($product['attributes']) ? ' - ' . $product['attributes'] : ''),
                     'price' => Tools::getContextLocale($this->context)->formatPrice($product_price * $product['quantity'], $this->context->currency->iso_code),
                     'quantity' => $product['quantity'],
+                    'image_url' => $imageUrl,
                     'customization' => [],
                 ];
 

@@ -24,18 +24,10 @@
  *}
 {foreach $list as $product}
 <tr>
-	<td style="border:1px solid #D6D4D4;">
-		<table class="table">
-			<tr>
-				<td width="5">&nbsp;</td>
-				<td>
-					<font size="2" face="Open-sans, sans-serif" color="#555454">
-						{$product['reference']}
-					</font>
-				</td>
-				<td width="5">&nbsp;</td>
-			</tr>
-		</table>
+	<td align="center" style="border:1px solid #D6D4D4; padding: 5px;">
+		{if !empty($product['image_url'])}
+			<img src="{$product['image_url']}" alt="{$product['name']|escape:'htmlall'}" width="70" style="max-width:70px; height:auto; display:inline-block;">
+		{/if}
 	</td>
 	<td style="border:1px solid #D6D4D4;">
 		<table class="table">
@@ -43,15 +35,8 @@
 				<td width="5">&nbsp;</td>
 				<td>
 					<font size="2" face="Open-sans, sans-serif" color="#555454">
-						<strong>{$product['name']}</strong>
-						{if count($product['customization']) == 1}
-							<br>
-							{foreach $product['customization'] as $customization}
-								{$customization['customization_text']}
-							{/foreach}
-						{/if}
-
-						{hook h='displayProductPriceBlock' product=$product type="unit_price"}
+						<strong>{$product['name']}</strong><br>
+						{$product['reference']}
 					</font>
 				</td>
 				<td width="5">&nbsp;</td>
