@@ -28,12 +28,30 @@
   {include file='_partials/header.tpl'}
   {literal}
   <style>
+    /* Réactiver la barre de recherche masquée par défaut sur checkout */
     #checkout #search_widget,
     body#checkout #search_widget,
     #checkout .header-right-search,
     #checkout .mobile-header-search { display: block !important; }
     #checkout .header-right-search #search_widget,
     #checkout .mobile-header-search #search_widget { display: inline-block !important; }
+
+    /* Aligner le header sur l'apparence homepage : annuler les overrides PS */
+    body#checkout #header .header-nav {
+      padding: 0 !important;
+      max-height: none !important;
+      margin-bottom: 0 !important;
+      border: 0 !important;
+    }
+    body#checkout #header .header-nav .logo,
+    body#checkout #header .logo {
+      max-height: none !important;
+      width: auto !important;
+    }
+    body#checkout #header .header-top { padding: 0 !important; }
+    body#checkout #header .header-right,
+    body#checkout #header .header-right-actions,
+    body#checkout #header .header-right-search { display: flex !important; }
   </style>
   {/literal}
 {/block}
