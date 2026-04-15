@@ -304,20 +304,28 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
+    function fallbackToValidation(paymentIntentId) {
+      // Le paiement a réussi côté Stripe. On laisse le flow server-side
+      // (validation.php → success.tpl) gérer la finalisation avec son idempotence.
+      var sep = returnUrl.indexOf('?') === -1 ? '?' : '&';
+      window.location.href = returnUrl + sep + 'payment_intent=' + encodeURIComponent(paymentIntentId) + '&redirect_status=succeeded';
+    }
+
     function finalizeOrder(paymentIntentId) {
       var sep = ajaxUrl.indexOf('?') === -1 ? '?' : '&';
       fetch(ajaxUrl + sep + 'payment_intent=' + encodeURIComponent(paymentIntentId), {
         method: 'POST',
         credentials: 'same-origin',
         headers: { 'Accept': 'application/json' }
-      }).then(function(r){ return r.json(); }).then(function(data){
-        if (!data || data.error) {
-          showError(data && data.error ? data.error : 'Finalisation impossible');
+      }).then(function(r){ return r.json().catch(function(){ return null; }); }).then(function(data){
+        if (!data || data.error || !data.success) {
+          // Le paiement est réussi côté Stripe → bascule sur le flow server-side
+          fallbackToValidation(paymentIntentId);
           return;
         }
         renderSuccess(data);
-      }).catch(function(e){
-        showError('Erreur réseau : ' + e.message);
+      }).catch(function(){
+        fallbackToValidation(paymentIntentId);
       });
     }
 

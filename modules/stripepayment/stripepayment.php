@@ -269,19 +269,28 @@ class Stripepayment extends PaymentModule
         $total = (float) $cart->getOrderTotal(true, Cart::BOTH);
         $method = !empty($intent['payment_method_types'][0]) ? $intent['payment_method_types'][0] : 'card';
 
-        $this->validateOrder(
-            (int) $cart->id,
-            (int) Configuration::get('PS_OS_PAYMENT'),
-            $total,
-            'Stripe — ' . strtoupper($method),
-            null,
-            ['transaction_id' => $intent['id']],
-            (int) $currency->id,
-            false,
-            $customer->secure_key
-        );
-
-        $idOrder = (int) $this->currentOrder;
+        $idOrder = 0;
+        try {
+            $this->validateOrder(
+                (int) $cart->id,
+                (int) Configuration::get('PS_OS_PAYMENT'),
+                $total,
+                'Stripe — ' . strtoupper($method),
+                null,
+                ['transaction_id' => $intent['id']],
+                (int) $currency->id,
+                false,
+                $customer->secure_key
+            );
+            $idOrder = (int) $this->currentOrder;
+        } catch (Exception $e) {
+            // Race condition : webhook ou autre flow a créé la commande entre-temps
+            $idOrder = (int) Order::getIdByCartId((int) $cart->id);
+            if (!$idOrder) {
+                throw $e;
+            }
+            PrestaShopLogger::addLog('Stripe createOrderFromIntent: race resolved (order ' . $idOrder . ' existed after validateOrder failure)', 1);
+        }
 
         Db::getInstance()->update('stripe_payment', [
             'id_order' => $idOrder,
