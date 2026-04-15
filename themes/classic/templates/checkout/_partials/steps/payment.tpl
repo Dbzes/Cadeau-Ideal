@@ -57,8 +57,9 @@
   {/if}
   {literal}
   <style>
-    .payment-options .custom-radio { border-color: #ee7a03 !important; }
+    .payment-options .custom-radio { border-color: #000 !important; }
     .payment-options .custom-radio input[type="radio"]:checked + span { background-color: #ee7a03 !important; }
+    .payment-options .payment-option { margin-bottom: 18px; }
     .payment-options .payment-option label { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .payment-options .payment-option label img.payment-brand { height: 22px; width: auto; }
   </style>
