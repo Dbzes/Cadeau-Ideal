@@ -14,7 +14,13 @@ class StripepaymentValidationModuleFrontController extends ModuleFrontController
         $redirectStatus = Tools::getValue('redirect_status');
 
         PrestaShopLogger::addLog(
-            sprintf('[Stripe validation] start id_cart=%d pi=%s redirect_status=%s', $idCart, $piId, $redirectStatus),
+            sprintf(
+                '[Stripe validation] start id_cart=%d pi=%s redirect_status=%s skey=%s key=%s request_uri=%s',
+                $idCart, $piId, $redirectStatus,
+                Tools::getValue('skey'),
+                Tools::getValue('key'),
+                isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : ''
+            ),
             1
         );
 
@@ -28,7 +34,7 @@ class StripepaymentValidationModuleFrontController extends ModuleFrontController
             return $this->bailToCart('Client introuvable');
         }
         if ($customer->secure_key !== $key) {
-            return $this->bailToCart('Secure key mismatch');
+            return $this->bailToCart('Secure key mismatch (expected=' . $customer->secure_key . ' got=' . $key . ')');
         }
 
         require_once _PS_MODULE_DIR_ . 'stripepayment/lib/StripeClient.php';
