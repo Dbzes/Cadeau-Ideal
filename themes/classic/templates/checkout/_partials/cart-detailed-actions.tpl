@@ -23,6 +23,13 @@
  * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License 3.0 (AFL-3.0)
  *}
 {block name='cart_detailed_actions'}
+  {literal}
+  <style>
+    .lci-btn-commander:hover,
+    .lci-btn-commander:focus,
+    .lci-btn-commander:active { background:#d36c00 !important; border-color:#d36c00 !important; color:#fff !important; }
+  </style>
+  {/literal}
   <div class="checkout cart-detailed-actions js-cart-detailed-actions card-block">
     {if $cart.minimalPurchaseRequired}
       <div class="alert alert-warning" role="alert">
@@ -37,7 +44,7 @@
       </div>
     {else}
       <div class="text-sm-center">
-        <a href="{$urls.pages.order}" class="btn btn-primary">{l s='Proceed to checkout' d='Shop.Theme.Actions'}</a>
+        <a href="{$urls.pages.order}" class="btn btn-primary lci-btn-commander" style="background:#ee7a03;border-color:#ee7a03;color:#fff;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:14px 32px;">{l s='Proceed to checkout' d='Shop.Theme.Actions'}</a>
         {hook h='displayExpressCheckout'}
       </div>
     {/if}
