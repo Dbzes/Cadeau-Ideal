@@ -27,7 +27,8 @@ class StripepaymentAjaxModuleFrontController extends ModuleFrontController
     private function handle()
     {
         $idCart = (int) Tools::getValue('id_cart');
-        $key = Tools::getValue('key');
+        $key = Tools::getValue('skey');
+        if (!$key) { $key = Tools::getValue('key'); }
         $piId = Tools::getValue('payment_intent');
 
         if (!$idCart || !$key || !$piId) {

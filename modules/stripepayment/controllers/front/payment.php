@@ -78,12 +78,12 @@ class StripepaymentPaymentModuleFrontController extends ModuleFrontController
         $returnUrl = $this->context->link->getModuleLink($this->module->name, 'validation', [
             'id_cart' => (int) $cart->id,
             'method' => $method,
-            'key' => $customer->secure_key,
+            'skey' => $customer->secure_key,
         ], true);
 
         $ajaxUrl = $this->context->link->getModuleLink($this->module->name, 'ajax', [
             'id_cart' => (int) $cart->id,
-            'key' => $customer->secure_key,
+            'skey' => $customer->secure_key,
         ], true);
 
         $homeUrl = $this->context->link->getPageLink('index', true);

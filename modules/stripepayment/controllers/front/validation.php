@@ -8,7 +8,8 @@ class StripepaymentValidationModuleFrontController extends ModuleFrontController
     public function postProcess()
     {
         $idCart = (int) Tools::getValue('id_cart');
-        $key = Tools::getValue('key');
+        $key = Tools::getValue('skey');
+        if (!$key) { $key = Tools::getValue('key'); } // backward compat
         $piId = Tools::getValue('payment_intent');
         $redirectStatus = Tools::getValue('redirect_status');
 
@@ -94,7 +95,7 @@ class StripepaymentValidationModuleFrontController extends ModuleFrontController
     {
         $url = $this->context->link->getModuleLink('stripepayment', 'success', [
             'id_order' => (int) $idOrder,
-            'key' => $secureKey,
+            'skey' => $secureKey,
         ], true);
         PrestaShopLogger::addLog('[Stripe validation] redirect → ' . $url, 1);
         Tools::redirect($url);

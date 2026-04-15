@@ -11,7 +11,8 @@ class StripepaymentSuccessModuleFrontController extends ModuleFrontController
         parent::initContent();
 
         $idOrder = (int) Tools::getValue('id_order');
-        $key = Tools::getValue('key');
+        $key = Tools::getValue('skey');
+        if (!$key) { $key = Tools::getValue('key'); } // backward compat
 
         $order = new Order($idOrder);
         if (!Validate::isLoadedObject($order)) {
