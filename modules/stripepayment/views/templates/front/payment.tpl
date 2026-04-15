@@ -173,8 +173,8 @@
   .stripe-payment-amount { padding: 14px 16px; }
   .stripe-amount-value { font-size: 20px; }
   .stripe-pay-button { padding: 14px 18px; font-size: 14px; }
-  .stripe-payment-trust { gap: 10px; justify-content: flex-start; }
-  .stripe-trust-item { font-size: 12px; flex: 1 1 100%; }
+  .stripe-payment-trust { gap: 10px; justify-content: center; }
+  .stripe-trust-item { font-size: 12px; flex: 1 1 100%; justify-content: center; text-align: center; }
 }
 </style>
 {/literal}
@@ -197,7 +197,10 @@
       clientSecret: clientSecret,
       appearance: { theme: 'stripe', variables: { colorPrimary: '#004774' } }
     });
-    var paymentElement = elements.create('payment', { layout: { type: 'tabs' } });
+    var paymentElement = elements.create('payment', {
+      layout: { type: 'tabs' },
+      wallets: { link: 'never' }
+    });
     paymentElement.mount('#stripe-payment-element');
 
     var form = document.getElementById('stripe-payment-form');
