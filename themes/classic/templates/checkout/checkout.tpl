@@ -26,6 +26,16 @@
 
 {block name='header'}
   {include file='_partials/header.tpl'}
+  {literal}
+  <style>
+    #checkout #search_widget,
+    body#checkout #search_widget,
+    #checkout .header-right-search,
+    #checkout .mobile-header-search { display: block !important; }
+    #checkout .header-right-search #search_widget,
+    #checkout .mobile-header-search #search_widget { display: inline-block !important; }
+  </style>
+  {/literal}
 {/block}
 
 {block name='content'}
