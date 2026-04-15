@@ -29,6 +29,11 @@ class StripeClient
         return $this->request('GET', '/payment_intents/' . urlencode($id));
     }
 
+    public function updatePaymentIntent($id, array $params)
+    {
+        return $this->request('POST', '/payment_intents/' . urlencode($id), $params);
+    }
+
     public function createRefund(array $params)
     {
         return $this->request('POST', '/refunds', $params);

@@ -69,6 +69,18 @@ class StripepaymentValidationModuleFrontController extends ModuleFrontController
             'status' => pSQL($intent['status']),
         ], 'payment_intent_id = "' . pSQL($intent['id']) . '"');
 
+        try {
+            $stripe->updatePaymentIntent($intent['id'], [
+                'description' => 'LCI-C#' . (int) $order->id . '-' . $order->reference,
+                'metadata' => [
+                    'id_order' => (int) $order->id,
+                    'order_reference' => $order->reference,
+                ],
+            ]);
+        } catch (Exception $e) {
+            PrestaShopLogger::addLog('Stripe update PI description error: ' . $e->getMessage(), 2);
+        }
+
         $this->redirectToConfirmation($cart, $order, $customer);
     }
 
