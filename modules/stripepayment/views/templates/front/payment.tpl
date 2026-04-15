@@ -274,61 +274,6 @@
       spinner.style.display = 'none';
     }
 
-    function escapeHtml(s) {
-      return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
-        return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
-      });
-    }
-
-    function renderSuccess(data) {
-      var card = document.querySelector('.stripe-payment-card');
-      if (!card) return;
-      var name = data.firstname ? ' ' + escapeHtml(data.firstname) : '';
-      card.innerHTML =
-        '<div class="stripe-success-block">' +
-          '<div class="stripe-success-icon">' +
-            '<svg viewBox="0 0 64 64" width="72" height="72" xmlns="http://www.w3.org/2000/svg">' +
-              '<circle cx="32" cy="32" r="30" fill="#16a34a"/>' +
-              '<path d="M20 33 L29 42 L46 24" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>' +
-            '</svg>' +
-          '</div>' +
-          '<h2 class="stripe-success-title">Merci' + name + ', votre commande est confirmée&nbsp;!</h2>' +
-          '<p class="stripe-success-message">Votre paiement de <strong>' + escapeHtml(data.total) + '</strong> a bien été traité. Nous préparons votre commande avec le plus grand soin.</p>' +
-          '<div class="stripe-success-info">' +
-            '<div class="stripe-success-info-row"><span class="stripe-info-label">Numéro de commande</span><span class="stripe-info-value">#' + escapeHtml(String(data.id_order)) + '</span></div>' +
-            '<div class="stripe-success-info-row"><span class="stripe-info-label">Référence</span><span class="stripe-info-value">' + escapeHtml(data.reference) + '</span></div>' +
-          '</div>' +
-          '<p class="stripe-success-email">Un email de confirmation vient d\'être envoyé à <strong>' + escapeHtml(data.email) + '</strong>.<br>Pensez à vérifier vos spams si vous ne le voyez pas dans quelques minutes.</p>' +
-          '<a href="' + escapeHtml(homeUrl) + '" class="stripe-success-home">Accueil du site</a>' +
-        '</div>';
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function fallbackToValidation(paymentIntentId) {
-      // Le paiement a réussi côté Stripe. On laisse le flow server-side
-      // (validation.php → success.tpl) gérer la finalisation avec son idempotence.
-      var sep = returnUrl.indexOf('?') === -1 ? '?' : '&';
-      window.location.href = returnUrl + sep + 'payment_intent=' + encodeURIComponent(paymentIntentId) + '&redirect_status=succeeded';
-    }
-
-    function finalizeOrder(paymentIntentId) {
-      var sep = ajaxUrl.indexOf('?') === -1 ? '?' : '&';
-      fetch(ajaxUrl + sep + 'payment_intent=' + encodeURIComponent(paymentIntentId), {
-        method: 'POST',
-        credentials: 'same-origin',
-        headers: { 'Accept': 'application/json' }
-      }).then(function(r){ return r.json().catch(function(){ return null; }); }).then(function(data){
-        if (!data || data.error || !data.success) {
-          // Le paiement est réussi côté Stripe → bascule sur le flow server-side
-          fallbackToValidation(paymentIntentId);
-          return;
-        }
-        renderSuccess(data);
-      }).catch(function(){
-        fallbackToValidation(paymentIntentId);
-      });
-    }
-
     form.addEventListener('submit', function(e){
       e.preventDefault();
       btn.disabled = true;
@@ -338,18 +283,11 @@
 
       stripe.confirmPayment({
         elements: elements,
-        confirmParams: { return_url: returnUrl },
-        redirect: 'if_required'
+        confirmParams: { return_url: returnUrl }
       }).then(function(result){
-        if (result.error) {
+        if (result && result.error) {
           showError(result.error.message);
-          return;
         }
-        if (result.paymentIntent && (result.paymentIntent.status === 'succeeded' || result.paymentIntent.status === 'processing')) {
-          finalizeOrder(result.paymentIntent.id);
-        }
-      }).catch(function(e){
-        showError(e.message);
       });
     });
   }
