@@ -99,10 +99,10 @@ class StripepaymentValidationModuleFrontController extends ModuleFrontController
 
     private function redirectToSuccess($idOrder, $secureKey)
     {
-        $url = $this->context->link->getModuleLink('stripepayment', 'success', [
+        $url = str_replace('&amp;', '&', $this->context->link->getModuleLink('stripepayment', 'success', [
             'id_order' => (int) $idOrder,
             'skey' => $secureKey,
-        ], true);
+        ], true));
         PrestaShopLogger::addLog('[Stripe validation] redirect → ' . $url, 1);
         Tools::redirect($url);
     }

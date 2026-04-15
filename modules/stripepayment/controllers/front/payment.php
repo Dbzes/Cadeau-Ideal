@@ -75,18 +75,18 @@ class StripepaymentPaymentModuleFrontController extends ModuleFrontController
             'mode' => pSQL($this->module->getMode()),
         ]);
 
-        $returnUrl = $this->context->link->getModuleLink($this->module->name, 'validation', [
+        $returnUrl = str_replace('&amp;', '&', $this->context->link->getModuleLink($this->module->name, 'validation', [
             'id_cart' => (int) $cart->id,
             'method' => $method,
             'skey' => $customer->secure_key,
-        ], true);
+        ], true));
 
-        $ajaxUrl = $this->context->link->getModuleLink($this->module->name, 'ajax', [
+        $ajaxUrl = str_replace('&amp;', '&', $this->context->link->getModuleLink($this->module->name, 'ajax', [
             'id_cart' => (int) $cart->id,
             'skey' => $customer->secure_key,
-        ], true);
+        ], true));
 
-        $homeUrl = $this->context->link->getPageLink('index', true);
+        $homeUrl = str_replace('&amp;', '&', $this->context->link->getPageLink('index', true));
 
         $this->context->smarty->assign([
             'stripe_pk' => $pk,

@@ -30,7 +30,7 @@ class StripepaymentSuccessModuleFrontController extends ModuleFrontController
             'order_total' => Tools::displayPrice((float) $order->total_paid),
             'customer_email' => $customer->email,
             'customer_firstname' => $customer->firstname,
-            'home_url' => $this->context->link->getPageLink('index'),
+            'home_url' => str_replace('&amp;', '&', $this->context->link->getPageLink('index')),
         ]);
 
         $this->setTemplate('module:stripepayment/views/templates/front/success.tpl');
