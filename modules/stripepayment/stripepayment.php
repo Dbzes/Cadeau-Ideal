@@ -15,7 +15,7 @@ class Stripepayment extends PaymentModule
         $this->tab = 'payments_gateways';
         $this->version = '1.0.0';
         $this->author = 'Cadeau Idéal';
-        $this->controllers = ['payment', 'validation', 'webhook'];
+        $this->controllers = ['payment', 'validation', 'webhook', 'success'];
         $this->currencies = true;
         $this->currencies_mode = 'checkbox';
         $this->bootstrap = true;
@@ -239,6 +239,56 @@ class Stripepayment extends PaymentModule
         ]);
 
         return $this->display(__FILE__, 'views/templates/hook/admin_order_refund.tpl');
+    }
+
+    /**
+     * Crée la commande PrestaShop à partir d'un PaymentIntent Stripe.
+     * Idempotent : si une commande existe déjà pour ce panier, retourne son id.
+     * Appelé par validation.php (retour navigateur) ET webhook.php (fallback).
+     *
+     * @return int id_order
+     * @throws Exception en cas d'échec
+     */
+    public function createOrderFromIntent(Cart $cart, array $intent)
+    {
+        $existing = (int) Order::getIdByCartId((int) $cart->id);
+        if ($existing) {
+            Db::getInstance()->update('stripe_payment', [
+                'id_order' => $existing,
+                'status' => pSQL($intent['status']),
+            ], 'payment_intent_id = "' . pSQL($intent['id']) . '"');
+            return $existing;
+        }
+
+        $customer = new Customer((int) $cart->id_customer);
+        if (!Validate::isLoadedObject($customer)) {
+            throw new Exception('Customer introuvable pour cart ' . (int) $cart->id);
+        }
+
+        $currency = new Currency((int) $cart->id_currency);
+        $total = (float) $cart->getOrderTotal(true, Cart::BOTH);
+        $method = !empty($intent['payment_method_types'][0]) ? $intent['payment_method_types'][0] : 'card';
+
+        $this->validateOrder(
+            (int) $cart->id,
+            (int) Configuration::get('PS_OS_PAYMENT'),
+            $total,
+            'Stripe — ' . strtoupper($method),
+            null,
+            ['transaction_id' => $intent['id']],
+            (int) $currency->id,
+            false,
+            $customer->secure_key
+        );
+
+        $idOrder = (int) $this->currentOrder;
+
+        Db::getInstance()->update('stripe_payment', [
+            'id_order' => $idOrder,
+            'status' => pSQL($intent['status']),
+        ], 'payment_intent_id = "' . pSQL($intent['id']) . '"');
+
+        return $idOrder;
     }
 
     // ---- Utils ----

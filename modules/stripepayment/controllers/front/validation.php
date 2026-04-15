@@ -23,7 +23,6 @@ class StripepaymentValidationModuleFrontController extends ModuleFrontController
         $stripe = new StripeClient($this->module->getSecretKey());
 
         if (!$piId) {
-            // Retrieve from DB
             $row = Db::getInstance()->getRow('SELECT payment_intent_id FROM ' . _DB_PREFIX_ . 'stripe_payment WHERE id_cart = ' . $idCart . ' ORDER BY id_stripe_payment DESC LIMIT 1');
             $piId = $row ? $row['payment_intent_id'] : null;
         }
@@ -40,34 +39,18 @@ class StripepaymentValidationModuleFrontController extends ModuleFrontController
             $this->redirectToCart('Paiement non confirmé (statut: ' . $intent['status'] . ')');
         }
 
-        // Idempotence : si une commande existe déjà pour ce cart, on redirige
-        $existingOrderId = (int) Order::getIdByCartId($idCart);
-        if ($existingOrderId) {
-            $order = new Order($existingOrderId);
-            $this->redirectToConfirmation($cart, $order, $customer);
+        try {
+            $idOrder = $this->module->createOrderFromIntent($cart, $intent);
+        } catch (Exception $e) {
+            PrestaShopLogger::addLog('Stripe createOrderFromIntent error (validation): ' . $e->getMessage(), 3);
+            $this->redirectToCart('Erreur lors de la création de la commande. Notre équipe a été notifiée.');
         }
 
-        $currency = new Currency((int) $cart->id_currency);
-        $total = (float) $cart->getOrderTotal(true, Cart::BOTH);
+        if (!$idOrder) {
+            $this->redirectToCart('Création de commande impossible');
+        }
 
-        $this->module->validateOrder(
-            (int) $cart->id,
-            (int) Configuration::get('PS_OS_PAYMENT'),
-            $total,
-            'Stripe — ' . strtoupper(Tools::getValue('method', 'card')),
-            null,
-            ['transaction_id' => $intent['id']],
-            (int) $currency->id,
-            false,
-            $customer->secure_key
-        );
-
-        $order = new Order((int) $this->module->currentOrder);
-
-        Db::getInstance()->update('stripe_payment', [
-            'id_order' => (int) $order->id,
-            'status' => pSQL($intent['status']),
-        ], 'payment_intent_id = "' . pSQL($intent['id']) . '"');
+        $order = new Order((int) $idOrder);
 
         try {
             $stripe->updatePaymentIntent($intent['id'], [
@@ -81,17 +64,10 @@ class StripepaymentValidationModuleFrontController extends ModuleFrontController
             PrestaShopLogger::addLog('Stripe update PI description error: ' . $e->getMessage(), 2);
         }
 
-        $this->redirectToConfirmation($cart, $order, $customer);
-    }
-
-    private function redirectToConfirmation(Cart $cart, Order $order, Customer $customer)
-    {
-        Tools::redirect($this->context->link->getPageLink('order-confirmation', true, null, [
-            'id_cart' => (int) $cart->id,
-            'id_module' => (int) $this->module->id,
+        Tools::redirect($this->context->link->getModuleLink('stripepayment', 'success', [
             'id_order' => (int) $order->id,
             'key' => $customer->secure_key,
-        ]));
+        ], true));
     }
 
     private function redirectToCart($msg)

@@ -57,6 +57,35 @@ class StripepaymentWebhookModuleFrontController extends ModuleFrontController
         Db::getInstance()->update('stripe_payment', [
             'status' => pSQL($pi['status']),
         ], 'payment_intent_id = "' . pSQL($pi['id']) . '"');
+
+        // Fallback : créer la commande si validation.php ne l'a pas fait
+        // (utilisateur ferme la fenêtre, exception, timeout, etc.)
+        $idCart = !empty($pi['metadata']['id_cart']) ? (int) $pi['metadata']['id_cart'] : 0;
+        if (!$idCart) { return; }
+
+        $cart = new Cart($idCart);
+        if (!Validate::isLoadedObject($cart)) { return; }
+
+        try {
+            $idOrder = $this->module->createOrderFromIntent($cart, $pi);
+            if ($idOrder) {
+                $order = new Order((int) $idOrder);
+                $stripe = new StripeClient($this->module->getSecretKey());
+                try {
+                    $stripe->updatePaymentIntent($pi['id'], [
+                        'description' => 'LCI-C#' . (int) $order->id . '-' . $order->reference,
+                        'metadata' => [
+                            'id_order' => (int) $order->id,
+                            'order_reference' => $order->reference,
+                        ],
+                    ]);
+                } catch (Exception $e) {
+                    PrestaShopLogger::addLog('Stripe webhook update PI description: ' . $e->getMessage(), 2);
+                }
+            }
+        } catch (Exception $e) {
+            PrestaShopLogger::addLog('Stripe webhook order creation error: ' . $e->getMessage(), 3);
+        }
     }
 
     private function handlePaymentFailed(array $pi)
