@@ -60,6 +60,9 @@
     .payment-options .custom-radio { border-color: #000 !important; }
     .payment-options .custom-radio input[type="radio"]:checked + span { background-color: #ee7a03 !important; }
     .payment-options > div { margin-bottom: 28px; }
+    .payment-options > div:last-child { margin-bottom: 21px; }
+    #conditions-to-approve { margin-top: 0; }
+    #conditions-to-approve ul { margin-top: 0; padding-top: 0; }
     .payment-options .payment-option label { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .payment-options .payment-option label img.payment-brand { height: 22px; width: auto; }
   </style>
