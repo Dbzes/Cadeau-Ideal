@@ -55,6 +55,14 @@
   {if $is_free}
     <p class="cart-payment-step-not-needed-info">{l s='No payment needed for this order' d='Shop.Theme.Checkout'}</p>
   {/if}
+  {literal}
+  <style>
+    .payment-options .custom-radio { border-color: #ee7a03 !important; }
+    .payment-options .custom-radio input[type="radio"]:checked + span { background-color: #ee7a03 !important; }
+    .payment-options .payment-option label { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .payment-options .payment-option label img.payment-brand { height: 22px; width: auto; }
+  </style>
+  {/literal}
   <div class="payment-options {if $is_free}hidden-xs-up{/if}">
     {foreach from=$payment_options item="module_options"}
       {foreach from=$module_options item="option"}
@@ -86,7 +94,13 @@
 
             <label for="{$option.id}">
               <span>{$option.call_to_action_text}</span>
-              {if $option.logo}
+              {if $option.module_name === 'stripepayment' && $option.call_to_action_text === 'Carte bancaire'}
+                <img class="payment-brand" src="/img/template/payment/Visa.png" alt="Visa" loading="lazy">
+                <img class="payment-brand" src="/img/template/payment/Mastercard.png" alt="Mastercard" loading="lazy">
+                <img class="payment-brand" src="/img/template/payment/Amex.png" alt="Amex" loading="lazy">
+              {elseif $option.module_name === 'stripepayment' && $option.call_to_action_text === 'PayPal'}
+                <img class="payment-brand" src="/img/template/payment/PayPal.png" alt="PayPal" loading="lazy">
+              {elseif $option.logo}
                 <img src="{$option.logo}" loading="lazy">
               {/if}
             </label>
@@ -94,14 +108,6 @@
           </div>
         </div>
 
-        {if $option.additionalInformation}
-          <div
-            id="{$option.id}-additional-information"
-            class="js-additional-information definition-list additional-information{if $option.id != $selected_payment_option} ps-hidden {/if}"
-          >
-            {$option.additionalInformation nofilter}
-          </div>
-        {/if}
 
         <div
           id="pay-with-{$option.id}-form"

@@ -184,8 +184,7 @@ class Stripepayment extends PaymentModule
             $card = new PaymentOption();
             $card->setCallToActionText('Carte bancaire')
                 ->setModuleName($this->name)
-                ->setAction($this->context->link->getModuleLink($this->name, 'payment', ['method' => 'card'], true))
-                ->setAdditionalInformation($this->fetch('module:stripepayment/views/templates/hook/option_card.tpl'));
+                ->setAction($this->context->link->getModuleLink($this->name, 'payment', ['method' => 'card'], true));
             $options[] = $card;
         }
 
@@ -193,8 +192,7 @@ class Stripepayment extends PaymentModule
             $pp = new PaymentOption();
             $pp->setCallToActionText('PayPal')
                 ->setModuleName($this->name)
-                ->setAction($this->context->link->getModuleLink($this->name, 'payment', ['method' => 'paypal'], true))
-                ->setAdditionalInformation($this->fetch('module:stripepayment/views/templates/hook/option_paypal.tpl'));
+                ->setAction($this->context->link->getModuleLink($this->name, 'payment', ['method' => 'paypal'], true));
             $options[] = $pp;
         }
 
