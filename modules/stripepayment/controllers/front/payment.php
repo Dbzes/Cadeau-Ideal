@@ -89,13 +89,16 @@ class StripepaymentPaymentModuleFrontController extends ModuleFrontController
         $homeUrl = str_replace('&amp;', '&', $this->context->link->getPageLink('index', true));
 
         $this->context->smarty->assign([
-            'stripe_pk' => $pk,
-            'stripe_client_secret' => $intent['client_secret'],
             'stripe_payment_method' => $method,
-            'stripe_return_url' => $returnUrl,
-            'stripe_ajax_url' => $ajaxUrl,
-            'stripe_home_url' => $homeUrl,
             'stripe_amount_display' => Tools::displayPrice($total),
+            'stripe_js_config' => json_encode([
+                'pk' => $pk,
+                'clientSecret' => $intent['client_secret'],
+                'returnUrl' => $returnUrl,
+                'ajaxUrl' => $ajaxUrl,
+                'homeUrl' => $homeUrl,
+                'method' => $method,
+            ], JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_QUOT),
         ]);
 
         $this->setTemplate('module:stripepayment/views/templates/front/payment.tpl');

@@ -235,15 +235,18 @@
 </style>
 {/literal}
 
+<script>window.STRIPE_CFG = {$stripe_js_config nofilter};</script>
+
 {literal}
 <script>
 (function(){
-  var pk = {/literal}"{$stripe_pk|escape:'javascript'}"{literal};
-  var clientSecret = {/literal}"{$stripe_client_secret|escape:'javascript'}"{literal};
-  var returnUrl = {/literal}"{$stripe_return_url|escape:'javascript'}"{literal};
-  var ajaxUrl = {/literal}"{$stripe_ajax_url|escape:'javascript'}"{literal};
-  var homeUrl = {/literal}"{$stripe_home_url|escape:'javascript'}"{literal};
-  var method = {/literal}"{$stripe_payment_method|escape:'javascript'}"{literal};
+  var cfg = window.STRIPE_CFG || {};
+  var pk = cfg.pk;
+  var clientSecret = cfg.clientSecret;
+  var returnUrl = cfg.returnUrl;
+  var ajaxUrl = cfg.ajaxUrl;
+  var homeUrl = cfg.homeUrl;
+  var method = cfg.method;
 
   function init() {
     if (!window.Stripe) {
