@@ -15,7 +15,7 @@ class Stripepayment extends PaymentModule
         $this->tab = 'payments_gateways';
         $this->version = '1.0.0';
         $this->author = 'Cadeau Idéal';
-        $this->controllers = ['payment', 'validation', 'webhook', 'success'];
+        $this->controllers = ['payment', 'validation', 'webhook', 'success', 'ajax'];
         $this->currencies = true;
         $this->currencies_mode = 'checkbox';
         $this->bootstrap = true;

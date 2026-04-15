@@ -81,11 +81,20 @@ class StripepaymentPaymentModuleFrontController extends ModuleFrontController
             'key' => $customer->secure_key,
         ], true);
 
+        $ajaxUrl = $this->context->link->getModuleLink($this->module->name, 'ajax', [
+            'id_cart' => (int) $cart->id,
+            'key' => $customer->secure_key,
+        ], true);
+
+        $homeUrl = $this->context->link->getPageLink('index', true);
+
         $this->context->smarty->assign([
             'stripe_pk' => $pk,
             'stripe_client_secret' => $intent['client_secret'],
             'stripe_payment_method' => $method,
             'stripe_return_url' => $returnUrl,
+            'stripe_ajax_url' => $ajaxUrl,
+            'stripe_home_url' => $homeUrl,
             'stripe_amount_display' => Tools::displayPrice($total),
         ]);
 

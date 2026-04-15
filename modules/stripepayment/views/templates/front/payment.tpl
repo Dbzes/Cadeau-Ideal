@@ -161,6 +161,57 @@
 .stripe-spin { animation: stripe-spin 0.9s linear infinite; }
 @keyframes stripe-spin { to { transform: rotate(360deg); } }
 
+/* --- Success in-page --- */
+.stripe-success-block { text-align: center; padding: 8px 0; }
+.stripe-success-icon { margin-bottom: 18px; display: flex; justify-content: center; }
+.stripe-success-title {
+  font-family: 'Bebas Neue', sans-serif;
+  color: #004774;
+  font-size: 30px;
+  margin: 0 0 16px;
+  letter-spacing: 0.5px;
+  line-height: 1.2;
+}
+.stripe-success-message { color: #444; font-size: 16px; line-height: 1.55; margin: 0 0 26px; }
+.stripe-success-info {
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  padding: 16px 20px;
+  margin: 0 0 24px;
+  text-align: left;
+}
+.stripe-success-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+.stripe-success-info-row:last-child { border-bottom: none; }
+.stripe-info-label { color: #555; font-size: 14px; }
+.stripe-info-value {
+  color: #004774;
+  font-weight: 700;
+  font-size: 15px;
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 0.5px;
+}
+.stripe-success-email { color: #555; font-size: 14px; line-height: 1.5; margin: 0 0 28px; }
+.stripe-success-home {
+  display: inline-block;
+  background: #004774;
+  color: #fff !important;
+  padding: 16px 36px;
+  font-weight: 700;
+  font-size: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-decoration: none;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+.stripe-success-home:hover { background: #003355; text-decoration: none; color: #fff; }
+.stripe-success-home:active { transform: translateY(1px); }
+
 @media (max-width: 600px) {
   .stripe-payment-wrapper { margin: 16px auto; padding: 0 12px; }
   .stripe-payment-card { padding: 20px; }
@@ -175,6 +226,11 @@
   .stripe-pay-button { padding: 14px 18px; font-size: 14px; }
   .stripe-payment-trust { gap: 10px; justify-content: center; }
   .stripe-trust-item { font-size: 12px; flex: 1 1 100%; justify-content: center; text-align: center; }
+  .stripe-success-title { font-size: 24px; }
+  .stripe-success-message { font-size: 15px; }
+  .stripe-success-info { padding: 12px 16px; }
+  .stripe-success-info-row { flex-direction: column; align-items: flex-start; gap: 4px; }
+  .stripe-success-home { padding: 14px 28px; font-size: 14px; width: 100%; box-sizing: border-box; }
 }
 </style>
 {/literal}
@@ -185,6 +241,8 @@
   var pk = {/literal}"{$stripe_pk|escape:'javascript'}"{literal};
   var clientSecret = {/literal}"{$stripe_client_secret|escape:'javascript'}"{literal};
   var returnUrl = {/literal}"{$stripe_return_url|escape:'javascript'}"{literal};
+  var ajaxUrl = {/literal}"{$stripe_ajax_url|escape:'javascript'}"{literal};
+  var homeUrl = {/literal}"{$stripe_home_url|escape:'javascript'}"{literal};
   var method = {/literal}"{$stripe_payment_method|escape:'javascript'}"{literal};
 
   function init() {
@@ -209,6 +267,60 @@
     var spinner = document.getElementById('stripe-spinner');
     var errBox = document.getElementById('stripe-error');
 
+    function showError(msg) {
+      errBox.textContent = msg || 'Erreur de paiement';
+      btn.disabled = false;
+      btnText.style.display = 'inline-flex';
+      spinner.style.display = 'none';
+    }
+
+    function escapeHtml(s) {
+      return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+        return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+      });
+    }
+
+    function renderSuccess(data) {
+      var card = document.querySelector('.stripe-payment-card');
+      if (!card) return;
+      var name = data.firstname ? ' ' + escapeHtml(data.firstname) : '';
+      card.innerHTML =
+        '<div class="stripe-success-block">' +
+          '<div class="stripe-success-icon">' +
+            '<svg viewBox="0 0 64 64" width="72" height="72" xmlns="http://www.w3.org/2000/svg">' +
+              '<circle cx="32" cy="32" r="30" fill="#16a34a"/>' +
+              '<path d="M20 33 L29 42 L46 24" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>' +
+            '</svg>' +
+          '</div>' +
+          '<h2 class="stripe-success-title">Merci' + name + ', votre commande est confirmée&nbsp;!</h2>' +
+          '<p class="stripe-success-message">Votre paiement de <strong>' + escapeHtml(data.total) + '</strong> a bien été traité. Nous préparons votre commande avec le plus grand soin.</p>' +
+          '<div class="stripe-success-info">' +
+            '<div class="stripe-success-info-row"><span class="stripe-info-label">Numéro de commande</span><span class="stripe-info-value">#' + escapeHtml(String(data.id_order)) + '</span></div>' +
+            '<div class="stripe-success-info-row"><span class="stripe-info-label">Référence</span><span class="stripe-info-value">' + escapeHtml(data.reference) + '</span></div>' +
+          '</div>' +
+          '<p class="stripe-success-email">Un email de confirmation vient d\'être envoyé à <strong>' + escapeHtml(data.email) + '</strong>.<br>Pensez à vérifier vos spams si vous ne le voyez pas dans quelques minutes.</p>' +
+          '<a href="' + escapeHtml(homeUrl) + '" class="stripe-success-home">Accueil du site</a>' +
+        '</div>';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function finalizeOrder(paymentIntentId) {
+      var sep = ajaxUrl.indexOf('?') === -1 ? '?' : '&';
+      fetch(ajaxUrl + sep + 'payment_intent=' + encodeURIComponent(paymentIntentId), {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Accept': 'application/json' }
+      }).then(function(r){ return r.json(); }).then(function(data){
+        if (!data || data.error) {
+          showError(data && data.error ? data.error : 'Finalisation impossible');
+          return;
+        }
+        renderSuccess(data);
+      }).catch(function(e){
+        showError('Erreur réseau : ' + e.message);
+      });
+    }
+
     form.addEventListener('submit', function(e){
       e.preventDefault();
       btn.disabled = true;
@@ -218,14 +330,18 @@
 
       stripe.confirmPayment({
         elements: elements,
-        confirmParams: { return_url: returnUrl }
+        confirmParams: { return_url: returnUrl },
+        redirect: 'if_required'
       }).then(function(result){
         if (result.error) {
-          errBox.textContent = result.error.message || 'Erreur de paiement';
-          btn.disabled = false;
-          btnText.style.display = 'inline-flex';
-          spinner.style.display = 'none';
+          showError(result.error.message);
+          return;
         }
+        if (result.paymentIntent && (result.paymentIntent.status === 'succeeded' || result.paymentIntent.status === 'processing')) {
+          finalizeOrder(result.paymentIntent.id);
+        }
+      }).catch(function(e){
+        showError(e.message);
       });
     });
   }
