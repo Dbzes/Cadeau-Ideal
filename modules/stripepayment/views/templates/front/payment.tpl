@@ -277,6 +277,26 @@
       spinner.style.display = 'none';
     }
 
+    function showSuccessInPage() {
+      var card = document.querySelector('.stripe-payment-card');
+      if (!card) { window.location.href = homeUrl; return; }
+      var safeHomeUrl = String(homeUrl || '/').replace(/[<>"']/g, '');
+      card.innerHTML =
+        '<div class="stripe-success-block" style="text-align:center;padding:8px 0;">' +
+          '<div class="stripe-success-icon" style="margin-bottom:18px;display:flex;justify-content:center;">' +
+            '<svg viewBox="0 0 64 64" width="72" height="72" xmlns="http://www.w3.org/2000/svg">' +
+              '<circle cx="32" cy="32" r="30" fill="#16a34a"/>' +
+              '<path d="M20 33 L29 42 L46 24" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>' +
+            '</svg>' +
+          '</div>' +
+          '<h2 class="stripe-success-title">Votre commande est confirmée&nbsp;!</h2>' +
+          '<p class="stripe-success-message">Votre paiement a bien été traité. Nous préparons votre commande avec le plus grand soin.</p>' +
+          '<p class="stripe-success-email">Un email de confirmation vient de vous être envoyé.<br>Pensez à vérifier vos spams si vous ne le voyez pas dans quelques minutes.</p>' +
+          '<a href="' + safeHomeUrl + '" class="stripe-success-home">Accueil du site</a>' +
+        '</div>';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
     form.addEventListener('submit', function(e){
       e.preventDefault();
       btn.disabled = true;
@@ -286,11 +306,19 @@
 
       stripe.confirmPayment({
         elements: elements,
-        confirmParams: { return_url: returnUrl }
+        confirmParams: { return_url: returnUrl },
+        redirect: 'if_required'
       }).then(function(result){
         if (result && result.error) {
           showError(result.error.message);
+          return;
         }
+        if (result && result.paymentIntent &&
+            (result.paymentIntent.status === 'succeeded' || result.paymentIntent.status === 'processing')) {
+          showSuccessInPage();
+        }
+      }).catch(function(err){
+        showError(err && err.message ? err.message : 'Erreur de paiement');
       });
     });
   }
