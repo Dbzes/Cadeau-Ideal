@@ -980,6 +980,7 @@ class Mugeditor extends Module
         $baseImg = $this->getRenderImage('base');
         $lightImg = $this->getRenderImage('lighting');
         $adminUrl = AdminController::$currentIndex . '&configure=' . $this->name . '&token=' . Tools::getAdminTokenLite('AdminModules');
+        $checkerBg = 'data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2220%22 height=%2220%22><rect width=%2210%22 height=%2210%22 fill=%22%23ddd%22/><rect x=%2210%22 y=%2210%22 width=%2210%22 height=%2210%22 fill=%22%23ddd%22/></svg>';
 
         $html = '<div class="panel"><h3><i class="icon-image"></i> ' . $this->l('Rendu du mug (aperçu)') . '</h3>';
         $html .= '<p style="color:#555;margin-bottom:20px;">'
@@ -990,40 +991,99 @@ class Mugeditor extends Module
         $html .= '<form method="post" enctype="multipart/form-data">';
         $html .= '<div style="display:flex;gap:30px;flex-wrap:wrap;margin-bottom:20px;">';
 
-        // Image de base
-        $html .= '<div style="flex:1;min-width:250px;">';
+        // ---- Image de base ----
+        $html .= '<div style="flex:1;min-width:280px;">';
         $html .= '<h4 style="color:#004774;margin-bottom:10px;">1. Image de base</h4>';
         if ($baseImg) {
-            $html .= '<div style="margin-bottom:10px;position:relative;">';
-            $html .= '<img src="' . $baseImg['url'] . '" style="max-width:100%;max-height:200px;border:1px solid #ddd;background-image:url(\'data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2220%22 height=%2220%22><rect width=%2210%22 height=%2210%22 fill=%22%23ddd%22/><rect x=%2210%22 y=%2210%22 width=%2210%22 height=%2210%22 fill=%22%23ddd%22/></svg>\');background-size:20px;" />';
-            $html .= '<br><a href="' . $adminUrl . '&deleteRenderBase=1" onclick="return confirm(\'Supprimer l\\\'image de base ?\');" style="color:#c00;font-size:12px;">✕ Supprimer</a>';
-            $html .= '</div>';
-        } else {
-            $html .= '<div style="width:200px;height:160px;border:2px dashed #ccc;display:flex;align-items:center;justify-content:center;color:#999;margin-bottom:10px;font-size:13px;">Aucune image</div>';
+            $html .= '<div style="display:flex;gap:20px;align-items:center;background:#f0f7fc;border:1px solid #cfe2f0;padding:16px;margin-bottom:12px;">';
+            $html .= '<div style="width:200px;height:160px;background-image:url(\'' . $checkerBg . '\'),url(\'' . $baseImg['url'] . '\');background-repeat:repeat,no-repeat;background-size:20px,contain;background-position:center;border:1px solid #ddd;"></div>';
+            $html .= '<div style="flex:1;">';
+            $html .= '<div style="font-weight:600;color:#004774;font-size:14px;">' . $this->l('Image active') . '</div>';
+            $html .= '<div style="font-size:13px;color:#666;margin:4px 0;">.' . $baseImg['ext'] . '</div>';
+            $html .= '<a href="' . $adminUrl . '&deleteRenderBase=1" class="btn btn-danger btn-xs" onclick="return confirm(\'Supprimer l\\\'image de base ?\')">✕ ' . $this->l('Supprimer') . '</a>';
+            $html .= '</div></div>';
         }
-        $html .= '<input type="file" name="mug_render_base" accept="image/png,image/jpeg,image/webp" />';
-        $html .= '<p style="font-size:12px;color:#888;margin-top:4px;">Le mug vierge vu de face (PNG recommandé)</p>';
+        $html .= '<label class="mue-dropzone" id="mue-rdz-base">
+            <div class="mue-dropzone-icon">🖼</div>
+            <div class="mue-dropzone-title">' . ($baseImg ? $this->l('Remplacer l\'image de base') : $this->l('Glissez l\'image de base ici')) . '</div>
+            <div class="mue-dropzone-sub">' . $this->l('ou cliquez pour parcourir — PNG, JPG, WEBP · max 5 Mo') . '</div>
+            <input type="file" name="mug_render_base" id="mue-rfile-base" accept="image/png,image/jpeg,image/webp" />
+        </label>';
+        $html .= '<div id="mue-rfb-base" style="display:none;margin-top:10px;padding:12px;background:#e8f5e9;border:1px solid #a5d6a7;font-size:13px;color:#2e7d32;">
+            <strong>Fichier sélectionné :</strong> <span id="mue-rfname-base"></span>
+            <div id="mue-rfprev-base" style="margin-top:8px;max-width:200px;max-height:120px;overflow:hidden;"></div>
+        </div>';
         $html .= '</div>';
 
-        // Image éclairages
-        $html .= '<div style="flex:1;min-width:250px;">';
+        // ---- Image éclairages ----
+        $html .= '<div style="flex:1;min-width:280px;">';
         $html .= '<h4 style="color:#004774;margin-bottom:10px;">2. Image éclairages</h4>';
         if ($lightImg) {
-            $html .= '<div style="margin-bottom:10px;position:relative;">';
-            $html .= '<img src="' . $lightImg['url'] . '" style="max-width:100%;max-height:200px;border:1px solid #ddd;background-image:url(\'data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2220%22 height=%2220%22><rect width=%2210%22 height=%2210%22 fill=%22%23ddd%22/><rect x=%2210%22 y=%2210%22 width=%2210%22 height=%2210%22 fill=%22%23ddd%22/></svg>\');background-size:20px;" />';
-            $html .= '<br><a href="' . $adminUrl . '&deleteRenderLighting=1" onclick="return confirm(\'Supprimer l\\\'image éclairages ?\');" style="color:#c00;font-size:12px;">✕ Supprimer</a>';
-            $html .= '</div>';
-        } else {
-            $html .= '<div style="width:200px;height:160px;border:2px dashed #ccc;display:flex;align-items:center;justify-content:center;color:#999;margin-bottom:10px;font-size:13px;">Aucune image</div>';
+            $html .= '<div style="display:flex;gap:20px;align-items:center;background:#f0f7fc;border:1px solid #cfe2f0;padding:16px;margin-bottom:12px;">';
+            $html .= '<div style="width:200px;height:160px;background-image:url(\'' . $checkerBg . '\'),url(\'' . $lightImg['url'] . '\');background-repeat:repeat,no-repeat;background-size:20px,contain;background-position:center;border:1px solid #ddd;"></div>';
+            $html .= '<div style="flex:1;">';
+            $html .= '<div style="font-weight:600;color:#004774;font-size:14px;">' . $this->l('Image active') . '</div>';
+            $html .= '<div style="font-size:13px;color:#666;margin:4px 0;">.' . $lightImg['ext'] . '</div>';
+            $html .= '<a href="' . $adminUrl . '&deleteRenderLighting=1" class="btn btn-danger btn-xs" onclick="return confirm(\'Supprimer l\\\'image éclairages ?\')">✕ ' . $this->l('Supprimer') . '</a>';
+            $html .= '</div></div>';
         }
-        $html .= '<input type="file" name="mug_render_lighting" accept="image/png,image/jpeg,image/webp" />';
-        $html .= '<p style="font-size:12px;color:#888;margin-top:4px;">Effets de lumière / reflets (PNG transparent recommandé)</p>';
+        $html .= '<label class="mue-dropzone" id="mue-rdz-light">
+            <div class="mue-dropzone-icon">💡</div>
+            <div class="mue-dropzone-title">' . ($lightImg ? $this->l('Remplacer l\'image éclairages') : $this->l('Glissez l\'image éclairages ici')) . '</div>
+            <div class="mue-dropzone-sub">' . $this->l('ou cliquez pour parcourir — PNG transparent recommandé · max 5 Mo') . '</div>
+            <input type="file" name="mug_render_lighting" id="mue-rfile-light" accept="image/png,image/jpeg,image/webp" />
+        </label>';
+        $html .= '<div id="mue-rfb-light" style="display:none;margin-top:10px;padding:12px;background:#e8f5e9;border:1px solid #a5d6a7;font-size:13px;color:#2e7d32;">
+            <strong>Fichier sélectionné :</strong> <span id="mue-rfname-light"></span>
+            <div id="mue-rfprev-light" style="margin-top:8px;max-width:200px;max-height:120px;overflow:hidden;"></div>
+        </div>';
         $html .= '</div>';
 
         $html .= '</div>'; // flex container
         $html .= '<div style="text-align:right;"><button type="submit" name="submitMugRenderUpload" class="btn btn-primary"><i class="process-icon-save"></i> ' . $this->l('Uploader') . '</button></div>';
-        $html .= '</form></div>';
+        $html .= '</form>';
 
+        // JS drag & drop pour les 2 zones
+        $html .= '<script>
+        (function(){
+            function setupDZ(dzId, inpId, fbId, fnameId, fprevId) {
+                var dz=document.getElementById(dzId), inp=document.getElementById(inpId),
+                    fb=document.getElementById(fbId), fname=document.getElementById(fnameId),
+                    fprev=document.getElementById(fprevId);
+                if(!dz||!inp)return;
+                function showFeedback(){
+                    if(!inp.files||!inp.files.length)return;
+                    var f=inp.files[0];
+                    fname.textContent=f.name+" ("+Math.round(f.size/1024)+" Ko)";
+                    fprev.innerHTML="";
+                    if(f.type.indexOf("image")===0){
+                        var img=document.createElement("img");
+                        img.style.cssText="max-width:200px;max-height:120px;border:1px solid #ccc;";
+                        img.src=URL.createObjectURL(f);
+                        fprev.appendChild(img);
+                    }
+                    fb.style.display="block";
+                    dz.querySelector(".mue-dropzone-title").textContent="Fichier prêt — cliquez Uploader";
+                    dz.style.borderColor="#4caf50";
+                    dz.style.background="#f1f8e9";
+                }
+                ["dragenter","dragover"].forEach(function(e){dz.addEventListener(e,function(ev){ev.preventDefault();ev.stopPropagation();dz.classList.add("mue-drag");});});
+                ["dragleave","drop"].forEach(function(e){dz.addEventListener(e,function(ev){ev.preventDefault();ev.stopPropagation();dz.classList.remove("mue-drag");});});
+                dz.addEventListener("drop",function(ev){
+                    var dt=new DataTransfer();
+                    Array.from(ev.dataTransfer.files).forEach(function(f){dt.items.add(f);});
+                    inp.files=dt.files;
+                    showFeedback();
+                });
+                inp.addEventListener("change",function(){showFeedback();});
+                inp.addEventListener("click",function(e){e.stopPropagation();});
+            }
+            setupDZ("mue-rdz-base","mue-rfile-base","mue-rfb-base","mue-rfname-base","mue-rfprev-base");
+            setupDZ("mue-rdz-light","mue-rfile-light","mue-rfb-light","mue-rfname-light","mue-rfprev-light");
+        })();
+        </script>';
+
+        $html .= '</div>';
         return $html;
     }
 
