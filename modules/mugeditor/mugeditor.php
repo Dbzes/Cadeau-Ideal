@@ -915,10 +915,15 @@ class Mugeditor extends Module
         foreach (['png', 'jpg', 'jpeg', 'webp'] as $ext) {
             $file = $dir . $type . '.' . $ext;
             if (file_exists($file)) {
+                $info = @getimagesize($file);
                 return [
                     'path' => $file,
                     'url' => _MODULE_DIR_ . $this->name . '/' . self::RENDER_DIR . $type . '.' . $ext . '?t=' . filemtime($file),
                     'ext' => $ext,
+                    'filename' => $type . '.' . $ext,
+                    'width' => $info ? $info[0] : 0,
+                    'height' => $info ? $info[1] : 0,
+                    'filesize' => filesize($file),
                 ];
             }
         }
@@ -999,7 +1004,8 @@ class Mugeditor extends Module
             $html .= '<div style="width:200px;height:160px;background-image:url(\'' . $checkerBg . '\'),url(\'' . $baseImg['url'] . '\');background-repeat:repeat,no-repeat;background-size:20px,contain;background-position:center;border:1px solid #ddd;"></div>';
             $html .= '<div style="flex:1;">';
             $html .= '<div style="font-weight:600;color:#004774;font-size:14px;">' . $this->l('Image active') . '</div>';
-            $html .= '<div style="font-size:13px;color:#666;margin:4px 0;">.' . $baseImg['ext'] . '</div>';
+            $html .= '<div style="font-size:13px;color:#666;margin:4px 0;">' . $baseImg['filename'] . '</div>';
+            $html .= '<div style="font-size:13px;color:#666;margin:4px 0;">' . $baseImg['width'] . ' × ' . $baseImg['height'] . ' px · ' . round($baseImg['filesize'] / 1024) . ' Ko</div>';
             $html .= '<a href="' . $adminUrl . '&deleteRenderBase=1" class="btn btn-danger btn-xs" onclick="return confirm(\'Supprimer l\\\'image de base ?\')">✕ ' . $this->l('Supprimer') . '</a>';
             $html .= '</div></div>';
         }
@@ -1023,7 +1029,8 @@ class Mugeditor extends Module
             $html .= '<div style="width:200px;height:160px;background-image:url(\'' . $checkerBg . '\'),url(\'' . $lightImg['url'] . '\');background-repeat:repeat,no-repeat;background-size:20px,contain;background-position:center;border:1px solid #ddd;"></div>';
             $html .= '<div style="flex:1;">';
             $html .= '<div style="font-weight:600;color:#004774;font-size:14px;">' . $this->l('Image active') . '</div>';
-            $html .= '<div style="font-size:13px;color:#666;margin:4px 0;">.' . $lightImg['ext'] . '</div>';
+            $html .= '<div style="font-size:13px;color:#666;margin:4px 0;">' . $lightImg['filename'] . '</div>';
+            $html .= '<div style="font-size:13px;color:#666;margin:4px 0;">' . $lightImg['width'] . ' × ' . $lightImg['height'] . ' px · ' . round($lightImg['filesize'] / 1024) . ' Ko</div>';
             $html .= '<a href="' . $adminUrl . '&deleteRenderLighting=1" class="btn btn-danger btn-xs" onclick="return confirm(\'Supprimer l\\\'image éclairages ?\')">✕ ' . $this->l('Supprimer') . '</a>';
             $html .= '</div></div>';
         }
