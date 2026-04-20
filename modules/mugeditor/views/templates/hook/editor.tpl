@@ -1,4 +1,15 @@
-{literal}<style>@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');.product-customization{display:none!important}#mue-preview-container{box-sizing:border-box}#mue-canvas-border{border:1px solid #ddd;display:inline-block;line-height:0}</style>{/literal}
+{literal}<style>@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');.product-customization{display:none!important}#mue-preview-container{box-sizing:border-box}#mue-canvas-border{border:1px solid #ddd;display:inline-block;line-height:0}
+.mue-font-dropdown{position:relative;width:100%}
+.mue-font-selected{border:1px solid #ddd;padding:8px 12px;cursor:pointer;background:#fff;font-size:14px;display:flex;justify-content:space-between;align-items:center}
+.mue-font-selected:hover{border-color:#004774}
+.mue-font-arrow{font-size:10px;color:#999;margin-left:8px}
+.mue-font-list{display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #ddd;border-top:none;max-height:200px;overflow-y:auto;z-index:100;box-shadow:0 4px 12px rgba(0,0,0,.1)}
+.mue-font-dropdown.mue-open .mue-font-list{display:block}
+.mue-font-dropdown.mue-open .mue-font-arrow{transform:rotate(180deg)}
+.mue-font-option{padding:8px 12px;cursor:pointer;font-size:15px;border-bottom:1px solid #f0f0f0}
+.mue-font-option:hover{background:#f0f7fc}
+.mue-font-option:last-child{border-bottom:none}
+</style>{/literal}
 <div id="mue-loader" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:99999;align-items:center;justify-content:center;flex-direction:column;padding:20px;">
   <div style="width:70px;height:70px;border:6px solid rgba(255,255,255,.25);border-top-color:#ee7a03;border-radius:50%;animation:mue-spin 1s linear infinite;"></div>
   <div style="color:#fff;margin-top:18px;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;">Ajout au panier en cours...</div>
@@ -91,18 +102,25 @@
         <input type="text" class="mue-text-input" id="mue-text-input" placeholder="Votre texte ici..." />
         <div class="mue-text-controls">
           <label>Police
-            <select id="mue-text-font" onchange="this.style.fontFamily=this.value+',sans-serif'">
-              {if isset($mue_default_fonts)}
-                {foreach from=$mue_default_fonts item=df}
-                  <option value="{$df}" style="font-family:'{$df}', sans-serif;">{$df}</option>
-                {/foreach}
-              {/if}
-              {if isset($mue_fonts) && $mue_fonts|count > 0}
-                {foreach from=$mue_fonts item=f}
-                  <option value="{$f.family}" style="font-family:'{$f.family}', sans-serif;">{$f.family}</option>
-                {/foreach}
-              {/if}
-            </select>
+            <input type="hidden" id="mue-text-font" value="{if isset($mue_default_fonts) && $mue_default_fonts|count > 0}{$mue_default_fonts[0]}{/if}" />
+            <div class="mue-font-dropdown" id="mue-font-dropdown">
+              <div class="mue-font-selected" id="mue-font-selected" style="font-family:'{if isset($mue_default_fonts) && $mue_default_fonts|count > 0}{$mue_default_fonts[0]}{/if}',sans-serif;">
+                {if isset($mue_default_fonts) && $mue_default_fonts|count > 0}{$mue_default_fonts[0]}{else}Police{/if}
+                <span class="mue-font-arrow">▾</span>
+              </div>
+              <div class="mue-font-list" id="mue-font-list">
+                {if isset($mue_default_fonts)}
+                  {foreach from=$mue_default_fonts item=df}
+                    <div class="mue-font-option" data-font="{$df}" style="font-family:'{$df}',sans-serif;">{$df}</div>
+                  {/foreach}
+                {/if}
+                {if isset($mue_fonts) && $mue_fonts|count > 0}
+                  {foreach from=$mue_fonts item=f}
+                    <div class="mue-font-option" data-font="{$f.family}" style="font-family:'{$f.family}',sans-serif;">{$f.family}</div>
+                  {/foreach}
+                {/if}
+              </div>
+            </div>
           </label>
           <label>Taille
             <input type="number" id="mue-text-size" value="32" min="10" max="120" />
@@ -186,6 +204,29 @@ function mueInit() {
       if (!open) item.classList.add('mue-open');
     });
   });
+
+  // Font dropdown custom
+  (function(){
+    var dd = document.getElementById('mue-font-dropdown');
+    var sel = document.getElementById('mue-font-selected');
+    var hidden = document.getElementById('mue-text-font');
+    if (!dd || !sel || !hidden) return;
+    sel.addEventListener('click', function(e){
+      e.stopPropagation();
+      dd.classList.toggle('mue-open');
+    });
+    dd.querySelectorAll('.mue-font-option').forEach(function(opt){
+      opt.addEventListener('click', function(e){
+        e.stopPropagation();
+        var font = opt.dataset.font;
+        hidden.value = font;
+        sel.style.fontFamily = "'" + font + "',sans-serif";
+        sel.childNodes[0].textContent = font + ' ';
+        dd.classList.remove('mue-open');
+      });
+    });
+    document.addEventListener('click', function(){ dd.classList.remove('mue-open'); });
+  })();
 
   var fabricReady = (typeof fabric !== 'undefined');
   if (!fabricReady) {
