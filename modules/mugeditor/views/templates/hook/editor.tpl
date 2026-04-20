@@ -49,7 +49,7 @@
     {if isset($mue_render_base) && $mue_render_base}
     <div id="mue-preview-container" style="position:relative;overflow:hidden;margin-bottom:16px;border:1px solid #ddd;background:#fff;">
       <img id="mue-preview-base" src="{$mue_render_base.url}" style="display:block;width:100%;height:auto;" alt="Aperçu mug" />
-      <canvas id="mue-preview-perso" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;opacity:1;"></canvas>
+      <canvas id="mue-preview-perso" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;opacity:1;border:1px solid #ddd;box-sizing:border-box;"></canvas>
       {if isset($mue_render_lighting) && $mue_render_lighting}
       <img id="mue-preview-lighting" src="{$mue_render_lighting.url}" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;" alt="" />
       {/if}
