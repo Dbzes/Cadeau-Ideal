@@ -64,7 +64,7 @@
   width: 100%;
   max-width: 800px;
   margin: 0 auto 25px;
-  background: #f0f0f0;
+  background: transparent;
   border-radius: 6px;
   overflow: hidden;
   position: relative;
