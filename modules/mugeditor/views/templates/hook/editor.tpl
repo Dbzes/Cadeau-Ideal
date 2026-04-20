@@ -100,28 +100,29 @@
       <div class="mue-body" id="mue-texte">
         <p class="mue-hint">Tapez votre texte :</p>
         <input type="text" class="mue-text-input" id="mue-text-input" placeholder="Votre texte ici..." />
-        <div class="mue-text-controls">
-          <label>Police
-            <input type="hidden" id="mue-text-font" value="{if isset($mue_default_fonts) && $mue_default_fonts|count > 0}{$mue_default_fonts[0]}{/if}" />
-            <div class="mue-font-dropdown" id="mue-font-dropdown">
-              <div class="mue-font-selected" id="mue-font-selected" style="font-family:'{if isset($mue_default_fonts) && $mue_default_fonts|count > 0}{$mue_default_fonts[0]}{/if}',sans-serif;">
-                {if isset($mue_default_fonts) && $mue_default_fonts|count > 0}{$mue_default_fonts[0]}{else}Police{/if}
-                <span class="mue-font-arrow">▾</span>
-              </div>
-              <div class="mue-font-list" id="mue-font-list">
-                {if isset($mue_default_fonts)}
-                  {foreach from=$mue_default_fonts item=df}
-                    <div class="mue-font-option" data-font="{$df}" style="font-family:'{$df}',sans-serif;">{$df}</div>
-                  {/foreach}
-                {/if}
-                {if isset($mue_fonts) && $mue_fonts|count > 0}
-                  {foreach from=$mue_fonts item=f}
-                    <div class="mue-font-option" data-font="{$f.family}" style="font-family:'{$f.family}',sans-serif;">{$f.family}</div>
-                  {/foreach}
-                {/if}
-              </div>
+        <div style="margin:12px 0 8px;">
+          <label style="display:block;font-size:12px;font-weight:600;color:#666;margin-bottom:4px;">Police</label>
+          <input type="hidden" id="mue-text-font" value="{if isset($mue_default_fonts) && $mue_default_fonts|count > 0}{$mue_default_fonts[0]}{/if}" />
+          <div class="mue-font-dropdown" id="mue-font-dropdown">
+            <div class="mue-font-selected" id="mue-font-selected" style="font-family:'{if isset($mue_default_fonts) && $mue_default_fonts|count > 0}{$mue_default_fonts[0]}{/if}',sans-serif;">
+              {if isset($mue_default_fonts) && $mue_default_fonts|count > 0}{$mue_default_fonts[0]}{else}Police{/if}
+              <span class="mue-font-arrow">▾</span>
             </div>
-          </label>
+            <div class="mue-font-list" id="mue-font-list">
+              {if isset($mue_default_fonts)}
+                {foreach from=$mue_default_fonts item=df}
+                  <div class="mue-font-option" data-font="{$df}" style="font-family:'{$df}',sans-serif;">{$df}</div>
+                {/foreach}
+              {/if}
+              {if isset($mue_fonts) && $mue_fonts|count > 0}
+                {foreach from=$mue_fonts item=f}
+                  <div class="mue-font-option" data-font="{$f.family}" style="font-family:'{$f.family}',sans-serif;">{$f.family}</div>
+                {/foreach}
+              {/if}
+            </div>
+          </div>
+        </div>
+        <div class="mue-text-controls">
           <label>Taille
             <input type="number" id="mue-text-size" value="32" min="10" max="120" />
           </label>
