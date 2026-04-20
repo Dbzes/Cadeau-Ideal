@@ -1027,11 +1027,17 @@ function mueInit() {
   addToCart.style.display = '';
   addToCart.style.marginBottom = '15px';
 
-  // Masquer le label "Quantité" et l'input qty, garder le bouton ajout panier
+  // Masquer le label "Quantité", garder l'input qty sans les boutons +/-
   var qtyLabel = addToCart.querySelector('.control-label');
   if (qtyLabel) qtyLabel.style.display = 'none';
-  var qtyInput = addToCart.querySelector('.qty');
-  if (qtyInput) qtyInput.style.display = 'none';
+  var qtyInput = addToCart.querySelector('#quantity_wanted');
+  if (qtyInput) {
+    qtyInput.setAttribute('type', 'number');
+    qtyInput.style.cssText = 'width:60px;text-align:center;border:1px solid #ddd;padding:8px;font-size:14px;-moz-appearance:textfield;';
+  }
+  // Masquer les boutons +/- natifs Bootstrap/PS (TouchSpin)
+  var touchSpinBtns = addToCart.querySelectorAll('.bootstrap-touchspin-up, .bootstrap-touchspin-down, .input-group-btn-vertical, .btn-touchspin');
+  touchSpinBtns.forEach(function(b){ b.style.display = 'none'; });
 })();
 {/literal}
 </script>
