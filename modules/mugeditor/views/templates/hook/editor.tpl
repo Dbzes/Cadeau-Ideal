@@ -501,7 +501,7 @@ function mueInit() {
       // Zones imprimables pour chaque vue de mug (coordonnées dans l'espace 1461x453)
       // angle de vue de la caméra (en degrés), curve = amplitude incurvation verticale (px)
       var mugViews = [
-        { x: 130, y: 95, w: 245, h: 265, angle: -35, curve: 8 },  // Mug gauche (¾, anse gauche)
+        { x: 125, y: 95, w: 245, h: 265, angle: -35, curve: 8 },  // Mug gauche (¾, anse gauche)
         { x: 565, y: 90, w: 280, h: 275, angle: 0, curve: 3 },     // Mug centre (face)
         { x: 1090, y: 95, w: 240, h: 265, angle: 35, curve: 8 }    // Mug droit (¾, anse droite)
       ];
@@ -582,9 +582,9 @@ function mueInit() {
               var srcCol = Math.round(patronU * (patronW - 1));
               if (srcCol < 0 || srcCol >= patronW) continue;
 
-              // Incurvation verticale : les bords descendent, le centre reste stable
-              // Simule la courbure du rebord du mug vue en perspective
-              var curveOffset = curveAmp * (1 - Math.cos(theta - viewAngle));
+              // Incurvation verticale : les bords montent, le centre reste stable
+              // Simule la courbure du rebord du mug vue en perspective (surface qui s'éloigne → remonte)
+              var curveOffset = -curveAmp * (1 - Math.cos(theta - viewAngle));
 
               // Dessiner la colonne avec décalage vertical pour suivre la courbure
               previewCtx.drawImage(
