@@ -1186,11 +1186,11 @@ class Mugeditor extends Module
         $fontOptionsHtml = '';
         foreach ($allDefaultFonts as $df) {
             $esc = htmlspecialchars($df, ENT_QUOTES, 'UTF-8');
-            $fontOptionsHtml .= '<div class="mue-font-option" data-font="' . $esc . '" style="font-family:\'' . $esc . '\',sans-serif;">' . $esc . '</div>';
+            $fontOptionsHtml .= '<div class="mue-font-option" data-font="' . $esc . '" style="font-family:\'' . $esc . '\',sans-serif !important;font-size:18px;">' . $esc . '</div>';
         }
         foreach ($activeCustom as $cf) {
             $esc = htmlspecialchars($cf['family'], ENT_QUOTES, 'UTF-8');
-            $fontOptionsHtml .= '<div class="mue-font-option" data-font="' . $esc . '" style="font-family:\'' . $esc . '\',sans-serif;">' . $esc . '</div>';
+            $fontOptionsHtml .= '<div class="mue-font-option" data-font="' . $esc . '" style="font-family:\'' . $esc . '\',sans-serif !important;font-size:18px;">' . $esc . '</div>';
         }
 
         $this->context->smarty->assign([
