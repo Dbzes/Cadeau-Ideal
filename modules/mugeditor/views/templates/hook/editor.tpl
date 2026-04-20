@@ -1027,9 +1027,11 @@ function mueInit() {
   addToCart.style.display = '';
   addToCart.style.marginBottom = '15px';
 
-  // Masquer le sélecteur de quantité (label + input + boutons +/-)
-  var qtyWrap = addToCart.querySelector('.product-quantity');
-  if (qtyWrap) qtyWrap.style.display = 'none';
+  // Masquer le label "Quantité" et l'input qty, garder le bouton ajout panier
+  var qtyLabel = addToCart.querySelector('.control-label');
+  if (qtyLabel) qtyLabel.style.display = 'none';
+  var qtyInput = addToCart.querySelector('.qty');
+  if (qtyInput) qtyInput.style.display = 'none';
 })();
 {/literal}
 </script>
