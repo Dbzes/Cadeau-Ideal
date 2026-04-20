@@ -10,6 +10,16 @@
 .mue-font-option:hover{background:#f0f7fc}
 .mue-font-option:last-child{border-bottom:none}
 </style>{/literal}
+{if isset($mue_google_url) && $mue_google_url}
+<link href="{$mue_google_url}" rel="stylesheet">
+{/if}
+{if isset($mue_fonts) && $mue_fonts|count > 0}
+<style>
+{foreach from=$mue_fonts item=f}
+@font-face { font-family: "{$f.family}"; src: url("{$mue_font_url}{$f.file}") format("{if $f.ext == 'ttf'}truetype{elseif $f.ext == 'otf'}opentype{else}{$f.ext}{/if}"); font-display: swap; }
+{/foreach}
+</style>
+{/if}
 <div id="mue-loader" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:99999;align-items:center;justify-content:center;flex-direction:column;padding:20px;">
   <div style="width:70px;height:70px;border:6px solid rgba(255,255,255,.25);border-top-color:#ee7a03;border-radius:50%;animation:mue-spin 1s linear infinite;"></div>
   <div style="color:#fff;margin-top:18px;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;">Ajout au panier en cours...</div>
@@ -144,16 +154,6 @@
   </div>
 </div>
 
-{if isset($mue_google_url) && $mue_google_url}
-<link href="{$mue_google_url}" rel="stylesheet">
-{/if}
-{if isset($mue_fonts) && $mue_fonts|count > 0}
-<style>
-{foreach from=$mue_fonts item=f}
-@font-face { font-family: "{$f.family}"; src: url("{$mue_font_url}{$f.file}") format("{if $f.ext == 'ttf'}truetype{elseif $f.ext == 'otf'}opentype{else}{$f.ext}{/if}"); font-display: swap; }
-{/foreach}
-</style>
-{/if}
 <script>
 window.mueSerializeState = null;
 window.mueComposeHD = null;
