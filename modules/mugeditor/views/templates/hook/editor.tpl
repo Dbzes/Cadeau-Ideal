@@ -494,7 +494,7 @@ function mueInit() {
       var BASE_W = 1461, BASE_H = 453;
 
       // Couverture du patron sur le cylindre (en degrés)
-      var COVERAGE_DEG = 220;
+      var COVERAGE_DEG = 170;
       var HALF_COV = (COVERAGE_DEG / 2) * Math.PI / 180;
       var TOTAL_COV = COVERAGE_DEG * Math.PI / 180;
 
