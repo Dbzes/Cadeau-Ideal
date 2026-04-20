@@ -77,6 +77,7 @@
           <span>+ Ajouter une image</span>
         </label>
         <p class="mue-hint" id="mue-img-counter">0 / 50 images</p>
+        <div id="mue-img-list" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;"></div>
       </div>
     </div>
 
@@ -382,7 +383,15 @@ function mueInit() {
 
   function bringTemplateToFront() {
     if (templateOverlay && canvas) {
-      canvas.bringToFront(templateOverlay);
+      // Positionner le template juste au-dessus du fond (index 0 ou 1),
+      // mais en-dessous des objets utilisateur (images, textes)
+      var objects = canvas.getObjects();
+      var bgIdx = -1;
+      for (var i = 0; i < objects.length; i++) {
+        if (objects[i].mueIsBg) { bgIdx = i; break; }
+      }
+      var targetIdx = bgIdx >= 0 ? bgIdx + 1 : 0;
+      canvas.moveTo(templateOverlay, targetIdx);
     }
   }
 
@@ -692,6 +701,8 @@ function mueInit() {
   var imgCounter = document.getElementById('mue-img-counter');
   var imgUploadLabel = document.getElementById('mue-img-upload-label');
 
+  var imgList = document.getElementById('mue-img-list');
+
   imgInput.addEventListener('change', function(e){
     if (!fabricReady || !canvas) { alert('Éditeur non chargé.'); return; }
     if (imageCount >= MAX_IMAGES) { alert('Maximum ' + MAX_IMAGES + ' images.'); return; }
@@ -702,9 +713,11 @@ function mueInit() {
       ufd.append('file', file);
       fetch(window.MUE_UPLOADIMAGE_URL, { method: 'POST', body: ufd, credentials: 'same-origin' });
     } catch(e) {}
+    var dataUrl = null;
     var reader = new FileReader();
     reader.onload = function(ev) {
-      fabric.Image.fromURL(ev.target.result, function(img){
+      dataUrl = ev.target.result;
+      fabric.Image.fromURL(dataUrl, function(img){
         var maxDim = W / 3;
         var scale = Math.min(maxDim / img.width, maxDim / img.height);
         img.set({
@@ -719,12 +732,46 @@ function mueInit() {
         canvas.renderAll();
         imageCount++;
         updateImgCounter();
+        addImgThumb(img, dataUrl, file.name);
         scrollToCanvas();
       });
     };
     reader.readAsDataURL(file);
     imgInput.value = '';
   });
+
+  function addImgThumb(fabricObj, thumbUrl, fileName) {
+    if (!imgList) return;
+    var wrap = document.createElement('div');
+    wrap.style.cssText = 'position:relative;width:70px;height:70px;border:1px solid #ddd;overflow:hidden;cursor:pointer;';
+    var thumb = document.createElement('img');
+    thumb.src = thumbUrl;
+    thumb.alt = fileName || 'image';
+    thumb.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+    var del = document.createElement('button');
+    del.type = 'button';
+    del.textContent = '✕';
+    del.style.cssText = 'position:absolute;top:2px;right:2px;background:#e74c3c;color:#fff;border:none;width:20px;height:20px;font-size:11px;cursor:pointer;line-height:20px;padding:0;text-align:center;';
+    del.title = 'Supprimer';
+    // Clic sur la vignette = sélectionner l'objet sur le canvas
+    wrap.addEventListener('click', function(e){
+      if (e.target === del) return;
+      canvas.setActiveObject(fabricObj);
+      canvas.renderAll();
+    });
+    // Clic sur le bouton supprimer
+    del.addEventListener('click', function(){
+      canvas.remove(fabricObj);
+      imgList.removeChild(wrap);
+      imageCount = Math.max(0, imageCount - 1);
+      updateImgCounter();
+      saveState();
+      canvas.renderAll();
+    });
+    wrap.appendChild(thumb);
+    wrap.appendChild(del);
+    imgList.appendChild(wrap);
+  }
 
   function updateImgCounter() {
     imgCounter.textContent = imageCount + ' / ' + MAX_IMAGES + ' images';
