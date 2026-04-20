@@ -495,6 +495,11 @@ function mueInit() {
         obj.left = _lastPos[id].x + dx * MOVE_DAMPING;
         obj.top = _lastPos[id].y + dy * MOVE_DAMPING;
       }
+      // Clamper dans les limites du patron
+      if (obj.left < 0) obj.left = 0;
+      if (obj.left > W) obj.left = W;
+      if (obj.top < 0) obj.top = 0;
+      if (obj.top > H) obj.top = H;
       _lastPos[id] = { x: obj.left, y: obj.top };
     });
 
