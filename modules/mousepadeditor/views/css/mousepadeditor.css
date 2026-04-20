@@ -181,6 +181,9 @@
   overflow: hidden;
   background: #fff;
 }
+.mpe-item.mpe-open {
+  overflow: visible;
+}
 
 .mpe-head {
   width: 100%;

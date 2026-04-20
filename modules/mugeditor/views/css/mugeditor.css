@@ -181,6 +181,9 @@
   overflow: hidden;
   background: #fff;
 }
+.mue-item.mue-open {
+  overflow: visible;
+}
 
 .mue-head {
   width: 100%;
