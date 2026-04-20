@@ -1038,6 +1038,11 @@ function mueInit() {
   // Masquer les boutons +/- natifs Bootstrap/PS (TouchSpin)
   var touchSpinBtns = addToCart.querySelectorAll('.bootstrap-touchspin-up, .bootstrap-touchspin-down, .input-group-btn-vertical, .btn-touchspin');
   touchSpinBtns.forEach(function(b){ b.style.display = 'none'; });
+  // Ré-essai après init TouchSpin (PS l'initialise en différé)
+  setTimeout(function(){
+    addToCart.querySelectorAll('.input-group-btn-vertical, .bootstrap-touchspin-up, .bootstrap-touchspin-down, .btn-touchspin')
+      .forEach(function(b){ b.style.display = 'none'; });
+  }, 1000);
 })();
 {/literal}
 </script>
