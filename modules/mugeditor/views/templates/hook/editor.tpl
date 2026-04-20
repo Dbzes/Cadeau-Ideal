@@ -543,6 +543,17 @@ function mueInit() {
           canvas.backgroundColor = origBg;
           canvas.backgroundImage = origBgImg;
 
+          // Rendre les pixels blancs/quasi-blancs transparents (pour la prévisualisation uniquement)
+          var imgData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+          var px = imgData.data;
+          var whiteThreshold = 240; // tolérance : tout pixel RGB > 240 → transparent
+          for (var p = 0; p < px.length; p += 4) {
+            if (px[p] >= whiteThreshold && px[p+1] >= whiteThreshold && px[p+2] >= whiteThreshold) {
+              px[p+3] = 0; // alpha = 0
+            }
+          }
+          tempCtx.putImageData(imgData, 0, 0);
+
           // Projeter le patron sur chaque vue de mug avec distorsion cylindrique
           var patronW = tempCanvas.width;
           var patronH = tempCanvas.height;
