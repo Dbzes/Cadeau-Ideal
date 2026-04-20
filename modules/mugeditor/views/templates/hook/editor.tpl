@@ -1026,6 +1026,10 @@ function mueInit() {
   cartZone.appendChild(addToCart);
   addToCart.style.display = '';
   addToCart.style.marginBottom = '15px';
+
+  // Masquer le sélecteur de quantité (label + input + boutons +/-)
+  var qtyWrap = addToCart.querySelector('.product-quantity');
+  if (qtyWrap) qtyWrap.style.display = 'none';
 })();
 {/literal}
 </script>
