@@ -461,20 +461,45 @@ function mueInit() {
 
   function isBgObject(o) { return o && o.mueIsBg === true; }
 
+  // Facteur de ralentissement du déplacement (compense le coverage élargi)
+  var MOVE_DAMPING = 0.6;
+  var _lastPos = {};
+
   if (fabricReady && canvas) {
+    // Ralentir le déplacement des objets utilisateur
     canvas.on('object:moving', function(e){
       var obj = e.target;
-      if (!obj || !obj.mueIsBg || obj.type === 'rect') return;
-      var sw = obj.width * obj.scaleX;
-      var sh = obj.height * obj.scaleY;
-      var minLeft = W - sw / 2;
-      var maxLeft = sw / 2;
-      var minTop = H - sh / 2;
-      var maxTop = sh / 2;
-      if (obj.left > maxLeft) obj.left = maxLeft;
-      if (obj.left < minLeft) obj.left = minLeft;
-      if (obj.top > maxTop) obj.top = maxTop;
-      if (obj.top < minTop) obj.top = minTop;
+      if (!obj) return;
+
+      // Clamping pour les fonds
+      if (obj.mueIsBg && obj.type !== 'rect') {
+        var sw = obj.width * obj.scaleX;
+        var sh = obj.height * obj.scaleY;
+        var minLeft = W - sw / 2;
+        var maxLeft = sw / 2;
+        var minTop = H - sh / 2;
+        var maxTop = sh / 2;
+        if (obj.left > maxLeft) obj.left = maxLeft;
+        if (obj.left < minLeft) obj.left = minLeft;
+        if (obj.top > maxTop) obj.top = maxTop;
+        if (obj.top < minTop) obj.top = minTop;
+        return;
+      }
+
+      // Damping pour les objets utilisateur (images, textes)
+      if (obj.mueIsBg || obj.mueIsTemplate) return;
+      var id = obj.__uid || (obj.__uid = Math.random());
+      if (_lastPos[id]) {
+        var dx = obj.left - _lastPos[id].x;
+        var dy = obj.top - _lastPos[id].y;
+        obj.left = _lastPos[id].x + dx * MOVE_DAMPING;
+        obj.top = _lastPos[id].y + dy * MOVE_DAMPING;
+      }
+      _lastPos[id] = { x: obj.left, y: obj.top };
+    });
+
+    canvas.on('mouse:up', function(){
+      _lastPos = {};
     });
 
     canvas.on('object:added', saveState);
