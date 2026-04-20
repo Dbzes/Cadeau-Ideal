@@ -71,12 +71,12 @@
         <span class="mue-arrow">+</span>
       </button>
       <div class="mue-body" id="mue-images">
-        <p class="mue-hint">Ajoutez jusqu'à 3 images sur votre mug :</p>
+        <p class="mue-hint">Ajoutez des images sur votre mug :</p>
         <label class="mue-upload" id="mue-img-upload-label">
           <input type="file" accept="image/*" id="mue-img-input" />
           <span>+ Ajouter une image</span>
         </label>
-        <p class="mue-hint" id="mue-img-counter">0 / 3 images</p>
+        <p class="mue-hint" id="mue-img-counter">0 / 50 images</p>
       </div>
     </div>
 
@@ -230,7 +230,7 @@ function mueInit() {
   var bgZoom = 1;
   var bgValue = null;
   var imageCount = 0;
-  var MAX_IMAGES = 3;
+  var MAX_IMAGES = 50;
   var templateOverlay = null;
   var STORAGE_KEY = 'mue_state_' + window.MUE_PRODUCT_ID;
   var restoring = true;
@@ -351,7 +351,7 @@ function mueInit() {
           }
           obj.setCoords();
           var slider = document.getElementById('mue-bg-zoom');
-          if (slider) slider.value = Math.round(bgZoom * 100);
+          if (slider) { slider.value = Math.round(bgZoom * 100); }
         }
         loadImagesAndTexts();
       });
@@ -400,8 +400,10 @@ function mueInit() {
     bringTemplateToFront();
     bgImage = obj;
     bgZoom = 1;
-    document.getElementById('mue-bg-zoom').value = 100;
-    document.getElementById('mue-bg-controls').style.display = 'block';
+    var _bgZoomEl = document.getElementById('mue-bg-zoom');
+    if (_bgZoomEl) _bgZoomEl.value = 100;
+    var _bgCtrlEl = document.getElementById('mue-bg-controls');
+    if (_bgCtrlEl) _bgCtrlEl.style.display = 'block';
     canvas.discardActiveObject();
     canvas.renderAll();
     if (typeof saveState === 'function') saveState();
@@ -554,29 +556,32 @@ function mueInit() {
     if (bgImage.top < minTop) bgImage.top = minTop;
   }
 
-  document.getElementById('mue-bg-zoom').addEventListener('change', function(){ saveState(); });
-  document.getElementById('mue-bg-zoom').addEventListener('input', function(e){
-    if (!bgImage || bgImage.type === 'rect') return;
-    var z = parseInt(e.target.value, 10) / 100;
-    bgZoom = z;
-    var baseScale = Math.max(W / bgImage.width, H / bgImage.height);
-    bgImage.scaleX = baseScale * z;
-    bgImage.scaleY = baseScale * z;
-    if (z > 1) {
-      bgImage.lockMovementX = false;
-      bgImage.lockMovementY = false;
-      bgImage.hoverCursor = 'move';
-    } else {
-      bgImage.lockMovementX = true;
-      bgImage.lockMovementY = true;
-      bgImage.hoverCursor = 'default';
-      bgImage.left = W / 2;
-      bgImage.top = H / 2;
-    }
-    clampBg();
-    bgImage.setCoords();
-    canvas.requestRenderAll();
-  });
+  var _bgZoomSlider = document.getElementById('mue-bg-zoom');
+  if (_bgZoomSlider) {
+    _bgZoomSlider.addEventListener('change', function(){ saveState(); });
+    _bgZoomSlider.addEventListener('input', function(e){
+      if (!bgImage || bgImage.type === 'rect') return;
+      var z = parseInt(e.target.value, 10) / 100;
+      bgZoom = z;
+      var baseScale = Math.max(W / bgImage.width, H / bgImage.height);
+      bgImage.scaleX = baseScale * z;
+      bgImage.scaleY = baseScale * z;
+      if (z > 1) {
+        bgImage.lockMovementX = false;
+        bgImage.lockMovementY = false;
+        bgImage.hoverCursor = 'move';
+      } else {
+        bgImage.lockMovementX = true;
+        bgImage.lockMovementY = true;
+        bgImage.hoverCursor = 'default';
+        bgImage.left = W / 2;
+        bgImage.top = H / 2;
+      }
+      clampBg();
+      bgImage.setCoords();
+      canvas.requestRenderAll();
+    });
+  }
 
   // Upload fond client (AJAX)
   var cdz = document.getElementById('mue-cdz');
@@ -689,7 +694,7 @@ function mueInit() {
 
   imgInput.addEventListener('change', function(e){
     if (!fabricReady || !canvas) { alert('Éditeur non chargé.'); return; }
-    if (imageCount >= MAX_IMAGES) { alert('Maximum 3 images.'); return; }
+    if (imageCount >= MAX_IMAGES) { alert('Maximum ' + MAX_IMAGES + ' images.'); return; }
     var file = e.target.files[0];
     if (!file) return;
     try {
