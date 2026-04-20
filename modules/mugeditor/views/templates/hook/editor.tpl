@@ -503,7 +503,7 @@ function mueInit() {
       var mugViews = [
         { x: 125, y: 100, w: 241, h: 269, angle: -35, curve: 35 },  // Mug gauche (¾, anse gauche)
         { x: 565, y: 90, w: 280, h: 275, angle: 0, curve: 8 },     // Mug centre (face)
-        { x: 1090, y: 100, w: 241, h: 269, angle: 35, curve: 35 }   // Mug droit (¾, anse droite)
+        { x: 1092, y: 100, w: 241, h: 269, angle: 35, curve: 35 }   // Mug droit (¾, anse droite)
       ];
 
       function updatePreview() {
