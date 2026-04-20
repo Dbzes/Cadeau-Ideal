@@ -499,11 +499,11 @@ function mueInit() {
       var TOTAL_COV = COVERAGE_DEG * Math.PI / 180;
 
       // Zones imprimables pour chaque vue de mug (coordonnées dans l'espace 1461x453)
-      // et angle de vue de la caméra (en degrés)
+      // angle de vue de la caméra (en degrés), curve = amplitude incurvation verticale (px)
       var mugViews = [
-        { x: 135, y: 95, w: 235, h: 265, angle: -35 },  // Mug gauche (¾, anse gauche)
-        { x: 565, y: 90, w: 280, h: 275, angle: 0 },     // Mug centre (face)
-        { x: 1095, y: 95, w: 230, h: 265, angle: 35 }    // Mug droit (¾, anse droite)
+        { x: 130, y: 95, w: 245, h: 265, angle: -35, curve: 8 },  // Mug gauche (¾, anse gauche)
+        { x: 565, y: 90, w: 280, h: 275, angle: 0, curve: 3 },     // Mug centre (face)
+        { x: 1090, y: 95, w: 240, h: 265, angle: 35, curve: 8 }    // Mug droit (¾, anse droite)
       ];
 
       function updatePreview() {
@@ -557,6 +557,9 @@ function mueInit() {
             var dw = Math.round(view.w * scaleX);
             var dh = Math.round(view.h * scaleY);
 
+            // Amplitude de l'incurvation (en pixels écran)
+            var curveAmp = (view.curve || 0) * scaleY;
+
             // Projection cylindrique colonne par colonne
             for (var col = 0; col < dw; col++) {
               // Position normalisée sur l'écran [-1, 1]
@@ -579,11 +582,15 @@ function mueInit() {
               var srcCol = Math.round(patronU * (patronW - 1));
               if (srcCol < 0 || srcCol >= patronW) continue;
 
-              // Dessiner la colonne (1px de large) du patron vers le preview
+              // Incurvation verticale : les bords descendent, le centre reste stable
+              // Simule la courbure du rebord du mug vue en perspective
+              var curveOffset = curveAmp * (1 - Math.cos(theta - viewAngle));
+
+              // Dessiner la colonne avec décalage vertical pour suivre la courbure
               previewCtx.drawImage(
                 tempCanvas,
-                srcCol, 0, 1, patronH,   // source : 1 colonne du patron
-                dx + col, dy, 1, dh      // destination : 1 colonne sur le mug
+                srcCol, 0, 1, patronH,
+                dx + col, dy + curveOffset, 1, dh
               );
             }
           }
