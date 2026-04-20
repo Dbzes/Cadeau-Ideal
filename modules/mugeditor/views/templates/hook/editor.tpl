@@ -1,4 +1,4 @@
-{literal}<style>@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');.product-customization{display:none!important}.canvas-container{border:1px solid #ddd!important;box-sizing:content-box}</style>{/literal}
+{literal}<style>@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');.product-customization{display:none!important}.canvas-container{border:1px solid #ddd!important;box-sizing:border-box!important;max-width:100%!important}</style>{/literal}
 <div id="mue-loader" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:99999;align-items:center;justify-content:center;flex-direction:column;padding:20px;">
   <div style="width:70px;height:70px;border:6px solid rgba(255,255,255,.25);border-top-color:#ee7a03;border-radius:50%;animation:mue-spin 1s linear infinite;"></div>
   <div style="color:#fff;margin-top:18px;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;">Ajout au panier en cours...</div>
@@ -240,7 +240,9 @@ function mueInit() {
   var RATIO = TEMPLATE_W / TEMPLATE_H;
   var canvasEl = document.getElementById('mue-canvas');
   var wrap = document.querySelector('.mue-canvas-wrap');
-  var W = wrap.clientWidth;
+  // Aligner la largeur du patron sur le preview mug si présent
+  var previewEl = document.getElementById('mue-preview-container');
+  var W = previewEl ? previewEl.offsetWidth : wrap.clientWidth;
   var H = Math.round(W / RATIO);
   canvasEl.width = W;
   canvasEl.height = H;
@@ -962,7 +964,8 @@ function mueInit() {
   // Resize responsive
   window.addEventListener('resize', function(){
     if (!canvas) return;
-    var newW = wrap.clientWidth;
+    var previewResize = document.getElementById('mue-preview-container');
+    var newW = previewResize ? previewResize.offsetWidth : wrap.clientWidth;
     var newH = Math.round(newW / RATIO);
     var ratio = newW / W;
     canvas.setDimensions({ width: newW, height: newH });
