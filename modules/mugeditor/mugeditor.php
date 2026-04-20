@@ -16,6 +16,7 @@ class Mugeditor extends Module
     const UPLOAD_DIR = 'uploads/backgrounds/';
     const FONT_DIR = 'uploads/fonts/';
     const TEMPLATE_DIR = 'uploads/template/';
+    const RENDER_DIR = 'uploads/render/';
     const MAX_SIZE = 5242880; // 5 Mo
     const FONT_MAX_SIZE = 2097152; // 2 Mo
     const ALLOWED = ['jpg', 'jpeg', 'png', 'webp'];
@@ -230,7 +231,17 @@ class Mugeditor extends Module
             $output .= $this->handleTemplateDelete();
         }
 
-        return $output . $this->renderForm() . $this->renderTemplateManager() . $this->renderBackgroundsManager() . $this->renderFontsManager();
+        if (Tools::isSubmit('submitMugRenderUpload')) {
+            $output .= $this->handleRenderUpload();
+        }
+        if (Tools::getValue('deleteRenderBase')) {
+            $output .= $this->handleRenderDelete('base');
+        }
+        if (Tools::getValue('deleteRenderLighting')) {
+            $output .= $this->handleRenderDelete('lighting');
+        }
+
+        return $output . $this->renderForm() . $this->renderMugRenderManager() . $this->renderTemplateManager() . $this->renderBackgroundsManager() . $this->renderFontsManager();
     }
 
     protected function getBackgrounds()
@@ -895,6 +906,124 @@ class Mugeditor extends Module
         }
 
         $html .= '</div>';
+        return $html;
+    }
+
+    protected function getRenderImage($type)
+    {
+        $dir = _PS_MODULE_DIR_ . $this->name . '/' . self::RENDER_DIR;
+        foreach (['png', 'jpg', 'jpeg', 'webp'] as $ext) {
+            $file = $dir . $type . '.' . $ext;
+            if (file_exists($file)) {
+                return [
+                    'path' => $file,
+                    'url' => _MODULE_DIR_ . $this->name . '/' . self::RENDER_DIR . $type . '.' . $ext . '?t=' . filemtime($file),
+                    'ext' => $ext,
+                ];
+            }
+        }
+        return null;
+    }
+
+    protected function handleRenderUpload()
+    {
+        $dir = _PS_MODULE_DIR_ . $this->name . '/' . self::RENDER_DIR;
+        if (!is_dir($dir)) { mkdir($dir, 0755, true); }
+
+        $output = '';
+        foreach (['mug_render_base' => 'base', 'mug_render_lighting' => 'lighting'] as $field => $type) {
+            if (!isset($_FILES[$field]) || $_FILES[$field]['error'] === UPLOAD_ERR_NO_FILE) {
+                continue;
+            }
+            $f = $_FILES[$field];
+            if ($f['error'] !== UPLOAD_ERR_OK) {
+                $output .= $this->displayError($this->l('Erreur upload ' . $type . ' : code ' . $f['error']));
+                continue;
+            }
+            if ($f['size'] > self::MAX_SIZE) {
+                $output .= $this->displayError($this->l('Fichier ' . $type . ' trop volumineux (max 5 Mo).'));
+                continue;
+            }
+            $ext = strtolower(pathinfo($f['name'], PATHINFO_EXTENSION));
+            if (!in_array($ext, ['png', 'jpg', 'jpeg', 'webp'])) {
+                $output .= $this->displayError($this->l('Format ' . $type . ' non supporté (PNG, JPG, WEBP).'));
+                continue;
+            }
+            // Supprimer l'ancien fichier
+            foreach (['png', 'jpg', 'jpeg', 'webp'] as $oldExt) {
+                $old = $dir . $type . '.' . $oldExt;
+                if (file_exists($old)) { unlink($old); }
+            }
+            $dest = $dir . $type . '.' . $ext;
+            if (!move_uploaded_file($f['tmp_name'], $dest)) {
+                $output .= $this->displayError($this->l('Impossible de sauvegarder ' . $type . '.'));
+                continue;
+            }
+            $label = $type === 'base' ? 'Image de base' : 'Image éclairages';
+            $output .= $this->displayConfirmation($this->l($label . ' uploadée.'));
+        }
+        return $output;
+    }
+
+    protected function handleRenderDelete($type)
+    {
+        $img = $this->getRenderImage($type);
+        if ($img && file_exists($img['path'])) {
+            unlink($img['path']);
+            return $this->displayConfirmation($this->l('Image supprimée.'));
+        }
+        return $this->displayError($this->l('Image introuvable.'));
+    }
+
+    protected function renderMugRenderManager()
+    {
+        $baseImg = $this->getRenderImage('base');
+        $lightImg = $this->getRenderImage('lighting');
+        $adminUrl = AdminController::$currentIndex . '&configure=' . $this->name . '&token=' . Tools::getAdminTokenLite('AdminModules');
+
+        $html = '<div class="panel"><h3><i class="icon-image"></i> ' . $this->l('Rendu du mug (aperçu)') . '</h3>';
+        $html .= '<p style="color:#555;margin-bottom:20px;">'
+            . $this->l('Uploadez les 2 images pour le rendu visuel du mug. L\'image de base sert de fond, l\'image éclairages se superpose pour les effets de lumière.')
+            . '<br><strong>Ordre des calques :</strong> Image de base → Création du client → Image éclairages'
+            . '</p>';
+
+        $html .= '<form method="post" enctype="multipart/form-data">';
+        $html .= '<div style="display:flex;gap:30px;flex-wrap:wrap;margin-bottom:20px;">';
+
+        // Image de base
+        $html .= '<div style="flex:1;min-width:250px;">';
+        $html .= '<h4 style="color:#004774;margin-bottom:10px;">1. Image de base</h4>';
+        if ($baseImg) {
+            $html .= '<div style="margin-bottom:10px;position:relative;">';
+            $html .= '<img src="' . $baseImg['url'] . '" style="max-width:100%;max-height:200px;border:1px solid #ddd;background-image:url(\'data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2220%22 height=%2220%22><rect width=%2210%22 height=%2210%22 fill=%22%23ddd%22/><rect x=%2210%22 y=%2210%22 width=%2210%22 height=%2210%22 fill=%22%23ddd%22/></svg>\');background-size:20px;" />';
+            $html .= '<br><a href="' . $adminUrl . '&deleteRenderBase=1" onclick="return confirm(\'Supprimer l\\\'image de base ?\');" style="color:#c00;font-size:12px;">✕ Supprimer</a>';
+            $html .= '</div>';
+        } else {
+            $html .= '<div style="width:200px;height:160px;border:2px dashed #ccc;display:flex;align-items:center;justify-content:center;color:#999;margin-bottom:10px;font-size:13px;">Aucune image</div>';
+        }
+        $html .= '<input type="file" name="mug_render_base" accept="image/png,image/jpeg,image/webp" />';
+        $html .= '<p style="font-size:12px;color:#888;margin-top:4px;">Le mug vierge vu de face (PNG recommandé)</p>';
+        $html .= '</div>';
+
+        // Image éclairages
+        $html .= '<div style="flex:1;min-width:250px;">';
+        $html .= '<h4 style="color:#004774;margin-bottom:10px;">2. Image éclairages</h4>';
+        if ($lightImg) {
+            $html .= '<div style="margin-bottom:10px;position:relative;">';
+            $html .= '<img src="' . $lightImg['url'] . '" style="max-width:100%;max-height:200px;border:1px solid #ddd;background-image:url(\'data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2220%22 height=%2220%22><rect width=%2210%22 height=%2210%22 fill=%22%23ddd%22/><rect x=%2210%22 y=%2210%22 width=%2210%22 height=%2210%22 fill=%22%23ddd%22/></svg>\');background-size:20px;" />';
+            $html .= '<br><a href="' . $adminUrl . '&deleteRenderLighting=1" onclick="return confirm(\'Supprimer l\\\'image éclairages ?\');" style="color:#c00;font-size:12px;">✕ Supprimer</a>';
+            $html .= '</div>';
+        } else {
+            $html .= '<div style="width:200px;height:160px;border:2px dashed #ccc;display:flex;align-items:center;justify-content:center;color:#999;margin-bottom:10px;font-size:13px;">Aucune image</div>';
+        }
+        $html .= '<input type="file" name="mug_render_lighting" accept="image/png,image/jpeg,image/webp" />';
+        $html .= '<p style="font-size:12px;color:#888;margin-top:4px;">Effets de lumière / reflets (PNG transparent recommandé)</p>';
+        $html .= '</div>';
+
+        $html .= '</div>'; // flex container
+        $html .= '<div style="text-align:right;"><button type="submit" name="submitMugRenderUpload" class="btn btn-primary"><i class="process-icon-save"></i> ' . $this->l('Uploader') . '</button></div>';
+        $html .= '</form></div>';
+
         return $html;
     }
 
