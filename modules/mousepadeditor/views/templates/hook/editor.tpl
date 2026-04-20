@@ -3,7 +3,7 @@
 .mpe-font-selected{border:1px solid #ddd;padding:8px 12px;cursor:pointer;background:#fff;font-size:14px;display:flex;justify-content:space-between;align-items:center}
 .mpe-font-selected:hover{border-color:#004774}
 .mpe-font-arrow{font-size:10px;color:#999;margin-left:8px}
-.mpe-font-list{display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #ddd;border-top:none;max-height:200px;overflow-y:auto;z-index:100;box-shadow:0 4px 12px rgba(0,0,0,.1)}
+.mpe-font-list{display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #ddd;border-top:none;max-height:200px;overflow-y:scroll;z-index:100;box-shadow:0 4px 12px rgba(0,0,0,.1)}
 .mpe-font-dropdown.mpe-open .mpe-font-list{display:block}
 .mpe-font-dropdown.mpe-open .mpe-font-arrow{transform:rotate(180deg)}
 .mpe-font-option{padding:8px 12px;cursor:pointer;font-size:15px;border-bottom:1px solid #f0f0f0}
