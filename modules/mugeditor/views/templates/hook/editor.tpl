@@ -501,7 +501,7 @@ function mueInit() {
       // Zones imprimables pour chaque vue de mug (coordonnées dans l'espace 1461x453)
       // angle de vue de la caméra (en degrés), curve = amplitude incurvation verticale (px)
       var mugViews = [
-        { x: 125, y: 100, w: 245, h: 269, angle: -35, curve: 35 },  // Mug gauche (¾, anse gauche)
+        { x: 125, y: 100, w: 241, h: 269, angle: -35, curve: 35 },  // Mug gauche (¾, anse gauche)
         { x: 565, y: 90, w: 280, h: 275, angle: 0, curve: 8 },     // Mug centre (face)
         { x: 1090, y: 95, w: 240, h: 265, angle: 35, curve: 35 }   // Mug droit (¾, anse droite)
       ];
@@ -584,10 +584,16 @@ function mueInit() {
 
               // Incurvation "sur les rails" : le haut et le bas suivent
               // chacun la courbe du rebord du mug, comme un print collé sur le cylindre.
-              // Le rebord supérieur courbe plus fort que la base (perspective).
               var bendFactor = 1 - Math.cos(theta - viewAngle);
-              var topCurve  = -curveAmp * bendFactor;         // rebord haut : remonte fort
-              var botCurve  = -curveAmp * 0.4 * bendFactor;   // base : remonte moins
+
+              // Rail HAUT : asymétrique — le côté loin (qui s'éloigne du regard)
+              // courbe plus fort que le côté proche. Simule la perspective du rebord.
+              // screenX va de -1 (bord loin) à +1 (bord proche)
+              var topSkew = 1 - screenX * 0.5; // loin=1.5x, centre=1x, proche=0.5x
+              var topCurve  = -curveAmp * bendFactor * topSkew;
+
+              // Rail BAS : INCHANGÉ — les valeurs sont bonnes
+              var botCurve  = -curveAmp * 0.4 * bendFactor;
 
               var colTop = dy + topCurve;
               var colH   = dh + (botCurve - topCurve);  // hauteur ajustée entre les 2 rails
