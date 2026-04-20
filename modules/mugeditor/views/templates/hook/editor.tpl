@@ -586,11 +586,9 @@ function mueInit() {
               // chacun la courbe du rebord du mug, comme un print collé sur le cylindre.
               var bendFactor = 1 - Math.cos(theta - viewAngle);
 
-              // Rail HAUT : asymétrique — le côté loin (qui s'éloigne du regard)
-              // courbe plus fort que le côté proche. Simule la perspective du rebord.
-              // screenX va de -1 (bord loin) à +1 (bord proche)
-              var topSkew = 1 - screenX * 0.5; // loin=1.5x, centre=1x, proche=0.5x
-              var topCurve  = -curveAmp * bendFactor * topSkew;
+              // Rail HAUT : très subtil — le rebord supérieur du mug est quasi plat
+              // vu de cet angle (la caméra est légèrement au-dessus)
+              var topCurve  = -curveAmp * 0.12 * bendFactor;
 
               // Rail BAS : INCHANGÉ — les valeurs sont bonnes
               var botCurve  = -curveAmp * 0.4 * bendFactor;
