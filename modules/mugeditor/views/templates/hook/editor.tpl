@@ -91,7 +91,7 @@
         <input type="text" class="mue-text-input" id="mue-text-input" placeholder="Votre texte ici..." />
         <div class="mue-text-controls">
           <label>Police
-            <select id="mue-text-font">
+            <select id="mue-text-font" onchange="this.style.fontFamily=this.value+',sans-serif'">
               {if isset($mue_default_fonts)}
                 {foreach from=$mue_default_fonts item=df}
                   <option value="{$df}" style="font-family:'{$df}', sans-serif;">{$df}</option>

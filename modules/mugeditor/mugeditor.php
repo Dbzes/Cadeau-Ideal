@@ -241,7 +241,7 @@ class Mugeditor extends Module
             $output .= $this->handleRenderDelete('lighting');
         }
 
-        return $output . $this->renderForm() . $this->renderMugRenderManager() . $this->renderTemplateManager() . $this->renderBackgroundsManager() . $this->renderFontsManager();
+        return $output . $this->renderForm() . $this->renderMugRenderManager() . $this->renderTemplateManager() . $this->renderFontsManager();
     }
 
     protected function getBackgrounds()
