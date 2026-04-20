@@ -582,15 +582,21 @@ function mueInit() {
               var srcCol = Math.round(patronU * (patronW - 1));
               if (srcCol < 0 || srcCol >= patronW) continue;
 
-              // Incurvation verticale : les bords montent, le centre reste stable
-              // Simule la courbure du rebord du mug vue en perspective (surface qui s'éloigne → remonte)
-              var curveOffset = -curveAmp * (1 - Math.cos(theta - viewAngle));
+              // Incurvation "sur les rails" : le haut et le bas suivent
+              // chacun la courbe du rebord du mug, comme un print collé sur le cylindre.
+              // Le rebord supérieur courbe plus fort que la base (perspective).
+              var bendFactor = 1 - Math.cos(theta - viewAngle);
+              var topCurve  = -curveAmp * bendFactor;         // rebord haut : remonte fort
+              var botCurve  = -curveAmp * 0.4 * bendFactor;   // base : remonte moins
 
-              // Dessiner la colonne avec décalage vertical pour suivre la courbure
+              var colTop = dy + topCurve;
+              var colH   = dh + (botCurve - topCurve);  // hauteur ajustée entre les 2 rails
+
+              // Dessiner la colonne étirée entre les 2 courbes
               previewCtx.drawImage(
                 tempCanvas,
                 srcCol, 0, 1, patronH,
-                dx + col, dy + curveOffset, 1, dh
+                dx + col, colTop, 1, colH
               );
             }
           }
