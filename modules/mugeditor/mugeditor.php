@@ -1001,7 +1001,7 @@ class Mugeditor extends Module
         $html .= '<h4 style="color:#004774;margin-bottom:10px;">1. Image de base</h4>';
         if ($baseImg) {
             $html .= '<div style="display:flex;gap:20px;align-items:center;background:#f0f7fc;border:1px solid #cfe2f0;padding:16px;margin-bottom:12px;">';
-            $html .= '<div style="width:200px;height:160px;background-image:url(\'' . $checkerBg . '\'),url(\'' . $baseImg['url'] . '\');background-repeat:repeat,no-repeat;background-size:20px,contain;background-position:center;border:1px solid #ddd;"></div>';
+            $html .= '<img src="' . $baseImg['url'] . '" style="max-width:300px;max-height:250px;border:1px solid #ddd;background:#e8e8e8;" />';
             $html .= '<div style="flex:1;">';
             $html .= '<div style="font-weight:600;color:#004774;font-size:14px;">' . $this->l('Image active') . '</div>';
             $html .= '<div style="font-size:13px;color:#666;margin:4px 0;">' . $baseImg['filename'] . '</div>';
@@ -1026,7 +1026,7 @@ class Mugeditor extends Module
         $html .= '<h4 style="color:#004774;margin-bottom:10px;">2. Image éclairages</h4>';
         if ($lightImg) {
             $html .= '<div style="display:flex;gap:20px;align-items:center;background:#f0f7fc;border:1px solid #cfe2f0;padding:16px;margin-bottom:12px;">';
-            $html .= '<div style="width:200px;height:160px;background-image:url(\'' . $checkerBg . '\'),url(\'' . $lightImg['url'] . '\');background-repeat:repeat,no-repeat;background-size:20px,contain;background-position:center;border:1px solid #ddd;"></div>';
+            $html .= '<img src="' . $lightImg['url'] . '" style="max-width:300px;max-height:250px;border:1px solid #ddd;background-image:url(\'' . $checkerBg . '\');background-repeat:repeat;background-size:20px;" />';
             $html .= '<div style="flex:1;">';
             $html .= '<div style="font-weight:600;color:#004774;font-size:14px;">' . $this->l('Image active') . '</div>';
             $html .= '<div style="font-size:13px;color:#666;margin:4px 0;">' . $lightImg['filename'] . '</div>';
