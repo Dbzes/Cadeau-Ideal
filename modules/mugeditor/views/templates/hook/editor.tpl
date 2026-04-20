@@ -502,7 +502,7 @@ function mueInit() {
       // angle de vue de la caméra (en degrés), curve = amplitude incurvation verticale (px)
       var mugViews = [
         { x: 125, y: 100, w: 241, h: 269, angle: -35, curve: 35 },  // Mug gauche (¾, anse gauche)
-        { x: 575, y: 90, w: 265, h: 275, angle: 0, curve: 8 },     // Mug centre (face)
+        { x: 575, y: 90, w: 200, h: 275, angle: 0, curve: 8 },     // Mug centre (face) — TEST VISIBLE
         { x: 1092, y: 100, w: 241, h: 269, angle: 35, curve: 35 }   // Mug droit (¾, anse droite)
       ];
 
