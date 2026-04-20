@@ -1009,12 +1009,12 @@ class Mugeditor extends Module
             $html .= '<a href="' . $adminUrl . '&deleteRenderBase=1" class="btn btn-danger btn-xs" onclick="return confirm(\'Supprimer l\\\'image de base ?\')">✕ ' . $this->l('Supprimer') . '</a>';
             $html .= '</div></div>';
         }
-        $html .= '<label class="mue-dropzone" id="mue-rdz-base">
+        $html .= '<div class="mue-dropzone" id="mue-rdz-base">
             <div class="mue-dropzone-icon">🖼</div>
             <div class="mue-dropzone-title">' . ($baseImg ? $this->l('Remplacer l\'image de base') : $this->l('Glissez l\'image de base ici')) . '</div>
             <div class="mue-dropzone-sub">' . $this->l('ou cliquez pour parcourir — PNG, JPG, WEBP · max 5 Mo') . '</div>
             <input type="file" name="mug_render_base" id="mue-rfile-base" accept="image/png,image/jpeg,image/webp" />
-        </label>';
+        </div>';
         $html .= '<div id="mue-rfb-base" style="display:none;margin-top:10px;padding:12px;background:#e8f5e9;border:1px solid #a5d6a7;font-size:13px;color:#2e7d32;">
             <strong>Fichier sélectionné :</strong> <span id="mue-rfname-base"></span>
             <div id="mue-rfprev-base" style="margin-top:8px;max-width:200px;max-height:120px;overflow:hidden;"></div>
@@ -1034,12 +1034,12 @@ class Mugeditor extends Module
             $html .= '<a href="' . $adminUrl . '&deleteRenderLighting=1" class="btn btn-danger btn-xs" onclick="return confirm(\'Supprimer l\\\'image éclairages ?\')">✕ ' . $this->l('Supprimer') . '</a>';
             $html .= '</div></div>';
         }
-        $html .= '<label class="mue-dropzone" id="mue-rdz-light">
+        $html .= '<div class="mue-dropzone" id="mue-rdz-light">
             <div class="mue-dropzone-icon">💡</div>
             <div class="mue-dropzone-title">' . ($lightImg ? $this->l('Remplacer l\'image éclairages') : $this->l('Glissez l\'image éclairages ici')) . '</div>
             <div class="mue-dropzone-sub">' . $this->l('ou cliquez pour parcourir — PNG transparent recommandé · max 5 Mo') . '</div>
             <input type="file" name="mug_render_lighting" id="mue-rfile-light" accept="image/png,image/jpeg,image/webp" />
-        </label>';
+        </div>';
         $html .= '<div id="mue-rfb-light" style="display:none;margin-top:10px;padding:12px;background:#e8f5e9;border:1px solid #a5d6a7;font-size:13px;color:#2e7d32;">
             <strong>Fichier sélectionné :</strong> <span id="mue-rfname-light"></span>
             <div id="mue-rfprev-light" style="margin-top:8px;max-width:200px;max-height:120px;overflow:hidden;"></div>
@@ -1084,6 +1084,7 @@ class Mugeditor extends Module
                 });
                 inp.addEventListener("change",function(){showFeedback();});
                 inp.addEventListener("click",function(e){e.stopPropagation();});
+                dz.addEventListener("click",function(e){if(e.target!==inp)inp.click();});
             }
             setupDZ("mue-rdz-base","mue-rfile-base","mue-rfb-base","mue-rfname-base","mue-rfprev-base");
             setupDZ("mue-rdz-light","mue-rfile-light","mue-rfb-light","mue-rfname-light","mue-rfprev-light");
