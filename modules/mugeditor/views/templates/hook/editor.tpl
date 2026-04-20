@@ -733,7 +733,9 @@ function mueInit() {
         imageCount++;
         updateImgCounter();
         addImgThumb(img, dataUrl, file.name);
-        scrollToCanvas();
+        // Garder la section Images ouverte
+        var imgSection = document.querySelector('[data-target="mue-images"]');
+        if (imgSection) imgSection.parentElement.classList.add('mue-open');
       });
     };
     reader.readAsDataURL(file);
