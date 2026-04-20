@@ -1001,6 +1001,18 @@ class Mousepadeditor extends Module
         $composeUrl = $this->context->link->getModuleLink('mousepadeditor', 'compose', [], true);
         $attachUrl = $this->context->link->getModuleLink('mousepadeditor', 'attachcustom', [], true);
 
+        $allDefaultFonts = array_merge($activeWebsafe, $activeTheme, $activeGoogle);
+        $firstFont = !empty($allDefaultFonts) ? $allDefaultFonts[0] : '';
+        $fontOptionsHtml = '';
+        foreach ($allDefaultFonts as $df) {
+            $esc = htmlspecialchars($df, ENT_QUOTES, 'UTF-8');
+            $fontOptionsHtml .= '<div class="mpe-font-option" data-font="' . $esc . '" style="font-family:\'' . $esc . '\',sans-serif !important;font-size:18px;">' . $esc . '</div>';
+        }
+        foreach ($activeCustom as $cf) {
+            $esc = htmlspecialchars($cf['family'], ENT_QUOTES, 'UTF-8');
+            $fontOptionsHtml .= '<div class="mpe-font-option" data-font="' . $esc . '" style="font-family:\'' . $esc . '\',sans-serif !important;font-size:18px;">' . $esc . '</div>';
+        }
+
         $this->context->smarty->assign([
             'mpe_backgrounds' => $backgrounds,
             'mpe_bg_url' => $bgUrl,
@@ -1009,7 +1021,9 @@ class Mousepadeditor extends Module
             'mpe_uploadimage_url' => $this->context->link->getModuleLink('mousepadeditor', 'uploadimage', [], true),
             'mpe_fonts' => $activeCustom,
             'mpe_font_url' => $fontUrl,
-            'mpe_default_fonts' => array_merge($activeWebsafe, $activeTheme, $activeGoogle),
+            'mpe_default_fonts' => $allDefaultFonts,
+            'mpe_first_font' => $firstFont,
+            'mpe_font_options_html' => $fontOptionsHtml,
             'mpe_google_url' => $googleFrontUrl,
             'mpe_template' => $template,
             'mpe_compose_url' => $composeUrl,

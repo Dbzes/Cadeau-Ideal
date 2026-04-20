@@ -1,4 +1,25 @@
-{literal}<style>@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');.product-customization{display:none!important}</style>{/literal}
+{literal}<style>@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');.product-customization{display:none!important}
+.mpe-font-dropdown{position:relative;width:100%}
+.mpe-font-selected{border:1px solid #ddd;padding:8px 12px;cursor:pointer;background:#fff;font-size:14px;display:flex;justify-content:space-between;align-items:center}
+.mpe-font-selected:hover{border-color:#004774}
+.mpe-font-arrow{font-size:10px;color:#999;margin-left:8px}
+.mpe-font-list{display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #ddd;border-top:none;max-height:200px;overflow-y:auto;z-index:100;box-shadow:0 4px 12px rgba(0,0,0,.1)}
+.mpe-font-dropdown.mpe-open .mpe-font-list{display:block}
+.mpe-font-dropdown.mpe-open .mpe-font-arrow{transform:rotate(180deg)}
+.mpe-font-option{padding:8px 12px;cursor:pointer;font-size:15px;border-bottom:1px solid #f0f0f0}
+.mpe-font-option:hover{background:#f0f7fc}
+.mpe-font-option:last-child{border-bottom:none}
+</style>{/literal}
+{if isset($mpe_google_url) && $mpe_google_url}
+<link href="{$mpe_google_url nofilter}" rel="stylesheet">
+{/if}
+{if isset($mpe_fonts) && $mpe_fonts|count > 0}
+<style>
+{foreach from=$mpe_fonts item=f}
+@font-face { font-family: "{$f.family}"; src: url("{$mpe_font_url}{$f.file}") format("{if $f.ext == 'ttf'}truetype{elseif $f.ext == 'otf'}opentype{else}{$f.ext}{/if}"); font-display: swap; }
+{/foreach}
+</style>
+{/if}
 <div id="mpe-loader" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:99999;align-items:center;justify-content:center;flex-direction:column;padding:20px;">
   <div style="width:70px;height:70px;border:6px solid rgba(255,255,255,.25);border-top-color:#ee7a03;border-radius:50%;animation:mpe-spin 1s linear infinite;"></div>
   <div style="color:#fff;margin-top:18px;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;">Ajout au panier en cours...</div>
@@ -122,21 +143,20 @@
       <div class="mpe-body" id="mpe-texte">
         <p class="mpe-hint">Tapez votre texte :</p>
         <input type="text" class="mpe-text-input" id="mpe-text-input" placeholder="Votre texte ici..." />
+        <div style="margin:12px 0 8px;">
+          <label style="display:block;font-size:12px;font-weight:600;color:#666;margin-bottom:4px;">Police</label>
+          <input type="hidden" id="mpe-text-font" value="{$mpe_first_font nofilter}" />
+          <div class="mpe-font-dropdown" id="mpe-font-dropdown">
+            <div class="mpe-font-selected" id="mpe-font-selected" style="font-family:'{$mpe_first_font nofilter}',sans-serif !important;">
+              {if $mpe_first_font}{$mpe_first_font nofilter}{else}Police{/if}
+              <span class="mpe-font-arrow">&#9662;</span>
+            </div>
+            <div class="mpe-font-list" id="mpe-font-list">
+              {$mpe_font_options_html nofilter}
+            </div>
+          </div>
+        </div>
         <div class="mpe-text-controls">
-          <label>Police
-            <select id="mpe-text-font">
-              {if isset($mpe_default_fonts)}
-                {foreach from=$mpe_default_fonts item=df}
-                  <option value="{$df}" style="font-family:'{$df}', sans-serif;">{$df}</option>
-                {/foreach}
-              {/if}
-              {if isset($mpe_fonts) && $mpe_fonts|count > 0}
-                {foreach from=$mpe_fonts item=f}
-                  <option value="{$f.family}" style="font-family:'{$f.family}', sans-serif;">{$f.family}</option>
-                {/foreach}
-              {/if}
-            </select>
-          </label>
           <label>Taille
             <input type="number" id="mpe-text-size" value="32" min="10" max="120" />
           </label>
@@ -158,16 +178,6 @@
   </div>
 </div>
 
-{if isset($mpe_google_url) && $mpe_google_url}
-<link href="{$mpe_google_url}" rel="stylesheet">
-{/if}
-{if isset($mpe_fonts) && $mpe_fonts|count > 0}
-<style>
-{foreach from=$mpe_fonts item=f}
-@font-face { font-family: "{$f.family}"; src: url("{$mpe_font_url}{$f.file}") format("{if $f.ext == 'ttf'}truetype{elseif $f.ext == 'otf'}opentype{else}{$f.ext}{/if}"); font-display: swap; }
-{/foreach}
-</style>
-{/if}
 <script>
 window.mpeSerializeState = null;
 window.mpeComposeHD = null;
@@ -221,6 +231,29 @@ function mpeInit() {
       if (!open) item.classList.add('mpe-open');
     });
   });
+
+  // Font dropdown custom
+  (function(){
+    var dd = document.getElementById('mpe-font-dropdown');
+    var sel = document.getElementById('mpe-font-selected');
+    var hidden = document.getElementById('mpe-text-font');
+    if (!dd || !sel || !hidden) return;
+    sel.addEventListener('click', function(e){
+      e.stopPropagation();
+      dd.classList.toggle('mpe-open');
+    });
+    dd.querySelectorAll('.mpe-font-option').forEach(function(opt){
+      opt.addEventListener('click', function(e){
+        e.stopPropagation();
+        var font = opt.dataset.font;
+        hidden.value = font;
+        sel.style.fontFamily = "'" + font + "',sans-serif";
+        sel.childNodes[0].textContent = font + ' ';
+        dd.classList.remove('mpe-open');
+      });
+    });
+    document.addEventListener('click', function(){ dd.classList.remove('mpe-open'); });
+  })();
 
   // Canvas init
   var fabricReady = (typeof fabric !== 'undefined');
