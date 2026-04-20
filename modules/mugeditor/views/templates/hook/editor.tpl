@@ -240,7 +240,8 @@ function mueInit() {
   var RATIO = TEMPLATE_W / TEMPLATE_H;
   var canvasEl = document.getElementById('mue-canvas');
   var wrap = document.querySelector('.mue-canvas-wrap');
-  var W = wrap.clientWidth;
+  // -2px pour compenser le border 1px de .canvas-container (gauche + droite)
+  var W = wrap.clientWidth - 2;
   var H = Math.round(W / RATIO);
   canvasEl.width = W;
   canvasEl.height = H;
@@ -962,7 +963,7 @@ function mueInit() {
   // Resize responsive
   window.addEventListener('resize', function(){
     if (!canvas) return;
-    var newW = wrap.clientWidth;
+    var newW = wrap.clientWidth - 2;
     var newH = Math.round(newW / RATIO);
     var ratio = newW / W;
     canvas.setDimensions({ width: newW, height: newH });
