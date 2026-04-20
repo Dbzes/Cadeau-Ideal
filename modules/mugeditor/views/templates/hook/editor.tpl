@@ -46,6 +46,15 @@
 
   <div class="mue-layout">
   <div class="mue-canvas-wrap">
+    {if isset($mue_render_base) && $mue_render_base}
+    <div id="mue-preview-container" style="position:relative;overflow:hidden;margin-bottom:16px;border:1px solid #ddd;background:#e8e8e8;">
+      <img id="mue-preview-base" src="{$mue_render_base.url}" style="display:block;width:100%;height:auto;" alt="Aperçu mug" />
+      <canvas id="mue-preview-perso" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;"></canvas>
+      {if isset($mue_render_lighting) && $mue_render_lighting}
+      <img id="mue-preview-lighting" src="{$mue_render_lighting.url}" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;" alt="" />
+      {/if}
+    </div>
+    {/if}
     <canvas id="mue-canvas"></canvas>
     <div class="mue-canvas-toolbar">
       <button type="button" class="mue-tool-btn" id="mue-delete-selected" title="Supprimer l'élément sélectionné">🗑 Supprimer la sélection</button>
@@ -503,6 +512,38 @@ function mueInit() {
     canvas.on('object:removed', saveState);
     canvas.on('object:modified', saveState);
     canvas.on('mouse:up', saveState);
+
+    // --- Mise à jour temps réel du preview 3 couches ---
+    (function(){
+      var previewPerso = document.getElementById('mue-preview-perso');
+      var previewContainer = document.getElementById('mue-preview-container');
+      if (!previewPerso || !previewContainer) return;
+      var previewCtx = previewPerso.getContext('2d');
+      var updating = false;
+
+      function updatePreview() {
+        if (updating) return;
+        updating = true;
+        requestAnimationFrame(function(){
+          var containerW = previewContainer.offsetWidth;
+          var baseImg = document.getElementById('mue-preview-base');
+          if (!baseImg) { updating = false; return; }
+          var ratio = baseImg.naturalHeight / baseImg.naturalWidth;
+          var containerH = Math.round(containerW * ratio);
+          previewPerso.width = containerW;
+          previewPerso.height = containerH;
+          previewCtx.clearRect(0, 0, containerW, containerH);
+          // Dessiner le contenu du canvas Fabric dans la couche intermédiaire
+          // Pour l'instant on mappe tout le patron sur tout le preview (à ajuster plus tard)
+          previewCtx.drawImage(canvas.lowerCanvasEl, 0, 0, containerW, containerH);
+          updating = false;
+        });
+      }
+
+      canvas.on('after:render', updatePreview);
+      // Update initial après chargement
+      setTimeout(updatePreview, 500);
+    })();
   }
 
   document.querySelectorAll('.mue-bg-thumb').forEach(function(t){ bindBgClick(t); });

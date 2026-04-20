@@ -1196,6 +1196,8 @@ class Mugeditor extends Module
             'mue_attach_url' => $attachUrl,
             'mue_product_id' => $productId,
             'mue_lsv_blocs' => class_exists('LeSaviezVous') ? LeSaviezVous::getBlocs() : [],
+            'mue_render_base' => $this->getRenderImage('base'),
+            'mue_render_lighting' => $this->getRenderImage('lighting'),
         ]);
 
         return $this->display(__FILE__, 'views/templates/hook/editor.tpl');
