@@ -262,7 +262,7 @@ function mueInit() {
     if (fabric.IText && fabric.IText.prototype) fabric.IText.prototype.textBaseline = 'alphabetic';
     if (fabric.Textbox && fabric.Textbox.prototype) fabric.Textbox.prototype.textBaseline = 'alphabetic';
     canvas = new fabric.Canvas('mue-canvas', {
-      backgroundColor: '#f0f0f0',
+      backgroundColor: '#ffffff',
       preserveObjectStacking: true
     });
     canvas.setDimensions({ width: W, height: H });
