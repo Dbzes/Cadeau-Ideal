@@ -743,7 +743,7 @@ class Mugeditor extends Module
 
         if ($tpl) {
             $html .= '<div style="display:flex;gap:20px;align-items:center;background:#f0f7fc;border:1px solid #cfe2f0;border-radius:4px;padding:16px;margin-bottom:15px;">';
-            $html .= '<div style="width:200px;height:160px;background-image:url(\'data:image/svg+xml;utf8,<svg xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"20\\" height=\\"20\\"><rect width=\\"10\\" height=\\"10\\" fill=\\"%23ddd\\"/><rect x=\\"10\\" y=\\"10\\" width=\\"10\\" height=\\"10\\" fill=\\"%23ddd\\"/></svg>\'),url(\'' . $tpl['url'] . '\');background-repeat:repeat,no-repeat;background-size:20px,contain;background-position:center;border:1px solid #ddd;"></div>';
+            $html .= '<img src="' . $tpl['url'] . '" style="max-width:300px;max-height:200px;border:1px solid #ddd;background-image:url(\'data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2220%22 height=%2220%22><rect width=%2210%22 height=%2210%22 fill=%22%23ddd%22/><rect x=%2210%22 y=%2210%22 width=%2210%22 height=%2210%22 fill=%22%23ddd%22/></svg>\');background-repeat:repeat;background-size:20px;" />';
             $html .= '<div style="flex:1;">';
             $html .= '<div style="font-weight:600;color:#004774;font-size:14px;">' . $this->l('Gabarit actif') . '</div>';
             $html .= '<div style="font-size:13px;color:#666;margin:4px 0;">' . $tpl['width'] . ' × ' . $tpl['height'] . ' px · ratio ' . number_format($tpl['width'] / max($tpl['height'], 1), 2) . ':1</div>';
