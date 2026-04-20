@@ -1,4 +1,4 @@
-{literal}<style>@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');.product-customization{display:none!important}#mue-preview-container{box-sizing:border-box}.canvas-container{border:1px solid #ddd!important}</style>{/literal}
+{literal}<style>@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');.product-customization{display:none!important}#mue-preview-container{box-sizing:border-box}#mue-canvas-border{border:1px solid #ddd;display:inline-block;line-height:0}</style>{/literal}
 <div id="mue-loader" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:99999;align-items:center;justify-content:center;flex-direction:column;padding:20px;">
   <div style="width:70px;height:70px;border:6px solid rgba(255,255,255,.25);border-top-color:#ee7a03;border-radius:50%;animation:mue-spin 1s linear infinite;"></div>
   <div style="color:#fff;margin-top:18px;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;">Ajout au panier en cours...</div>
@@ -55,7 +55,7 @@
       {/if}
     </div>
     {/if}
-    <canvas id="mue-canvas"></canvas>
+    <div id="mue-canvas-border"><canvas id="mue-canvas"></canvas></div>
     <div class="mue-canvas-toolbar">
       <button type="button" class="mue-tool-btn" id="mue-delete-selected" title="Supprimer l'élément sélectionné">🗑 Supprimer la sélection</button>
       <button type="button" class="mue-tool-btn" id="mue-reset" title="Effacer toute la création">↺ Tout effacer</button>
