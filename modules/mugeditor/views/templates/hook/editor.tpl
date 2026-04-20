@@ -482,13 +482,29 @@ function mueInit() {
     canvas.on('object:modified', saveState);
     canvas.on('mouse:up', saveState);
 
-    // --- Mise à jour temps réel du preview 3 couches ---
+    // --- Preview cylindrique temps réel ---
     (function(){
       var previewPerso = document.getElementById('mue-preview-perso');
       var previewContainer = document.getElementById('mue-preview-container');
       if (!previewPerso || !previewContainer) return;
       var previewCtx = previewPerso.getContext('2d');
       var updating = false;
+
+      // Dimensions de l'image de base (espace de référence)
+      var BASE_W = 1461, BASE_H = 453;
+
+      // Couverture du patron sur le cylindre (en degrés)
+      var COVERAGE_DEG = 220;
+      var HALF_COV = (COVERAGE_DEG / 2) * Math.PI / 180;
+      var TOTAL_COV = COVERAGE_DEG * Math.PI / 180;
+
+      // Zones imprimables pour chaque vue de mug (coordonnées dans l'espace 1461x453)
+      // et angle de vue de la caméra (en degrés)
+      var mugViews = [
+        { x: 135, y: 95, w: 235, h: 265, angle: -35 },  // Mug gauche (¾, anse gauche)
+        { x: 565, y: 90, w: 280, h: 275, angle: 0 },     // Mug centre (face)
+        { x: 1095, y: 95, w: 230, h: 265, angle: 35 }    // Mug droit (¾, anse droite)
+      ];
 
       function updatePreview() {
         if (updating) return;
@@ -497,42 +513,86 @@ function mueInit() {
           var containerW = previewContainer.offsetWidth;
           var baseImg = document.getElementById('mue-preview-base');
           if (!baseImg) { updating = false; return; }
-          var ratio = baseImg.naturalHeight / baseImg.naturalWidth;
-          var containerH = Math.round(containerW * ratio);
+          var imgRatio = baseImg.naturalHeight / baseImg.naturalWidth;
+          var containerH = Math.round(containerW * imgRatio);
           previewPerso.width = containerW;
           previewPerso.height = containerH;
           previewCtx.clearRect(0, 0, containerW, containerH);
 
-          // Exporter uniquement les objets (sans le fond du patron) sur fond transparent
+          // Facteur d'échelle entre l'espace base et l'espace écran
+          var scaleX = containerW / BASE_W;
+          var scaleY = containerH / BASE_H;
+
+          // Exporter les objets du patron (sans fond ni template) sur fond transparent
           var origBg = canvas.backgroundColor;
           var origBgImg = canvas.backgroundImage;
           canvas.backgroundColor = 'transparent';
           canvas.backgroundImage = null;
 
-          // Créer un canvas temporaire pour capturer sans fond
           var tempCanvas = document.createElement('canvas');
           tempCanvas.width = canvas.width;
           tempCanvas.height = canvas.height;
           var tempCtx = tempCanvas.getContext('2d');
           var objects = canvas.getObjects();
-          // Ne pas dessiner le templateOverlay (le gabarit)
           objects.forEach(function(obj){
-            if (obj === templateOverlay) return;
+            if (obj === templateOverlay || obj.mueIsTemplate) return;
+            if (obj.mueIsBg) return;
             obj.render(tempCtx);
           });
 
-          // Restaurer le fond du patron
           canvas.backgroundColor = origBg;
           canvas.backgroundImage = origBgImg;
 
-          // Dessiner dans la couche preview (à ajuster les coordonnées plus tard)
-          previewCtx.drawImage(tempCanvas, 0, 0, containerW, containerH);
+          // Projeter le patron sur chaque vue de mug avec distorsion cylindrique
+          var patronW = tempCanvas.width;
+          var patronH = tempCanvas.height;
+
+          for (var v = 0; v < mugViews.length; v++) {
+            var view = mugViews[v];
+            var viewAngle = view.angle * Math.PI / 180;
+
+            // Coordonnées écran de la zone imprimable
+            var dx = Math.round(view.x * scaleX);
+            var dy = Math.round(view.y * scaleY);
+            var dw = Math.round(view.w * scaleX);
+            var dh = Math.round(view.h * scaleY);
+
+            // Projection cylindrique colonne par colonne
+            for (var col = 0; col < dw; col++) {
+              // Position normalisée sur l'écran [-1, 1]
+              var screenX = (col / (dw - 1)) * 2 - 1;
+
+              // Limiter pour éviter NaN (arcsin limite à [-1,1])
+              if (screenX < -0.98) screenX = -0.98;
+              if (screenX > 0.98) screenX = 0.98;
+
+              // Angle sur le cylindre
+              var theta = viewAngle + Math.asin(screenX);
+
+              // Position sur le patron (normalisée 0-1)
+              var patronU = (theta + HALF_COV) / TOTAL_COV;
+
+              // Hors du patron → pas de contenu
+              if (patronU < 0 || patronU > 1) continue;
+
+              // Colonne source dans le patron
+              var srcCol = Math.round(patronU * (patronW - 1));
+              if (srcCol < 0 || srcCol >= patronW) continue;
+
+              // Dessiner la colonne (1px de large) du patron vers le preview
+              previewCtx.drawImage(
+                tempCanvas,
+                srcCol, 0, 1, patronH,   // source : 1 colonne du patron
+                dx + col, dy, 1, dh      // destination : 1 colonne sur le mug
+              );
+            }
+          }
+
           updating = false;
         });
       }
 
       canvas.on('after:render', updatePreview);
-      // Update initial après chargement
       setTimeout(updatePreview, 500);
     })();
   }
