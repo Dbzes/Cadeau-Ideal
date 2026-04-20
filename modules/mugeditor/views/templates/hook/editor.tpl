@@ -47,9 +47,9 @@
   <div class="mue-layout">
   <div class="mue-canvas-wrap">
     {if isset($mue_render_base) && $mue_render_base}
-    <div id="mue-preview-container" style="position:relative;overflow:hidden;margin-bottom:16px;border:1px solid #ddd;background:#e8e8e8;">
+    <div id="mue-preview-container" style="position:relative;overflow:hidden;margin-bottom:16px;border:1px solid #ddd;background:#fff;">
       <img id="mue-preview-base" src="{$mue_render_base.url}" style="display:block;width:100%;height:auto;" alt="Aperçu mug" />
-      <canvas id="mue-preview-perso" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;"></canvas>
+      <canvas id="mue-preview-perso" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;opacity:1;"></canvas>
       {if isset($mue_render_lighting) && $mue_render_lighting}
       <img id="mue-preview-lighting" src="{$mue_render_lighting.url}" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;" alt="" />
       {/if}
@@ -533,9 +533,31 @@ function mueInit() {
           previewPerso.width = containerW;
           previewPerso.height = containerH;
           previewCtx.clearRect(0, 0, containerW, containerH);
-          // Dessiner le contenu du canvas Fabric dans la couche intermédiaire
-          // Pour l'instant on mappe tout le patron sur tout le preview (à ajuster plus tard)
-          previewCtx.drawImage(canvas.lowerCanvasEl, 0, 0, containerW, containerH);
+
+          // Exporter uniquement les objets (sans le fond du patron) sur fond transparent
+          var origBg = canvas.backgroundColor;
+          var origBgImg = canvas.backgroundImage;
+          canvas.backgroundColor = 'transparent';
+          canvas.backgroundImage = null;
+
+          // Créer un canvas temporaire pour capturer sans fond
+          var tempCanvas = document.createElement('canvas');
+          tempCanvas.width = canvas.width;
+          tempCanvas.height = canvas.height;
+          var tempCtx = tempCanvas.getContext('2d');
+          var objects = canvas.getObjects();
+          // Ne pas dessiner le templateOverlay (le gabarit)
+          objects.forEach(function(obj){
+            if (obj === templateOverlay) return;
+            obj.render(tempCtx);
+          });
+
+          // Restaurer le fond du patron
+          canvas.backgroundColor = origBg;
+          canvas.backgroundImage = origBgImg;
+
+          // Dessiner dans la couche preview (à ajuster les coordonnées plus tard)
+          previewCtx.drawImage(tempCanvas, 0, 0, containerW, containerH);
           updating = false;
         });
       }
