@@ -1181,6 +1181,18 @@ class Mugeditor extends Module
         $composeUrl = $this->context->link->getModuleLink('mugeditor', 'compose', [], true);
         $attachUrl = $this->context->link->getModuleLink('mugeditor', 'attachcustom', [], true);
 
+        $allDefaultFonts = array_merge($activeWebsafe, $activeTheme, $activeGoogle);
+        $firstFont = !empty($allDefaultFonts) ? $allDefaultFonts[0] : '';
+        $fontOptionsHtml = '';
+        foreach ($allDefaultFonts as $df) {
+            $esc = htmlspecialchars($df, ENT_QUOTES, 'UTF-8');
+            $fontOptionsHtml .= '<div class="mue-font-option" data-font="' . $esc . '" style="font-family:\'' . $esc . '\',sans-serif;">' . $esc . '</div>';
+        }
+        foreach ($activeCustom as $cf) {
+            $esc = htmlspecialchars($cf['family'], ENT_QUOTES, 'UTF-8');
+            $fontOptionsHtml .= '<div class="mue-font-option" data-font="' . $esc . '" style="font-family:\'' . $esc . '\',sans-serif;">' . $esc . '</div>';
+        }
+
         $this->context->smarty->assign([
             'mue_backgrounds' => $backgrounds,
             'mue_bg_url' => $bgUrl,
@@ -1189,7 +1201,9 @@ class Mugeditor extends Module
             'mue_uploadimage_url' => $this->context->link->getModuleLink('mugeditor', 'uploadimage', [], true),
             'mue_fonts' => $activeCustom,
             'mue_font_url' => $fontUrl,
-            'mue_default_fonts' => array_merge($activeWebsafe, $activeTheme, $activeGoogle),
+            'mue_default_fonts' => $allDefaultFonts,
+            'mue_first_font' => $firstFont,
+            'mue_font_options_html' => $fontOptionsHtml,
             'mue_google_url' => $googleFrontUrl,
             'mue_template' => $template,
             'mue_compose_url' => $composeUrl,

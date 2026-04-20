@@ -11,7 +11,7 @@
 .mue-font-option:last-child{border-bottom:none}
 </style>{/literal}
 {if isset($mue_google_url) && $mue_google_url}
-<link href="{$mue_google_url}" rel="stylesheet">
+<link href="{$mue_google_url nofilter}" rel="stylesheet">
 {/if}
 {if isset($mue_fonts) && $mue_fonts|count > 0}
 <style>
@@ -112,23 +112,14 @@
         <input type="text" class="mue-text-input" id="mue-text-input" placeholder="Votre texte ici..." />
         <div style="margin:12px 0 8px;">
           <label style="display:block;font-size:12px;font-weight:600;color:#666;margin-bottom:4px;">Police</label>
-          <input type="hidden" id="mue-text-font" value="{if isset($mue_default_fonts) && $mue_default_fonts|count > 0}{$mue_default_fonts[0]}{/if}" />
+          <input type="hidden" id="mue-text-font" value="{$mue_first_font nofilter}" />
           <div class="mue-font-dropdown" id="mue-font-dropdown">
-            <div class="mue-font-selected" id="mue-font-selected" style="font-family:'{if isset($mue_default_fonts) && $mue_default_fonts|count > 0}{$mue_default_fonts[0]}{/if}',sans-serif;">
-              {if isset($mue_default_fonts) && $mue_default_fonts|count > 0}{$mue_default_fonts[0]}{else}Police{/if}
+            <div class="mue-font-selected" id="mue-font-selected" style="font-family:'{$mue_first_font nofilter}',sans-serif;">
+              {if $mue_first_font}{$mue_first_font nofilter}{else}Police{/if}
               <span class="mue-font-arrow">▾</span>
             </div>
             <div class="mue-font-list" id="mue-font-list">
-              {if isset($mue_default_fonts)}
-                {foreach from=$mue_default_fonts item=df}
-                  <div class="mue-font-option" data-font="{$df}" style="font-family:'{$df}',sans-serif;">{$df}</div>
-                {/foreach}
-              {/if}
-              {if isset($mue_fonts) && $mue_fonts|count > 0}
-                {foreach from=$mue_fonts item=f}
-                  <div class="mue-font-option" data-font="{$f.family}" style="font-family:'{$f.family}',sans-serif;">{$f.family}</div>
-                {/foreach}
-              {/if}
+              {$mue_font_options_html nofilter}
             </div>
           </div>
         </div>
