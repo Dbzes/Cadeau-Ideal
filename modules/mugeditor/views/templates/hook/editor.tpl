@@ -66,49 +66,6 @@
     <div id="mue-cart-zone"></div>
 
     <div class="mue-item">
-      <button type="button" class="mue-head" data-target="mue-fonds">
-        <span>Fonds</span>
-        <span class="mue-arrow">+</span>
-      </button>
-      <div class="mue-body" id="mue-fonds">
-        <div class="mue-bg-controls" id="mue-bg-controls" style="display:none;margin-bottom:14px;">
-          <label class="mue-slider-label">Zoom du fond
-            <input type="range" id="mue-bg-zoom" min="100" max="300" value="100" />
-          </label>
-        </div>
-
-        <p class="mue-hint">Choisissez un fond pour votre mug :</p>
-        <div class="mue-grid">
-          <div class="mue-thumb mue-bg-thumb mue-thumb-solid" style="background:#ffffff;border:2px solid #ccc;" data-bg="#ffffff" title="Fond blanc"></div>
-          <div class="mue-thumb mue-bg-thumb mue-thumb-solid" style="background:#000000;border:2px solid #000;" data-bg="#000000" title="Fond noir"></div>
-          {if isset($mue_backgrounds) && $mue_backgrounds|count > 0}
-            {foreach from=$mue_backgrounds item=bg}
-              <div class="mue-thumb mue-thumb-img mue-bg-thumb" style="background-image:url('{$mue_bg_url}{$bg}');" data-bg="{$mue_bg_url}{$bg}"></div>
-            {/foreach}
-          {/if}
-        </div>
-
-        <div class="mue-divider"><span>OU</span></div>
-
-        <p class="mue-hint mue-subtitle">Importez votre propre fond :</p>
-        <div class="mue-customer-upload" data-upload-url="{$mue_upload_url}">
-          <div class="mue-cdz" id="mue-cdz" {if $mue_customer_bg}style="display:none;"{/if}>
-            <div class="mue-cdz-icon">⬆</div>
-            <div class="mue-cdz-title">Glissez votre image ici</div>
-            <div class="mue-cdz-sub">ou cliquez pour parcourir<br/>jpg, png, webp, heic — max 10 Mo</div>
-            <input type="file" id="mue-cfile" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif" />
-          </div>
-          <div class="mue-cbg-preview" id="mue-cbg-preview" {if !$mue_customer_bg}style="display:none;"{/if}>
-            <div class="mue-cbg-img mue-bg-thumb" id="mue-cbg-img" {if $mue_customer_bg}style="background-image:url('{$mue_customer_bg}');" data-bg="{$mue_customer_bg}"{/if}></div>
-            <button type="button" class="mue-cbg-delete" id="mue-cbg-delete">✕ Supprimer mon fond</button>
-          </div>
-          <div class="mue-cbg-loading" id="mue-cbg-loading" style="display:none;">Envoi en cours...</div>
-          <div class="mue-cbg-error" id="mue-cbg-error" style="display:none;"></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="mue-item">
       <button type="button" class="mue-head" data-target="mue-images">
         <span>Images</span>
         <span class="mue-arrow">+</span>
