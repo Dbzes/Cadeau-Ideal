@@ -234,10 +234,6 @@ class Mugeditor extends Module
         if (Tools::isSubmit('submitMugRenderUpload')) {
             $output .= $this->handleRenderUpload();
         }
-        // Debug temporaire
-        if (!empty($_FILES)) {
-            PrestaShopLogger::addLog('[MugEditor] FILES keys: ' . implode(',', array_keys($_FILES)) . ' | POST keys: ' . implode(',', array_keys($_POST)), 1);
-        }
         if (Tools::getValue('deleteRenderBase')) {
             $output .= $this->handleRenderDelete('base');
         }
@@ -1005,7 +1001,8 @@ class Mugeditor extends Module
             . '<br><strong>Ordre des calques :</strong> Image de base → Création du client → Image éclairages'
             . '</p>';
 
-        $html .= '<form method="post" enctype="multipart/form-data">';
+        $html .= '<form method="post" enctype="multipart/form-data" id="mue-render-form">';
+        $html .= '<input type="hidden" name="submitMugRenderUpload" value="1" />';
         $html .= '<div style="display:flex;gap:30px;flex-wrap:wrap;margin-bottom:20px;">';
 
         // ---- Image de base ----
@@ -1093,8 +1090,9 @@ class Mugeditor extends Module
                     Array.from(ev.dataTransfer.files).forEach(function(f){dt.items.add(f);});
                     inp.files=dt.files;
                     showFeedback();
+                    setTimeout(function(){dz.closest("form").submit();},300);
                 });
-                inp.addEventListener("change",function(){showFeedback();});
+                inp.addEventListener("change",function(){showFeedback();setTimeout(function(){dz.closest("form").submit();},300);});
                 inp.addEventListener("click",function(e){e.stopPropagation();});
                 dz.addEventListener("click",function(e){if(e.target!==inp)inp.click();});
             }
