@@ -97,7 +97,7 @@
 
     <div class="mue-item">
       <button type="button" class="mue-head" data-target="mue-images">
-        <span style="font-family:'Bebas Neue',sans-serif !important;font-size:20px;font-weight:400;letter-spacing:1px;">Images</span>
+        <span style="font-family:'Bebas Neue',sans-serif !important;font-size:20px;font-weight:400;letter-spacing:1px;">Importer des images</span>
         <span class="mue-arrow">+</span>
       </button>
       <div class="mue-body" id="mue-images">
@@ -113,7 +113,7 @@
 
     <div class="mue-item">
       <button type="button" class="mue-head" data-target="mue-texte">
-        <span style="font-family:'Bebas Neue',sans-serif !important;font-size:20px;font-weight:400;letter-spacing:1px;">Textes</span>
+        <span style="font-family:'Bebas Neue',sans-serif !important;font-size:20px;font-weight:400;letter-spacing:1px;">Inserer des textes</span>
         <span class="mue-arrow">+</span>
       </button>
       <div class="mue-body" id="mue-texte">
