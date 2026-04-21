@@ -9,6 +9,16 @@
 .mue-font-option{padding:8px 12px;cursor:pointer;font-size:15px;border-bottom:1px solid #f0f0f0}
 .mue-font-option:hover{background:#f0f7fc}
 .mue-font-option:last-child{border-bottom:none}
+.mue-layer-item{display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid #ddd;background:#fafafa;cursor:pointer}
+.mue-layer-item:hover{border-color:#004774}
+.mue-layer-item.mue-layer-active{border-color:#ee7a03;background:#fff7ee}
+.mue-layer-thumb{width:40px;height:40px;object-fit:cover;flex-shrink:0;border:1px solid #eee}
+.mue-layer-text-icon{width:40px;height:40px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:#eef3f8;color:#004774;font-weight:700;font-size:18px;border:1px solid #ddd}
+.mue-layer-name{flex:1;font-size:13px;color:#333;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.mue-layer-btn{width:24px;height:24px;border:1px solid #ddd;background:#fff;cursor:pointer;font-size:12px;color:#004774;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0}
+.mue-layer-btn:hover{border-color:#ee7a03;color:#ee7a03}
+.mue-layer-del{color:#e74c3c;border-color:#e74c3c}
+.mue-layer-del:hover{background:#e74c3c;color:#fff}
 </style>{/literal}
 {if isset($mue_google_url) && $mue_google_url}
 <link href="{$mue_google_url nofilter}" rel="stylesheet">
@@ -138,6 +148,7 @@
           </label>
         </div>
         <button type="button" class="mue-upload" id="mue-text-add">+ Ajouter le texte</button>
+        <div id="mue-text-list" style="display:flex;flex-direction:column;gap:6px;margin-top:10px;"></div>
       </div>
     </div>
 
@@ -549,6 +560,18 @@ function mueInit() {
     canvas.on('object:modified', saveState);
     canvas.on('mouse:up', saveState);
 
+    // Highlight calque actif
+    function highlightLayer(obj) {
+      document.querySelectorAll('.mue-layer-item').forEach(function(el){ el.classList.remove('mue-layer-active'); });
+      if (obj && obj.__mueId) {
+        var el = document.querySelector('.mue-layer-item[data-mue-id="' + obj.__mueId + '"]');
+        if (el) el.classList.add('mue-layer-active');
+      }
+    }
+    canvas.on('selection:created', function(e){ highlightLayer(e.selected && e.selected[0]); });
+    canvas.on('selection:updated', function(e){ highlightLayer(e.selected && e.selected[0]); });
+    canvas.on('selection:cleared', function(){ highlightLayer(null); });
+
     // --- Preview cylindrique temps réel ---
     (function(){
       var previewPerso = document.getElementById('mue-preview-perso');
@@ -896,21 +919,79 @@ function mueInit() {
     imgInput.value = '';
   });
 
-  function addImgThumb(fabricObj, thumbUrl, fileName) {
-    if (!imgList) return;
-    var wrap = document.createElement('div');
-    wrap.style.cssText = 'position:relative;width:70px;height:70px;border:1px solid #ddd;overflow:hidden;cursor:pointer;';
-    var thumb = document.createElement('img');
-    thumb.src = thumbUrl;
-    thumb.alt = fileName || 'image';
-    thumb.style.cssText = 'width:100%;height:100%;object-fit:cover;';
-    // Clic sur la vignette = sélectionner l'objet sur le canvas
-    wrap.addEventListener('click', function(e){
+  var __mueIdCounter = 0;
+  function createLayerItem(fabricObj, opts) {
+    if (!fabricObj.__mueId) { fabricObj.__mueId = ++__mueIdCounter; }
+    var item = document.createElement('div');
+    item.className = 'mue-layer-item';
+    item.dataset.mueId = fabricObj.__mueId;
+    // Vignette ou icône
+    if (opts.thumbUrl) {
+      var thumb = document.createElement('img');
+      thumb.src = opts.thumbUrl;
+      thumb.alt = opts.name || 'image';
+      thumb.className = 'mue-layer-thumb';
+      item.appendChild(thumb);
+    } else {
+      var icon = document.createElement('div');
+      icon.className = 'mue-layer-text-icon';
+      icon.textContent = 'T';
+      item.appendChild(icon);
+    }
+    // Nom
+    var name = document.createElement('span');
+    name.className = 'mue-layer-name';
+    name.textContent = opts.name || '';
+    item.appendChild(name);
+    // Flèche haut
+    var up = document.createElement('button');
+    up.type = 'button'; up.className = 'mue-layer-btn'; up.textContent = '▲'; up.title = 'Avancer';
+    up.addEventListener('click', function(e){ e.stopPropagation(); canvas.bringForward(fabricObj); bringTemplateToFront(); canvas.renderAll(); saveState(); });
+    item.appendChild(up);
+    // Flèche bas
+    var down = document.createElement('button');
+    down.type = 'button'; down.className = 'mue-layer-btn'; down.textContent = '▼'; down.title = 'Reculer';
+    down.addEventListener('click', function(e){ e.stopPropagation(); canvas.sendBackwards(fabricObj); bringTemplateToFront(); canvas.renderAll(); saveState(); });
+    item.appendChild(down);
+    // Supprimer
+    var del = document.createElement('button');
+    del.type = 'button'; del.className = 'mue-layer-btn mue-layer-del'; del.textContent = '✕'; del.title = 'Supprimer';
+    del.addEventListener('click', function(e){
+      e.stopPropagation();
+      canvas.remove(fabricObj);
+      item.parentNode.removeChild(item);
+      if (opts.onDelete) opts.onDelete();
+      canvas.discardActiveObject();
+      canvas.renderAll();
+      saveState();
+    });
+    item.appendChild(del);
+    // Clic sur l'item = sélectionner sur le canvas
+    item.addEventListener('click', function(){
       canvas.setActiveObject(fabricObj);
       canvas.renderAll();
     });
-    wrap.appendChild(thumb);
-    imgList.appendChild(wrap);
+    return item;
+  }
+
+  function addImgThumb(fabricObj, thumbUrl, fileName) {
+    if (!imgList) return;
+    var item = createLayerItem(fabricObj, {
+      thumbUrl: thumbUrl,
+      name: fileName || 'image',
+      onDelete: function(){ imageCount = Math.max(0, imageCount - 1); updateImgCounter(); }
+    });
+    imgList.appendChild(item);
+  }
+
+  var textList = document.getElementById('mue-text-list');
+  function addTextThumb(fabricObj, text) {
+    if (!textList) return;
+    var item = createLayerItem(fabricObj, {
+      name: text,
+      onDelete: function(){}
+    });
+    textList.appendChild(item);
   }
 
   function updateImgCounter() {
@@ -953,6 +1034,7 @@ function mueInit() {
     canvas.setActiveObject(t);
     bringTemplateToFront();
     canvas.renderAll();
+    addTextThumb(t, txt);
     input.value = '';
     scrollToCanvas();
   });
@@ -967,6 +1049,12 @@ function mueInit() {
     canvas.discardActiveObject();
     canvas.renderAll();
     if (wasImage) { imageCount = Math.max(0, imageCount - 1); updateImgCounter(); }
+    // Retirer de la liste de calques
+    if (obj.__mueId) {
+      var el = document.querySelector('.mue-layer-item[data-mue-id="' + obj.__mueId + '"]');
+      if (el) el.parentNode.removeChild(el);
+    }
+    saveState();
   });
 
   // Reset
@@ -990,6 +1078,8 @@ function mueInit() {
     imageCount = 0;
     try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
     updateImgCounter();
+    if (imgList) imgList.innerHTML = '';
+    if (textList) textList.innerHTML = '';
     document.getElementById('mue-bg-controls').style.display = 'none';
     document.querySelectorAll('.mue-bg-thumb').forEach(function(x){ x.classList.remove('mue-active'); });
     loadTemplateOverlay();
