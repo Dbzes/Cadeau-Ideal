@@ -293,7 +293,8 @@ function mueInit() {
             src: o.getSrc ? o.getSrc() : o._element.src,
             leftR: o.left / W, topR: o.top / H,
             scaleXR: o.scaleX / W, scaleYR: o.scaleY / W,
-            angle: o.angle || 0
+            angle: o.angle || 0,
+            fileName: o.__mueFileName || 'image'
           });
         } else if (o.type === 'i-text' || o.type === 'text' || o.type === 'textbox') {
           texts.push({
@@ -344,8 +345,10 @@ function mueInit() {
             scaleX: iScaleX, scaleY: iScaleY, angle: d.angle,
             cornerColor: '#ee7a03', borderColor: '#ee7a03', cornerSize: 10, transparentCorners: false
           });
+          img.__mueFileName = d.fileName || 'image';
           canvas.add(img);
           imageCount++;
+          if (typeof addImgThumb === 'function') addImgThumb(img, d.src, d.fileName || 'image');
           nextImg();
         });
       }
@@ -365,6 +368,7 @@ function mueInit() {
             cornerColor: '#ee7a03', borderColor: '#ee7a03', cornerSize: 10, transparentCorners: false
           });
           canvas.add(t);
+          if (typeof addTextThumb === 'function') addTextThumb(t, d.text);
         });
         if (typeof updateImgCounter === 'function') updateImgCounter();
         bringTemplateToFront();
@@ -903,6 +907,7 @@ function mueInit() {
           scaleX: scale, scaleY: scale,
           cornerColor: '#ee7a03', borderColor: '#ee7a03', cornerSize: 10, transparentCorners: false
         });
+        img.__mueFileName = file.name;
         canvas.add(img);
         canvas.setActiveObject(img);
         bringTemplateToFront();
