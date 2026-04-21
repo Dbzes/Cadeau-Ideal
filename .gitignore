@@ -13,6 +13,10 @@ img/
 upload/
 download/
 
+# Uploads modules (images uploadées en BO)
+modules/mugeditor/uploads/render/
+modules/mousepadeditor/uploads/
+
 # Dossier admin généré (renommé à l'install) — root uniquement
 /admin*/
 

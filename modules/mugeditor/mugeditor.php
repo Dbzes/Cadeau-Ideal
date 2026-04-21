@@ -234,11 +234,16 @@ class Mugeditor extends Module
         if (Tools::isSubmit('submitMugRenderUpload')) {
             $output .= $this->handleRenderUpload();
         }
-        if (Tools::getValue('deleteRenderBase')) {
+        if (Tools::getValue('deleteRenderBase') && !Tools::isSubmit('submitMugRenderUpload')) {
             $output .= $this->handleRenderDelete('base');
+            // Redirect pour nettoyer l'URL et éviter re-delete au prochain POST
+            $clean = AdminController::$currentIndex . '&configure=' . $this->name . '&token=' . Tools::getAdminTokenLite('AdminModules') . '&conf=1';
+            Tools::redirectAdmin($clean);
         }
-        if (Tools::getValue('deleteRenderLighting')) {
+        if (Tools::getValue('deleteRenderLighting') && !Tools::isSubmit('submitMugRenderUpload')) {
             $output .= $this->handleRenderDelete('lighting');
+            $clean = AdminController::$currentIndex . '&configure=' . $this->name . '&token=' . Tools::getAdminTokenLite('AdminModules') . '&conf=1';
+            Tools::redirectAdmin($clean);
         }
 
         return $output . $this->renderForm() . $this->renderMugRenderManager() . $this->renderTemplateManager() . $this->renderFontsManager();
