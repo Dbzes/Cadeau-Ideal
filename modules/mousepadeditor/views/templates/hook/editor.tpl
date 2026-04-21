@@ -9,6 +9,15 @@
 .mpe-font-option{padding:8px 12px;cursor:pointer;font-size:15px;border-bottom:1px solid #f0f0f0}
 .mpe-font-option:hover{background:#f0f7fc}
 .mpe-font-option:last-child{border-bottom:none}
+.mpe-layer-item{display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid #ddd;background:#fafafa;cursor:pointer;width:100%}
+.mpe-layer-item:hover{border-color:#004774}
+.mpe-layer-item.mpe-layer-active{border-color:#ee7a03;background:#fff7ee}
+.mpe-layer-thumb{width:40px;height:40px;object-fit:cover;flex-shrink:0;border:1px solid #eee}
+.mpe-layer-name{flex:1;font-size:13px;color:#333;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;min-width:0}
+.mpe-layer-btn{width:24px;height:24px;border:1px solid #ddd;background:#fff;cursor:pointer;font-size:12px;color:#004774;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0}
+.mpe-layer-btn:hover{border-color:#ee7a03;color:#ee7a03}
+.mpe-layer-del{color:#e74c3c;border-color:#e74c3c}
+.mpe-layer-del:hover{background:#e74c3c;color:#fff}
 </style>{/literal}
 {if isset($mpe_google_url) && $mpe_google_url}
 <link href="{$mpe_google_url nofilter}" rel="stylesheet">
@@ -132,6 +141,7 @@
           <span>+ Ajouter une image</span>
         </label>
         <p class="mpe-hint" id="mpe-img-counter">0 / 3 images</p>
+        <div id="mpe-img-list" style="display:flex;flex-direction:column;gap:6px;margin-top:10px;"></div>
       </div>
     </div>
 
@@ -171,6 +181,7 @@
           </label>
         </div>
         <button type="button" class="mpe-upload" id="mpe-text-add">+ Ajouter le texte</button>
+        <div id="mpe-text-list" style="display:flex;flex-direction:column;gap:6px;margin-top:10px;"></div>
       </div>
     </div>
 
@@ -318,7 +329,8 @@ function mpeInit() {
             src: o.getSrc ? o.getSrc() : o._element.src,
             leftR: o.left / W, topR: o.top / H,
             scaleXR: o.scaleX / W, scaleYR: o.scaleY / W,
-            angle: o.angle || 0
+            angle: o.angle || 0,
+            fileName: o.__mpeFileName || 'image'
           });
         } else if (o.type === 'i-text' || o.type === 'text' || o.type === 'textbox') {
           texts.push({
@@ -369,8 +381,10 @@ function mpeInit() {
             scaleX: iScaleX, scaleY: iScaleY, angle: d.angle,
             cornerColor: '#ee7a03', borderColor: '#ee7a03', cornerSize: 10, transparentCorners: false
           });
+          img.__mpeFileName = d.fileName || 'image';
           canvas.add(img);
           imageCount++;
+          if (typeof addImgThumb === 'function') addImgThumb(img, d.src, d.fileName || 'image');
           nextImg();
         });
       }
@@ -390,6 +404,7 @@ function mpeInit() {
             cornerColor: '#ee7a03', borderColor: '#ee7a03', cornerSize: 10, transparentCorners: false
           });
           canvas.add(t);
+          if (typeof addTextThumb === 'function') addTextThumb(t, d.text);
         });
         if (typeof updateImgCounter === 'function') updateImgCounter();
         bringTemplateToFront();
@@ -539,6 +554,18 @@ function mpeInit() {
       if (obj.top > maxTop) obj.top = maxTop;
       if (obj.top < minTop) obj.top = minTop;
     });
+
+    // Highlight calque actif
+    function highlightLayer(obj) {
+      document.querySelectorAll('.mpe-layer-item').forEach(function(el){ el.classList.remove('mpe-layer-active'); });
+      if (obj && obj.__mpeId) {
+        var el = document.querySelector('.mpe-layer-item[data-mpe-id="' + obj.__mpeId + '"]');
+        if (el) el.classList.add('mpe-layer-active');
+      }
+    }
+    canvas.on('selection:created', function(e){ highlightLayer(e.selected && e.selected[0]); });
+    canvas.on('selection:updated', function(e){ highlightLayer(e.selected && e.selected[0]); });
+    canvas.on('selection:cleared', function(){ highlightLayer(null); });
 
     // Persistance localStorage
     canvas.on('object:added', saveState);
@@ -711,21 +738,87 @@ function mpeInit() {
   var imgInput = document.getElementById('mpe-img-input');
   var imgCounter = document.getElementById('mpe-img-counter');
   var imgUploadLabel = document.getElementById('mpe-img-upload-label');
+  var imgList = document.getElementById('mpe-img-list');
+
+  var __mpeIdCounter = 0;
+  function createLayerItem(fabricObj, opts) {
+    if (!fabricObj.__mpeId) { fabricObj.__mpeId = ++__mpeIdCounter; }
+    var item = document.createElement('div');
+    item.className = 'mpe-layer-item';
+    item.dataset.mpeId = fabricObj.__mpeId;
+    if (opts.thumbUrl) {
+      var thumb = document.createElement('img');
+      thumb.src = opts.thumbUrl;
+      thumb.alt = opts.name || 'image';
+      thumb.className = 'mpe-layer-thumb';
+      item.appendChild(thumb);
+    }
+    var name = document.createElement('span');
+    name.className = 'mpe-layer-name';
+    name.textContent = opts.name || '';
+    item.appendChild(name);
+    var up = document.createElement('button');
+    up.type = 'button'; up.className = 'mpe-layer-btn'; up.textContent = '▲'; up.title = 'Avancer';
+    up.addEventListener('click', function(e){ e.stopPropagation(); canvas.bringForward(fabricObj); bringTemplateToFront(); canvas.renderAll(); saveState(); });
+    item.appendChild(up);
+    var down = document.createElement('button');
+    down.type = 'button'; down.className = 'mpe-layer-btn'; down.textContent = '▼'; down.title = 'Reculer';
+    down.addEventListener('click', function(e){ e.stopPropagation(); canvas.sendBackwards(fabricObj); bringTemplateToFront(); canvas.renderAll(); saveState(); });
+    item.appendChild(down);
+    var del = document.createElement('button');
+    del.type = 'button'; del.className = 'mpe-layer-btn mpe-layer-del'; del.textContent = '✕'; del.title = 'Supprimer';
+    del.addEventListener('click', function(e){
+      e.stopPropagation();
+      canvas.remove(fabricObj);
+      item.parentNode.removeChild(item);
+      if (opts.onDelete) opts.onDelete();
+      canvas.discardActiveObject();
+      canvas.renderAll();
+      saveState();
+    });
+    item.appendChild(del);
+    item.addEventListener('click', function(){
+      canvas.setActiveObject(fabricObj);
+      canvas.renderAll();
+    });
+    return item;
+  }
+
+  function addImgThumb(fabricObj, thumbUrl, fileName) {
+    if (!imgList) return;
+    var item = createLayerItem(fabricObj, {
+      thumbUrl: thumbUrl,
+      name: fileName || 'image',
+      onDelete: function(){ imageCount = Math.max(0, imageCount - 1); updateImgCounter(); }
+    });
+    imgList.appendChild(item);
+  }
+
+  var textList = document.getElementById('mpe-text-list');
+  function addTextThumb(fabricObj, text) {
+    if (!textList) return;
+    var item = createLayerItem(fabricObj, {
+      name: text,
+      onDelete: function(){}
+    });
+    textList.appendChild(item);
+  }
 
   imgInput.addEventListener('change', function(e){
     if (!fabricReady || !canvas) { alert('Éditeur non chargé.'); return; }
     if (imageCount >= MAX_IMAGES) { alert('Maximum 3 images.'); return; }
     var file = e.target.files[0];
     if (!file) return;
-    // Upload silencieux côté serveur (fire & forget) pour visualisation BO
     try {
       var ufd = new FormData();
       ufd.append('file', file);
       fetch(window.MPE_UPLOADIMAGE_URL, { method: 'POST', body: ufd, credentials: 'same-origin' });
     } catch(e) {}
+    var dataUrl = null;
     var reader = new FileReader();
     reader.onload = function(ev) {
-      fabric.Image.fromURL(ev.target.result, function(img){
+      dataUrl = ev.target.result;
+      fabric.Image.fromURL(dataUrl, function(img){
         var maxDim = W / 3;
         var scale = Math.min(maxDim / img.width, maxDim / img.height);
         img.set({
@@ -734,12 +827,14 @@ function mpeInit() {
           scaleX: scale, scaleY: scale,
           cornerColor: '#ee7a03', borderColor: '#ee7a03', cornerSize: 10, transparentCorners: false
         });
+        img.__mpeFileName = file.name;
         canvas.add(img);
         canvas.setActiveObject(img);
         bringTemplateToFront();
         canvas.renderAll();
         imageCount++;
         updateImgCounter();
+        addImgThumb(img, dataUrl, file.name);
         scrollToCanvas();
       });
     };
@@ -787,6 +882,7 @@ function mpeInit() {
     canvas.setActiveObject(t);
     bringTemplateToFront();
     canvas.renderAll();
+    addTextThumb(t, txt);
     input.value = '';
     scrollToCanvas();
   });
@@ -801,6 +897,11 @@ function mpeInit() {
     canvas.discardActiveObject();
     canvas.renderAll();
     if (wasImage) { imageCount = Math.max(0, imageCount - 1); updateImgCounter(); }
+    if (obj.__mpeId) {
+      var el = document.querySelector('.mpe-layer-item[data-mpe-id="' + obj.__mpeId + '"]');
+      if (el) el.parentNode.removeChild(el);
+    }
+    saveState();
   });
 
   // Reset
@@ -824,6 +925,8 @@ function mpeInit() {
     imageCount = 0;
     try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
     updateImgCounter();
+    if (imgList) imgList.innerHTML = '';
+    if (textList) textList.innerHTML = '';
     document.getElementById('mpe-bg-controls').style.display = 'none';
     document.querySelectorAll('.mpe-bg-thumb').forEach(function(x){ x.classList.remove('mpe-active'); });
     loadTemplateOverlay();
