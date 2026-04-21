@@ -420,11 +420,18 @@
   .mue-title {
     text-align: center;
   }
-  .mue-accordion {
-    max-width: 100% !important;
-    width: 100vw;
-    margin-left: calc(-50vw + 50%);
+  .mug-editor {
+    padding: 10px 0 !important;
+    margin-left: -15px;
+    margin-right: -15px;
+    width: auto;
+    max-width: none;
+  }
+  .mue-layout {
     padding: 0 10px;
-    box-sizing: border-box;
+  }
+  .mue-layout > .mue-accordion {
+    max-width: 100% !important;
+    width: 100%;
   }
 }
