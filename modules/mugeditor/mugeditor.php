@@ -234,6 +234,10 @@ class Mugeditor extends Module
         if (Tools::isSubmit('submitMugRenderUpload')) {
             $output .= $this->handleRenderUpload();
         }
+        // Debug temporaire
+        if (!empty($_FILES)) {
+            PrestaShopLogger::addLog('[MugEditor] FILES keys: ' . implode(',', array_keys($_FILES)) . ' | POST keys: ' . implode(',', array_keys($_POST)), 1);
+        }
         if (Tools::getValue('deleteRenderBase')) {
             $output .= $this->handleRenderDelete('base');
         }
