@@ -88,7 +88,7 @@
 
     <div class="mpe-item">
       <button type="button" class="mpe-head" data-target="mpe-fonds">
-        <span style="font-family:'Bebas Neue',sans-serif !important;font-size:20px;font-weight:400;letter-spacing:1px;">Fonds</span>
+        <span style="font-family:'Bebas Neue',sans-serif !important;font-size:20px;font-weight:400;letter-spacing:1px;">Ajouter un fond</span>
         <span class="mpe-arrow">+</span>
       </button>
       <div class="mpe-body" id="mpe-fonds">
@@ -131,7 +131,7 @@
 
     <div class="mpe-item">
       <button type="button" class="mpe-head" data-target="mpe-images">
-        <span style="font-family:'Bebas Neue',sans-serif !important;font-size:20px;font-weight:400;letter-spacing:1px;">Images</span>
+        <span style="font-family:'Bebas Neue',sans-serif !important;font-size:20px;font-weight:400;letter-spacing:1px;">Importer des images</span>
         <span class="mpe-arrow">+</span>
       </button>
       <div class="mpe-body" id="mpe-images">
@@ -147,7 +147,7 @@
 
     <div class="mpe-item">
       <button type="button" class="mpe-head" data-target="mpe-texte">
-        <span style="font-family:'Bebas Neue',sans-serif !important;font-size:20px;font-weight:400;letter-spacing:1px;">Textes</span>
+        <span style="font-family:'Bebas Neue',sans-serif !important;font-size:20px;font-weight:400;letter-spacing:1px;">Insérer des textes</span>
         <span class="mpe-arrow">+</span>
       </button>
       <div class="mpe-body" id="mpe-texte">
