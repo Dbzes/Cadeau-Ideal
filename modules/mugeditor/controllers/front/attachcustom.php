@@ -12,7 +12,8 @@ class MugeditorAttachcustomModuleFrontController extends ModuleFrontController
         try {
             $pid = (int) Tools::getValue('id_product');
             $stateJson = Tools::getValue('state_json');
-            $lowres = Tools::getValue('lowres');
+            $lowres = Tools::getValue('lowres'); // Mug gauche (miniature panier)
+            $lowresPreview = Tools::getValue('lowres_preview'); // Bande 3 vues (aperçu)
 
             if (!$pid || !$stateJson) {
                 throw new Exception('Paramètres manquants');
@@ -23,15 +24,34 @@ class MugeditorAttachcustomModuleFrontController extends ModuleFrontController
             $hash = md5($stateJson . microtime(true)) . '_' . substr(md5(uniqid('', true)), 0, 6);
             $dest = _PS_UPLOAD_DIR_ . $hash;
 
+            // Miniature panier = mug gauche (small)
             if ($lowres && strpos($lowres, 'data:') === 0) {
                 $parts = explode(',', $lowres, 2);
                 if (count($parts) === 2) {
                     $binary = base64_decode($parts[1]);
                     if ($binary !== false) {
-                        file_put_contents($dest, $binary);
                         file_put_contents($dest . '_small', $binary);
                     }
                 }
+            }
+
+            // Aperçu complet = bande 3 vues (fichier principal pour le lien "aperçu")
+            if ($lowresPreview && strpos($lowresPreview, 'data:') === 0) {
+                $parts = explode(',', $lowresPreview, 2);
+                if (count($parts) === 2) {
+                    $binary = base64_decode($parts[1]);
+                    if ($binary !== false) {
+                        file_put_contents($dest, $binary);
+                    }
+                }
+            }
+
+            // Fallback si l'un manque
+            if (!file_exists($dest) && file_exists($dest . '_small')) {
+                copy($dest . '_small', $dest);
+            }
+            if (!file_exists($dest . '_small') && file_exists($dest)) {
+                copy($dest, $dest . '_small');
             }
 
             if (!file_exists($dest)) {

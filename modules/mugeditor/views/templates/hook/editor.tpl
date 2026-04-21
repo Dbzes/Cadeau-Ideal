@@ -1192,13 +1192,46 @@ function mueInit() {
       e.stopImmediatePropagation();
 
       showLoader();
-      var lowres = '';
-      try { lowres = canvas.toDataURL('image/jpeg', 0.85); } catch(ex) {}
+
+      // Capturer la bande 3 vues (aperçu complet) depuis le preview container
+      var previewFull = '';
+      var previewThumb = '';
+      try {
+        var pc = document.getElementById('mue-preview-container');
+        if (pc) {
+          var pcW = pc.offsetWidth;
+          var pcH = pc.offsetHeight;
+          var tc = document.createElement('canvas');
+          tc.width = pcW; tc.height = pcH;
+          var tctx = tc.getContext('2d');
+          // Base image
+          var baseEl = document.getElementById('mue-preview-base');
+          if (baseEl) tctx.drawImage(baseEl, 0, 0, pcW, pcH);
+          // Preview canvas (cylindrical projection)
+          var pvCanvas = document.getElementById('mue-preview-perso');
+          if (pvCanvas) tctx.drawImage(pvCanvas, 0, 0, pcW, pcH);
+          // Lighting overlay
+          var lightEl = document.getElementById('mue-preview-lighting');
+          if (lightEl) tctx.drawImage(lightEl, 0, 0, pcW, pcH);
+          // Bande complete = aperçu
+          previewFull = tc.toDataURL('image/jpeg', 0.85);
+          // Mug gauche = crop pour miniature panier (1er tiers environ)
+          var cropW = Math.round(pcW * 0.36);
+          var tc2 = document.createElement('canvas');
+          tc2.width = cropW; tc2.height = pcH;
+          tc2.getContext('2d').drawImage(tc, 0, 0, cropW, pcH, 0, 0, cropW, pcH);
+          previewThumb = tc2.toDataURL('image/jpeg', 0.85);
+        }
+      } catch(ex) {}
+      // Fallback : patron brut si preview échoue
+      if (!previewThumb) { try { previewThumb = canvas.toDataURL('image/jpeg', 0.85); } catch(ex) {} }
+      if (!previewFull) previewFull = previewThumb;
 
       var fd = new FormData();
       fd.append('id_product', window.MUE_PRODUCT_ID);
       fd.append('state_json', JSON.stringify(state));
-      fd.append('lowres', lowres);
+      fd.append('lowres', previewThumb);
+      fd.append('lowres_preview', previewFull);
       fetch(window.MUE_ATTACH_URL, { method:'POST', body: fd, credentials:'same-origin' })
         .then(function(r){ return r.json(); })
         .then(function(d){
