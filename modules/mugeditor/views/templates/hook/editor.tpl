@@ -1266,37 +1266,54 @@ function mueInit() {
   var cartZone = document.getElementById('mue-cart-zone');
   if (!addToCart || !cartZone) return;
 
+  // Bouton Personnaliser centré à la place originale
+  var btnWrap = document.createElement('div');
+  btnWrap.style.cssText = 'text-align:center;margin-top:10px;';
   var customBtn = document.createElement('a');
   customBtn.href = '#mue-cart-zone';
   customBtn.textContent = 'JE PERSONNALISE MON PRODUIT';
-  customBtn.style.cssText = 'display:inline-block;background-color:#ee7a03;color:#fff;padding:10px 20px;font-weight:700;font-size:14px;text-decoration:none;text-align:center;cursor:pointer;margin-top:10px;';
+  customBtn.style.cssText = 'display:inline-block;background-color:#ee7a03;color:#fff;padding:10px 20px;font-weight:700;font-size:14px;text-decoration:none;text-align:center;cursor:pointer;';
   customBtn.addEventListener('click', function(e){
     e.preventDefault();
     var target = document.getElementById('mue-cart-zone');
     if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
   });
-  addToCart.parentNode.insertBefore(customBtn, addToCart);
+  btnWrap.appendChild(customBtn);
+  addToCart.parentNode.insertBefore(btnWrap, addToCart);
 
-  cartZone.appendChild(addToCart);
-  addToCart.style.display = '';
-  addToCart.style.marginBottom = '15px';
+  // Cacher le vrai bloc (reste dans le form pour que le submit fonctionne)
+  addToCart.style.cssText = 'position:absolute !important;left:-9999px !important;opacity:0 !important;height:0 !important;overflow:hidden !important;';
 
-  // Masquer le label "Quantité", garder l'input qty sans les boutons +/-
-  var qtyLabel = addToCart.querySelector('.control-label');
-  if (qtyLabel) qtyLabel.style.display = 'none';
-  var qtyInput = addToCart.querySelector('#quantity_wanted');
-  if (qtyInput) {
-    qtyInput.setAttribute('type', 'number');
-    qtyInput.style.cssText = 'width:60px;text-align:center;border:1px solid #ddd;padding:8px;font-size:14px;-moz-appearance:textfield;';
+  // Refs originales
+  var origInput = addToCart.querySelector('#quantity_wanted');
+  var origBtn = addToCart.querySelector('[data-button-action="add-to-cart"]');
+
+  // Créer le bloc miroir centré dans la zone éditeur
+  var mirrorBlock = document.createElement('div');
+  mirrorBlock.style.cssText = 'text-align:center;margin-bottom:15px;';
+  mirrorBlock.innerHTML = '<div style="display:inline-flex;align-items:center;gap:10px;margin-bottom:10px;">'
+    + '<input type="number" id="mue-qty-mirror" value="' + (origInput ? origInput.value : '1') + '" min="' + (origInput ? origInput.min : '1') + '" style="width:50px;height:42px;text-align:center;border:1px solid #ccc;font-size:16px;-moz-appearance:textfield;" />'
+    + '<button type="button" id="mue-add-mirror" class="btn btn-primary add-to-cart" style="background-color:#ee7a03 !important;border-color:#ee7a03 !important;cursor:pointer;">'
+    + '<i class="material-icons shopping-cart">&#xE547;</i> Ajouter au panier</button>'
+    + '</div>'
+    + '<p style="text-align:center;font-size:13px;color:#666;margin:0;">Cliquez sur "Ajouter au panier" une fois votre personnalisation terminée.</p>';
+  cartZone.appendChild(mirrorBlock);
+
+  // Masquer les spinners du miroir
+  var spinStyle = document.createElement('style');
+  spinStyle.textContent = '#mue-qty-mirror::-webkit-outer-spin-button,#mue-qty-mirror::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}#mue-qty-mirror{-moz-appearance:textfield;}';
+  document.head.appendChild(spinStyle);
+
+  // Sync et déclenchement du vrai bouton
+  var mirrorQty = document.getElementById('mue-qty-mirror');
+  var mirrorBtn = document.getElementById('mue-add-mirror');
+  if (mirrorQty && origInput) {
+    mirrorQty.addEventListener('input', function(){ origInput.value = mirrorQty.value; });
+    mirrorQty.addEventListener('change', function(){ origInput.value = mirrorQty.value; });
   }
-  // Masquer les boutons +/- natifs Bootstrap/PS (TouchSpin)
-  var touchSpinBtns = addToCart.querySelectorAll('.bootstrap-touchspin-up, .bootstrap-touchspin-down, .input-group-btn-vertical, .btn-touchspin');
-  touchSpinBtns.forEach(function(b){ b.style.display = 'none'; });
-  // Ré-essai après init TouchSpin (PS l'initialise en différé)
-  setTimeout(function(){
-    addToCart.querySelectorAll('.input-group-btn-vertical, .bootstrap-touchspin-up, .bootstrap-touchspin-down, .btn-touchspin')
-      .forEach(function(b){ b.style.display = 'none'; });
-  }, 1000);
+  if (mirrorBtn && origBtn) {
+    mirrorBtn.addEventListener('click', function(){ origBtn.click(); });
+  }
 })();
 {/literal}
 </script>
