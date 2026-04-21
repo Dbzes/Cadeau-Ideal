@@ -987,7 +987,15 @@ class Mugeditor extends Module
         $adminUrl = AdminController::$currentIndex . '&configure=' . $this->name . '&token=' . Tools::getAdminTokenLite('AdminModules');
         $checkerBg = 'data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2220%22 height=%2220%22><rect width=%2210%22 height=%2210%22 fill=%22%23ddd%22/><rect x=%2210%22 y=%2210%22 width=%2210%22 height=%2210%22 fill=%22%23ddd%22/></svg>';
 
-        $html = '<div class="panel"><h3><i class="icon-image"></i> ' . $this->l('Rendu du mug (aperçu)') . '</h3>';
+        $html = '<style>
+            .mue-dropzone{border:3px dashed #ccd5e0;border-radius:8px;padding:40px 20px;text-align:center;background:#fafbfc;cursor:pointer;transition:all .2s;}
+            .mue-dropzone:hover,.mue-dropzone.mue-drag{border-color:#ee7a03;background:#fff7ee;}
+            .mue-dropzone-icon{font-size:54px;color:#004774;line-height:1;margin-bottom:12px;}
+            .mue-dropzone-title{font-size:18px;font-weight:600;color:#004774;margin-bottom:6px;}
+            .mue-dropzone-sub{font-size:13px;color:#888;}
+            .mue-dropzone input[type=file]{display:none;}
+        </style>';
+        $html .= '<div class="panel"><h3><i class="icon-image"></i> ' . $this->l('Rendu du mug (aperçu)') . '</h3>';
         $html .= '<p style="color:#555;margin-bottom:20px;">'
             . $this->l('Uploadez les 2 images pour le rendu visuel du mug. L\'image de base sert de fond, l\'image éclairages se superpose pour les effets de lumière.')
             . '<br><strong>Ordre des calques :</strong> Image de base → Création du client → Image éclairages'
