@@ -9,12 +9,11 @@
 .mue-font-option{padding:8px 12px;cursor:pointer;font-size:15px;border-bottom:1px solid #f0f0f0}
 .mue-font-option:hover{background:#f0f7fc}
 .mue-font-option:last-child{border-bottom:none}
-.mue-layer-item{display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid #ddd;background:#fafafa;cursor:pointer}
+.mue-layer-item{display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid #ddd;background:#fafafa;cursor:pointer;width:100%}
 .mue-layer-item:hover{border-color:#004774}
 .mue-layer-item.mue-layer-active{border-color:#ee7a03;background:#fff7ee}
 .mue-layer-thumb{width:40px;height:40px;object-fit:cover;flex-shrink:0;border:1px solid #eee}
-.mue-layer-text-icon{width:40px;height:40px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:#eef3f8;color:#004774;font-weight:700;font-size:18px;border:1px solid #ddd}
-.mue-layer-name{flex:1;font-size:13px;color:#333;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.mue-layer-name{flex:1;font-size:13px;color:#333;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;min-width:0}
 .mue-layer-btn{width:24px;height:24px;border:1px solid #ddd;background:#fff;cursor:pointer;font-size:12px;color:#004774;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0}
 .mue-layer-btn:hover{border-color:#ee7a03;color:#ee7a03}
 .mue-layer-del{color:#e74c3c;border-color:#e74c3c}
@@ -108,7 +107,7 @@
           <span>+ Ajouter une image</span>
         </label>
         <p class="mue-hint" id="mue-img-counter">0 / 50 images</p>
-        <div id="mue-img-list" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;"></div>
+        <div id="mue-img-list" style="display:flex;flex-direction:column;gap:6px;margin-top:10px;"></div>
       </div>
     </div>
 
@@ -945,18 +944,13 @@ function mueInit() {
     var item = document.createElement('div');
     item.className = 'mue-layer-item';
     item.dataset.mueId = fabricObj.__mueId;
-    // Vignette ou icône
+    // Vignette (images uniquement)
     if (opts.thumbUrl) {
       var thumb = document.createElement('img');
       thumb.src = opts.thumbUrl;
       thumb.alt = opts.name || 'image';
       thumb.className = 'mue-layer-thumb';
       item.appendChild(thumb);
-    } else {
-      var icon = document.createElement('div');
-      icon.className = 'mue-layer-text-icon';
-      icon.textContent = 'T';
-      item.appendChild(icon);
     }
     // Nom
     var name = document.createElement('span');
