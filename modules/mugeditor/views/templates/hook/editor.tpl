@@ -904,28 +904,12 @@ function mueInit() {
     thumb.src = thumbUrl;
     thumb.alt = fileName || 'image';
     thumb.style.cssText = 'width:100%;height:100%;object-fit:cover;';
-    var del = document.createElement('button');
-    del.type = 'button';
-    del.textContent = '✕';
-    del.style.cssText = 'position:absolute;top:2px;right:2px;background:#e74c3c;color:#fff;border:none;width:20px;height:20px;font-size:11px;cursor:pointer;line-height:20px;padding:0;text-align:center;';
-    del.title = 'Supprimer';
     // Clic sur la vignette = sélectionner l'objet sur le canvas
     wrap.addEventListener('click', function(e){
-      if (e.target === del) return;
       canvas.setActiveObject(fabricObj);
       canvas.renderAll();
     });
-    // Clic sur le bouton supprimer
-    del.addEventListener('click', function(){
-      canvas.remove(fabricObj);
-      imgList.removeChild(wrap);
-      imageCount = Math.max(0, imageCount - 1);
-      updateImgCounter();
-      saveState();
-      canvas.renderAll();
-    });
     wrap.appendChild(thumb);
-    wrap.appendChild(del);
     imgList.appendChild(wrap);
   }
 
