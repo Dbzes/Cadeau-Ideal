@@ -27,12 +27,18 @@
   <div class="product-line-grid-left col-md-3 col-xs-4">
     <span class="product-image media-middle">
       {assign var='mpeCustomImg' value=''}
+      {assign var='mpeCustomImgLarge' value=''}
       {assign var='mpeCustomId' value=0}
       {if is_array($product.customizations) && $product.customizations|count}
         {foreach from=$product.customizations item="mpeCust"}
           {foreach from=$mpeCust.fields item="mpeField"}
             {if $mpeField.type == 'image' && $mpeField.image.small.url}
               {assign var='mpeCustomImg' value=$mpeField.image.small.url}
+              {if isset($mpeField.image.large.url) && $mpeField.image.large.url}
+                {assign var='mpeCustomImgLarge' value=$mpeField.image.large.url}
+              {else}
+                {assign var='mpeCustomImgLarge' value=$mpeField.image.small.url}
+              {/if}
               {assign var='mpeCustomId' value=$mpeCust.id_customization}
             {/if}
           {/foreach}
@@ -133,11 +139,11 @@
             </div>
           </div>
           {* Modal custom fullscreen pour l'aperçu *}
-          {if $mpeCustomImg}
+          {if $mpeCustomImgLarge}
             <div id="mpe-preview-modal-{$customization.id_customization}" class="mpe-preview-modal" style="display:none;">
               <div class="mpe-preview-backdrop"></div>
               <button type="button" class="mpe-preview-close" aria-label="Fermer">&times;</button>
-              <img src="{$mpeCustomImg}" alt="Aperçu de la création" class="mpe-preview-img" />
+              <img src="{$mpeCustomImgLarge}" alt="Aperçu de la création" class="mpe-preview-img" />
             </div>
           {/if}
         {/foreach}
