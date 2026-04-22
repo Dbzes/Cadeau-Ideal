@@ -24,7 +24,7 @@
  *}
 <table class="product" width="100%" cellpadding="4" cellspacing="0">
 
-  {assign var='widthColProduct' value=$layout.product.width}
+  {assign var='widthColProduct' value=$layout.product.width - 8}
   {if !$isTaxEnabled}
     {assign var='widthColProduct' value=$widthColProduct+$layout.tax_code.width}
   {/if}
@@ -79,25 +79,25 @@
     {/if}
     <tr class="product {$bgcolor_class}">
 
-      <td class="product center" style="vertical-align:middle;">
+      <td class="product center" valign="middle">
         {if $pdfCustomImg && file_exists($pdfCustomImg)}
           <img src="{$pdfCustomImg}" style="width:45px;height:45px;" />
         {/if}
       </td>
-      <td class="product center" style="vertical-align:middle;">
+      <td class="product center" valign="middle">
         {$order_detail.product_reference}
       </td>
-      <td class="product left" style="vertical-align:middle;">
+      <td class="product left" valign="middle">
         {$order_detail.product_name}{if $pdfVariant} ({$pdfVariant}){/if}
       </td>
       {if $isTaxEnabled}
-        <td class="product center" style="vertical-align:middle;">
+        <td class="product center" valign="middle">
           {$order_detail.order_detail_tax_label}
         </td>
       {/if}
 
       {if isset($layout.before_discount)}
-        <td class="product center">
+        <td class="product center" valign="middle">
           {if isset($order_detail.unit_price_tax_excl_before_specific_price)}
             {displayPrice currency=$order->id_currency price=$order_detail.unit_price_tax_excl_before_specific_price}
           {else}
@@ -106,17 +106,17 @@
         </td>
       {/if}
 
-      <td class="product right" style="vertical-align:middle;">
+      <td class="product right" valign="middle">
         {displayPrice currency=$order->id_currency price=$order_detail.unit_price_tax_excl_including_ecotax}
         {if $order_detail.ecotax_tax_excl > 0}
           <br>
           <small>{{displayPrice currency=$order->id_currency price=$order_detail.ecotax_tax_excl}|string_format:{l s='ecotax: %s' d='Shop.Pdf' pdf='true'}}</small>
         {/if}
       </td>
-      <td class="product center" style="vertical-align:middle;">
+      <td class="product center" valign="middle">
         {$order_detail.product_quantity}
       </td>
-      <td class="product right" style="vertical-align:middle;">
+      <td class="product right" valign="middle">
         {displayPrice currency=$order->id_currency price=$order_detail.total_price_tax_excl_including_ecotax}
       </td>
     </tr>
