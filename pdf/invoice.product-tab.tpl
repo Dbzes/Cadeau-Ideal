@@ -77,52 +77,65 @@
         {/foreach}
       {/foreach}
     {/if}
+    {assign var='hasVisuel' value=false}
     {if $pdfCustomImg && file_exists($pdfCustomImg)}
-      {assign var='cellStyle' value='style="line-height:45px;"'}
-    {else}
-      {assign var='cellStyle' value=''}
+      {assign var='hasVisuel' value=true}
     {/if}
     <tr class="product {$bgcolor_class}">
 
-      <td class="product center" valign="middle">
-        {if $pdfCustomImg && file_exists($pdfCustomImg)}
+      <td class="product center">
+        {if $hasVisuel}
           <img src="{$pdfCustomImg}" style="width:45px;height:45px;" />
         {/if}
       </td>
-      <td class="product center" {$cellStyle}>
+      <td class="product center">
+        {if $hasVisuel}<table style="height:45px;"><tr><td valign="middle">{/if}
         {$order_detail.product_reference}
+        {if $hasVisuel}</td></tr></table>{/if}
       </td>
-      <td class="product left" {$cellStyle}>
+      <td class="product left">
+        {if $hasVisuel}<table style="height:45px;"><tr><td valign="middle">{/if}
         {$order_detail.product_name}{if $pdfVariant} ({$pdfVariant}){/if}
+        {if $hasVisuel}</td></tr></table>{/if}
       </td>
       {if $isTaxEnabled}
-        <td class="product center" {$cellStyle}>
+        <td class="product center">
+          {if $hasVisuel}<table style="height:45px;"><tr><td valign="middle">{/if}
           {$order_detail.order_detail_tax_label}
+          {if $hasVisuel}</td></tr></table>{/if}
         </td>
       {/if}
 
       {if isset($layout.before_discount)}
-        <td class="product center" {$cellStyle}>
+        <td class="product center">
+          {if $hasVisuel}<table style="height:45px;"><tr><td valign="middle">{/if}
           {if isset($order_detail.unit_price_tax_excl_before_specific_price)}
             {displayPrice currency=$order->id_currency price=$order_detail.unit_price_tax_excl_before_specific_price}
           {else}
             --
           {/if}
+          {if $hasVisuel}</td></tr></table>{/if}
         </td>
       {/if}
 
-      <td class="product right" {$cellStyle}>
+      <td class="product right">
+        {if $hasVisuel}<table style="height:45px;"><tr><td valign="middle">{/if}
         {displayPrice currency=$order->id_currency price=$order_detail.unit_price_tax_excl_including_ecotax}
         {if $order_detail.ecotax_tax_excl > 0}
           <br>
           <small>{{displayPrice currency=$order->id_currency price=$order_detail.ecotax_tax_excl}|string_format:{l s='ecotax: %s' d='Shop.Pdf' pdf='true'}}</small>
         {/if}
+        {if $hasVisuel}</td></tr></table>{/if}
       </td>
-      <td class="product center" {$cellStyle}>
+      <td class="product center">
+        {if $hasVisuel}<table style="height:45px;"><tr><td valign="middle">{/if}
         {$order_detail.product_quantity}
+        {if $hasVisuel}</td></tr></table>{/if}
       </td>
-      <td class="product right" {$cellStyle}>
+      <td class="product right">
+        {if $hasVisuel}<table style="height:45px;"><tr><td valign="middle">{/if}
         {displayPrice currency=$order->id_currency price=$order_detail.total_price_tax_excl_including_ecotax}
+        {if $hasVisuel}</td></tr></table>{/if}
       </td>
     </tr>
 
