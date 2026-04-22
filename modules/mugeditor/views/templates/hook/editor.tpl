@@ -1106,8 +1106,8 @@ function mueInit() {
     var state = {
       canvasW: W,
       canvasH: H,
-      targetW: Math.round(TEMPLATE_W * 150 * 0.0393701),
-      targetH: Math.round(TEMPLATE_H * 150 * 0.0393701),
+      targetW: TEMPLATE_W,
+      targetH: TEMPLATE_H,
       bg: null,
       images: [],
       texts: []
