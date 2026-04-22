@@ -75,9 +75,10 @@
           {/foreach}
         {/foreach}
       {/if}
-      <a class="label" href="{$product.url}" data-id_customization="{$product.id_customization|intval}">{$product.name}{if $mpeVariantSuffix} <span style="color:#ee7a03;font-weight:600;">({$mpeVariantSuffix})</span>{/if}</a>
+      <a class="label" href="{$product.url}" data-id_customization="{$product.id_customization|intval}">{$product.name}{if $mpeVariantSuffix} <span style="color:#ee7a03;font-weight:600;">{$mpeVariantSuffix}</span>{/if}</a>
     </div>
 
+    {if !$mpeCustomImg}
     <div class="product-line-info product-price h5 {if $product.has_discount}has-discount{/if}">
       {if $product.has_discount}
         <div class="product-discount">
@@ -101,6 +102,7 @@
       </div>
       {hook h='displayProductPriceBlock' product=$product type="unit_price"}
     </div>
+    {/if}
 
     <br/>
 
@@ -115,7 +117,7 @@
       <br>
       {block name='cart_detailed_product_line_customization'}
         {foreach from=$product.customizations item="customization"}
-          <a href="#" class="mpe-preview-trigger" data-target="#mpe-preview-modal-{$customization.id_customization}">Aperçu de la création</a>
+          <a href="#" class="mpe-preview-trigger" data-target="#mpe-preview-modal-{$customization.id_customization}" style="color:#004774;font-weight:700;text-decoration:none;">Aperçu de la création</a>
           <div class="modal fade customization-modal js-customization-modal" id="product-customizations-modal-{$customization.id_customization}" tabindex="-1" role="dialog" aria-hidden="true">
             <div class="modal-dialog" role="document">
               <div class="modal-content">
