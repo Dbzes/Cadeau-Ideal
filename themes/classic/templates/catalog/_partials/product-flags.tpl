@@ -25,6 +25,7 @@
 {block name='product_flags'}
     <ul class="product-flags js-product-flags">
         {foreach from=$product.flags item=flag}
+            {if $flag.type == 'pack'}{continue}{/if}
             <li class="product-flag {$flag.type}">{if $flag.type == 'discount'}Réduction {$flag.label}{else}{$flag.label}{/if}</li>
         {/foreach}
     </ul>
