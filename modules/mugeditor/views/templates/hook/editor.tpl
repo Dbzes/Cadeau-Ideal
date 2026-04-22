@@ -1182,7 +1182,7 @@ function mueInit() {
     var bypass = false;
 
     btn.addEventListener('click', function(e){
-      if (bypass) return;
+      if (bypass) { bypass = false; return; }
       var state = window.mueSerializeState && window.mueSerializeState();
       if (!state) return;
       var hasContent = state.bg || (state.images && state.images.length) || (state.texts && state.texts.length);
@@ -1190,6 +1190,10 @@ function mueInit() {
 
       e.preventDefault();
       e.stopImmediatePropagation();
+
+      // Reset customization ID pour forcer une nouvelle ligne dans le panier
+      var customField = document.getElementById('product_customization_id');
+      if (customField) customField.value = '0';
 
       showLoader();
 

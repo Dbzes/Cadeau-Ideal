@@ -82,6 +82,15 @@ class MugeditorAttachcustomModuleFrontController extends ModuleFrontController
                 $ctx->cookie->write();
             }
 
+            // Compter les customizations existantes pour ce produit dans ce panier → suffixe lettre
+            $existingCount = (int) Db::getInstance()->getValue(
+                'SELECT COUNT(*) FROM ' . _DB_PREFIX_ . 'customization
+                 WHERE id_cart = ' . (int) $ctx->cart->id . '
+                 AND id_product = ' . $pid . '
+                 AND in_cart = 1'
+            );
+            $suffix = chr(65 + $existingCount); // A, B, C, D...
+
             $customization = new Customization();
             $customization->id_cart = (int) $ctx->cart->id;
             $customization->id_product = $pid;
@@ -93,12 +102,24 @@ class MugeditorAttachcustomModuleFrontController extends ModuleFrontController
             $customization->in_cart = 0;
             $customization->add();
 
+            // Image de personnalisation (type 0 = file)
             Db::getInstance()->insert('customized_data', [
                 'id_customization' => (int) $customization->id,
                 'type' => 0,
                 'index' => (int) $fieldId,
                 'value' => pSQL($hash),
             ]);
+
+            // Champ texte "Variante" avec suffixe lettre (A, B, C...)
+            $textFieldId = $this->ensureTextField($pid);
+            if ($textFieldId) {
+                Db::getInstance()->insert('customized_data', [
+                    'id_customization' => (int) $customization->id,
+                    'type' => 1,
+                    'index' => (int) $textFieldId,
+                    'value' => pSQL('Personnalisation (' . $suffix . ')'),
+                ]);
+            }
 
             Db::getInstance()->insert('mue_compose_queue', [
                 'id_customization' => (int) $customization->id,
@@ -110,6 +131,7 @@ class MugeditorAttachcustomModuleFrontController extends ModuleFrontController
             echo json_encode([
                 'success' => true,
                 'id_customization' => (int) $customization->id,
+                'suffix' => $suffix,
             ]);
         } catch (Exception $e) {
             echo json_encode(['success' => false, 'error' => $e->getMessage()]);
@@ -121,8 +143,8 @@ class MugeditorAttachcustomModuleFrontController extends ModuleFrontController
     {
         $db = Db::getInstance();
 
-        $db->update('product', ['customizable' => 2, 'uploadable_files' => 1], 'id_product = ' . (int) $pid);
-        $db->update('product_shop', ['customizable' => 2, 'uploadable_files' => 1], 'id_product = ' . (int) $pid);
+        $db->update('product', ['customizable' => 2, 'uploadable_files' => 1, 'text_fields' => 1], 'id_product = ' . (int) $pid);
+        $db->update('product_shop', ['customizable' => 2, 'uploadable_files' => 1, 'text_fields' => 1], 'id_product = ' . (int) $pid);
 
         $confKey = 'MUG_FIELD_' . (int) $pid;
         $fieldId = (int) Configuration::get($confKey);
@@ -158,6 +180,45 @@ class MugeditorAttachcustomModuleFrontController extends ModuleFrontController
                 'id_lang' => (int) $lang['id_lang'],
                 'id_shop' => (int) Context::getContext()->shop->id,
                 'name' => pSQL($label),
+            ]);
+        }
+
+        Configuration::updateValue($confKey, $newId);
+        return $newId;
+    }
+
+    protected function ensureTextField($pid)
+    {
+        $db = Db::getInstance();
+        $confKey = 'MUG_TEXTFIELD_' . (int) $pid;
+        $fieldId = (int) Configuration::get($confKey);
+        if ($fieldId) {
+            $exists = $db->getValue('SELECT id_customization_field FROM ' . _DB_PREFIX_ . 'customization_field WHERE id_customization_field = ' . $fieldId . ' AND is_deleted = 0');
+            if ($exists) return (int) $fieldId;
+        }
+
+        $db->insert('customization_field', [
+            'id_product' => (int) $pid,
+            'type' => 1, // texte
+            'required' => 0,
+            'is_module' => 1,
+            'is_deleted' => 0,
+        ]);
+        $newId = (int) $db->Insert_ID();
+
+        try {
+            $db->insert('customization_field_shop', [
+                'id_customization_field' => $newId,
+                'id_shop' => (int) Context::getContext()->shop->id,
+            ]);
+        } catch (Exception $e) {}
+
+        foreach (Language::getLanguages() as $lang) {
+            $db->insert('customization_field_lang', [
+                'id_customization_field' => $newId,
+                'id_lang' => (int) $lang['id_lang'],
+                'id_shop' => (int) Context::getContext()->shop->id,
+                'name' => pSQL('Variante'),
             ]);
         }
 
