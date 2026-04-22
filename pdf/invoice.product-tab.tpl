@@ -114,11 +114,10 @@
 
     {foreach $order_detail.customizedDatas as $customizationPerAddress}
       {foreach $customizationPerAddress as $customizationId => $customization}
-        <tr class="customization_data {$bgcolor_class}">
-          <td class="center"> &nbsp;</td>
-
-          <td>
-            {if isset($customization.datas[Product::CUSTOMIZE_TEXTFIELD]) && count($customization.datas[Product::CUSTOMIZE_TEXTFIELD]) > 0}
+        {if isset($customization.datas[Product::CUSTOMIZE_TEXTFIELD]) && count($customization.datas[Product::CUSTOMIZE_TEXTFIELD]) > 0}
+          <tr class="customization_data {$bgcolor_class}">
+            <td class="center">&nbsp;</td>
+            <td colspan="{$layout._colCount - 1}">
               <table style="width: 100%;">
                 {foreach $customization.datas[Product::CUSTOMIZE_TEXTFIELD] as $customization_infos}
                   <tr>
@@ -126,36 +125,22 @@
                   </tr>
                 {/foreach}
               </table>
-            {/if}
-
-            {if isset($customization.datas[Product::CUSTOMIZE_FILE]) && count($customization.datas[Product::CUSTOMIZE_FILE]) > 0}
-              <table style="width: 100%;">
-                {foreach $customization.datas[Product::CUSTOMIZE_FILE] as $cfile}
-                  <tr>
-                    <td>
-                      {assign var='cust_img_path' value="{$smarty.const._PS_UPLOAD_DIR_}{$cfile.value}_small"}
-                      {if file_exists($cust_img_path)}
-                        <img src="{$cust_img_path}" style="max-width:120px;max-height:80px;" />
-                      {/if}
-                    </td>
-                  </tr>
-                {/foreach}
-              </table>
-            {/if}
-          </td>
-
-          <td class="center">
-            ({if $customization.quantity == 0}1{else}{$customization.quantity}{/if})
-          </td>
-
-          {assign var=end value=($layout._colCount-3)}
-          {for $var=0 to $end}
-            <td class="center">
-              --
             </td>
-          {/for}
-
-        </tr>
+          </tr>
+        {/if}
+        {if isset($customization.datas[Product::CUSTOMIZE_FILE]) && count($customization.datas[Product::CUSTOMIZE_FILE]) > 0}
+          <tr class="customization_data {$bgcolor_class}">
+            <td class="center">&nbsp;</td>
+            <td colspan="{$layout._colCount - 1}">
+              {foreach $customization.datas[Product::CUSTOMIZE_FILE] as $cfile}
+                {assign var='cust_img_path' value="{$smarty.const._PS_UPLOAD_DIR_}{$cfile.value}_small"}
+                {if file_exists($cust_img_path)}
+                  <img src="{$cust_img_path}" style="width:45px;height:45px;" />
+                {/if}
+              {/foreach}
+            </td>
+          </tr>
+        {/if}
       {/foreach}
     {/foreach}
   {/foreach}
