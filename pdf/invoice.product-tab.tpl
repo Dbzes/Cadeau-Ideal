@@ -30,9 +30,9 @@
   {/if}
   <thead>
   <tr>
-    <th class="product header small" width="{$layout.reference.width}%">{l s='Reference' d='Shop.Pdf' pdf='true'}</th>
-    <th class="product header small" width="{$widthColProduct - 8}%">{l s='Product' d='Shop.Pdf' pdf='true'}</th>
     <th class="product header small" width="8%">Visuel</th>
+    <th class="product header small" width="{$layout.reference.width}%">{l s='Reference' d='Shop.Pdf' pdf='true'}</th>
+    <th class="product header small" width="{$widthColProduct}%">{l s='Product' d='Shop.Pdf' pdf='true'}</th>
     {if $isTaxEnabled}
       <th class="product header small" width="{$layout.tax_code.width}%">{l s='Tax Rate' d='Shop.Pdf' pdf='true'}</th>
     {/if}
@@ -57,41 +57,41 @@
   <!-- PRODUCTS -->
   {foreach $order_details as $order_detail}
     {cycle values=["color_line_even", "color_line_odd"] assign=bgcolor_class}
-    <tr class="product {$bgcolor_class}">
-
-      <td class="product center">
-        {$order_detail.product_reference}
-      </td>
-      <td class="product left">
-        {assign var='pdfVariant' value=''}
-        {assign var='pdfCustomImg' value=''}
-        {if isset($order_detail.customizedDatas)}
-          {foreach $order_detail.customizedDatas as $cpa}
-            {foreach $cpa as $cid => $cdata}
-              {if isset($cdata.datas[Product::CUSTOMIZE_TEXTFIELD])}
-                {foreach $cdata.datas[Product::CUSTOMIZE_TEXTFIELD] as $ci}
-                  {if $ci.name == 'Variante'}
-                    {assign var='pdfVariant' value=$ci.value}
-                  {/if}
-                {/foreach}
-              {/if}
-              {if isset($cdata.datas[Product::CUSTOMIZE_FILE])}
-                {foreach $cdata.datas[Product::CUSTOMIZE_FILE] as $cf}
-                  {assign var='pdfCustomImg' value="{$smarty.const._PS_UPLOAD_DIR_}{$cf.value}_small"}
-                {/foreach}
+    {assign var='pdfVariant' value=''}
+    {assign var='pdfCustomImg' value=''}
+    {if isset($order_detail.customizedDatas)}
+      {foreach $order_detail.customizedDatas as $cpa}
+        {foreach $cpa as $cid => $cdata}
+          {if isset($cdata.datas[Product::CUSTOMIZE_TEXTFIELD])}
+            {foreach $cdata.datas[Product::CUSTOMIZE_TEXTFIELD] as $ci}
+              {if $ci.name == 'Variante'}
+                {assign var='pdfVariant' value=$ci.value}
               {/if}
             {/foreach}
-          {/foreach}
-        {/if}
-        {$order_detail.product_name}{if $pdfVariant} ({$pdfVariant}){/if}
-      </td>
-      <td class="product center">
+          {/if}
+          {if isset($cdata.datas[Product::CUSTOMIZE_FILE])}
+            {foreach $cdata.datas[Product::CUSTOMIZE_FILE] as $cf}
+              {assign var='pdfCustomImg' value="{$smarty.const._PS_UPLOAD_DIR_}{$cf.value}_small"}
+            {/foreach}
+          {/if}
+        {/foreach}
+      {/foreach}
+    {/if}
+    <tr class="product {$bgcolor_class}">
+
+      <td class="product center" style="vertical-align:middle;">
         {if $pdfCustomImg && file_exists($pdfCustomImg)}
           <img src="{$pdfCustomImg}" style="width:45px;height:45px;" />
         {/if}
       </td>
+      <td class="product center" style="vertical-align:middle;">
+        {$order_detail.product_reference}
+      </td>
+      <td class="product left" style="vertical-align:middle;">
+        {$order_detail.product_name}{if $pdfVariant} ({$pdfVariant}){/if}
+      </td>
       {if $isTaxEnabled}
-        <td class="product center">
+        <td class="product center" style="vertical-align:middle;">
           {$order_detail.order_detail_tax_label}
         </td>
       {/if}
@@ -106,17 +106,17 @@
         </td>
       {/if}
 
-      <td class="product right">
+      <td class="product right" style="vertical-align:middle;">
         {displayPrice currency=$order->id_currency price=$order_detail.unit_price_tax_excl_including_ecotax}
         {if $order_detail.ecotax_tax_excl > 0}
           <br>
           <small>{{displayPrice currency=$order->id_currency price=$order_detail.ecotax_tax_excl}|string_format:{l s='ecotax: %s' d='Shop.Pdf' pdf='true'}}</small>
         {/if}
       </td>
-      <td class="product center">
+      <td class="product center" style="vertical-align:middle;">
         {$order_detail.product_quantity}
       </td>
-      <td  class="product right">
+      <td class="product right" style="vertical-align:middle;">
         {displayPrice currency=$order->id_currency price=$order_detail.total_price_tax_excl_including_ecotax}
       </td>
     </tr>
