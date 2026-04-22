@@ -290,6 +290,12 @@ class Stripepayment extends PaymentModule
                 throw $e;
             }
             PrestaShopLogger::addLog('Stripe createOrderFromIntent: race resolved (order ' . $idOrder . ' existed after validateOrder failure)', 1);
+            // Forcer l'état si la commande est restée à 0 (validateOrder a crashé mid-way)
+            $order = new Order($idOrder);
+            if (Validate::isLoadedObject($order) && (int) $order->current_state === 0) {
+                $order->setCurrentState((int) Configuration::get('PS_OS_PAYMENT'));
+                PrestaShopLogger::addLog('Stripe createOrderFromIntent: forced state PS_OS_PAYMENT on order ' . $idOrder, 1);
+            }
         }
 
         Db::getInstance()->update('stripe_payment', [
