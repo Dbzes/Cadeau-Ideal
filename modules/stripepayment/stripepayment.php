@@ -289,6 +289,7 @@ class Stripepayment extends PaymentModule
             if (!$idOrder) {
                 throw $e;
             }
+            PrestaShopLogger::addLog('Stripe createOrderFromIntent: validateOrder exception: ' . $e->getMessage() . ' | file: ' . $e->getFile() . ':' . $e->getLine(), 3);
             PrestaShopLogger::addLog('Stripe createOrderFromIntent: race resolved (order ' . $idOrder . ' existed after validateOrder failure)', 1);
             // Forcer l'état si la commande est restée à 0 (validateOrder a crashé mid-way)
             $order = new Order($idOrder);
