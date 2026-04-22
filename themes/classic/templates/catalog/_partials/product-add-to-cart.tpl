@@ -23,9 +23,7 @@
  * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License 3.0 (AFL-3.0)
  *}
 {literal}<style>
-#quantity_wanted::-webkit-outer-spin-button,
-#quantity_wanted::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-#quantity_wanted { -moz-appearance: textfield; }
+.product-quantity .input-group-btn-vertical { display: none !important; }
 </style>{/literal}
 <div class="product-add-to-cart js-product-add-to-cart">
   {if !$configuration.is_catalog}
