@@ -80,12 +80,16 @@
     {assign var='hasVisuel' value=false}
     {if $pdfCustomImg && file_exists($pdfCustomImg)}
       {assign var='hasVisuel' value=true}
+    {elseif isset($order_detail.image_tag) && $order_detail.image_tag}
+      {assign var='hasVisuel' value=true}
     {/if}
     <tr class="product {$bgcolor_class}">
 
       <td class="product center">
-        {if $hasVisuel}
+        {if $pdfCustomImg && file_exists($pdfCustomImg)}
           <img src="{$pdfCustomImg}" style="width:45px;height:45px;" />
+        {elseif isset($order_detail.image_tag) && $order_detail.image_tag}
+          {$order_detail.image_tag nofilter}
         {/if}
       </td>
       <td class="product center">
