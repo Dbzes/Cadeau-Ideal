@@ -117,7 +117,7 @@ class MugeditorAttachcustomModuleFrontController extends ModuleFrontController
                     'id_customization' => (int) $customization->id,
                     'type' => 1,
                     'index' => (int) $textFieldId,
-                    'value' => pSQL('Personnalisation (' . $suffix . ')'),
+                    'value' => pSQL($suffix),
                 ]);
             }
 

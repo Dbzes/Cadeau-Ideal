@@ -65,7 +65,17 @@
   <!--  product line body: label, discounts, price, attributes, customizations -->
   <div class="product-line-grid-body col-md-4 col-xs-8">
     <div class="product-line-info">
-      <a class="label" href="{$product.url}" data-id_customization="{$product.id_customization|intval}">{$product.name}</a>
+      {assign var='mpeVariantSuffix' value=''}
+      {if is_array($product.customizations) && $product.customizations|count}
+        {foreach from=$product.customizations item="vCust"}
+          {foreach from=$vCust.fields item="vField"}
+            {if $vField.type == 'text' && $vField.label == 'Variante'}
+              {assign var='mpeVariantSuffix' value=$vField.text}
+            {/if}
+          {/foreach}
+        {/foreach}
+      {/if}
+      <a class="label" href="{$product.url}" data-id_customization="{$product.id_customization|intval}">{$product.name}{if $mpeVariantSuffix} <span style="color:#ee7a03;font-weight:600;">({$mpeVariantSuffix})</span>{/if}</a>
     </div>
 
     <div class="product-line-info product-price h5 {if $product.has_discount}has-discount{/if}">
@@ -117,6 +127,7 @@
                 </div>
                 <div class="modal-body">
                   {foreach from=$customization.fields item="field"}
+                    {if $field.type == 'text' && $field.label == 'Variante'}{continue}{/if}
                     <div class="product-customization-line row">
                       <div class="col-sm-3 col-xs-4 label">
                         {$field.label}
