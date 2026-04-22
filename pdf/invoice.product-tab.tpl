@@ -130,10 +130,16 @@
 
             {if isset($customization.datas[Product::CUSTOMIZE_FILE]) && count($customization.datas[Product::CUSTOMIZE_FILE]) > 0}
               <table style="width: 100%;">
-                <tr>
-                  <td style="width: 70%;">{l s='image(s):' d='Shop.Pdf' pdf='true'}</td>
-                  <td>{count($customization.datas[Product::CUSTOMIZE_FILE])}</td>
-                </tr>
+                {foreach $customization.datas[Product::CUSTOMIZE_FILE] as $cfile}
+                  <tr>
+                    <td>
+                      {assign var='cust_img_path' value="{$smarty.const._PS_UPLOAD_DIR_}{$cfile.value}_small"}
+                      {if file_exists($cust_img_path)}
+                        <img src="{$cust_img_path}" style="max-width:120px;max-height:80px;" />
+                      {/if}
+                    </td>
+                  </tr>
+                {/foreach}
               </table>
             {/if}
           </td>
