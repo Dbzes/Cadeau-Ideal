@@ -31,7 +31,8 @@
   <thead>
   <tr>
     <th class="product header small" width="{$layout.reference.width}%">{l s='Reference' d='Shop.Pdf' pdf='true'}</th>
-    <th class="product header small" width="{$widthColProduct}%">{l s='Product' d='Shop.Pdf' pdf='true'}</th>
+    <th class="product header small" width="{$widthColProduct - 8}%">{l s='Product' d='Shop.Pdf' pdf='true'}</th>
+    <th class="product header small" width="8%">Visuel</th>
     {if $isTaxEnabled}
       <th class="product header small" width="{$layout.tax_code.width}%">{l s='Tax Rate' d='Shop.Pdf' pdf='true'}</th>
     {/if}
@@ -63,6 +64,7 @@
       </td>
       <td class="product left">
         {assign var='pdfVariant' value=''}
+        {assign var='pdfCustomImg' value=''}
         {if isset($order_detail.customizedDatas)}
           {foreach $order_detail.customizedDatas as $cpa}
             {foreach $cpa as $cid => $cdata}
@@ -73,27 +75,20 @@
                   {/if}
                 {/foreach}
               {/if}
+              {if isset($cdata.datas[Product::CUSTOMIZE_FILE])}
+                {foreach $cdata.datas[Product::CUSTOMIZE_FILE] as $cf}
+                  {assign var='pdfCustomImg' value="{$smarty.const._PS_UPLOAD_DIR_}{$cf.value}_small"}
+                {/foreach}
+              {/if}
             {/foreach}
           {/foreach}
         {/if}
-        {if $display_product_images}
-          <table width="100%">
-            <tr>
-              <td width="15%">
-                {if isset($order_detail.image) && $order_detail.image->id}
-                  {$order_detail.image_tag}
-                {/if}
-              </td>
-              <td width="5%">&nbsp;</td>
-              <td width="80%">
-                {$order_detail.product_name}{if $pdfVariant} ({$pdfVariant}){/if}
-              </td>
-            </tr>
-          </table>
-        {else}
-          {$order_detail.product_name}{if $pdfVariant} ({$pdfVariant}){/if}
+        {$order_detail.product_name}{if $pdfVariant} ({$pdfVariant}){/if}
+      </td>
+      <td class="product center">
+        {if $pdfCustomImg && file_exists($pdfCustomImg)}
+          <img src="{$pdfCustomImg}" style="width:45px;height:45px;" />
         {/if}
-
       </td>
       {if $isTaxEnabled}
         <td class="product center">
@@ -136,7 +131,7 @@
           {if $hasNonVariantText}
             <tr class="customization_data {$bgcolor_class}">
               <td class="center">&nbsp;</td>
-              <td colspan="{$layout._colCount - 1}">
+              <td colspan="{$layout._colCount}">
                 <table style="width: 100%;">
                   {foreach $customization.datas[Product::CUSTOMIZE_TEXTFIELD] as $customization_infos}
                     {if $customization_infos.name != 'Variante'}
@@ -150,19 +145,7 @@
             </tr>
           {/if}
         {/if}
-        {if isset($customization.datas[Product::CUSTOMIZE_FILE]) && count($customization.datas[Product::CUSTOMIZE_FILE]) > 0}
-          <tr class="customization_data {$bgcolor_class}">
-            <td class="center">&nbsp;</td>
-            <td colspan="{$layout._colCount - 1}">
-              {foreach $customization.datas[Product::CUSTOMIZE_FILE] as $cfile}
-                {assign var='cust_img_path' value="{$smarty.const._PS_UPLOAD_DIR_}{$cfile.value}_small"}
-                {if file_exists($cust_img_path)}
-                  <img src="{$cust_img_path}" style="width:45px;height:45px;" />
-                {/if}
-              {/foreach}
-            </td>
-          </tr>
-        {/if}
+        {* Visuel déjà affiché dans la colonne Visuel — pas de doublon ici *}
       {/foreach}
     {/foreach}
   {/foreach}
@@ -174,13 +157,13 @@
   {foreach from=$cart_rules item=cart_rule name="cart_rules_loop"}
     {if $smarty.foreach.cart_rules_loop.first}
       <tr class="discount">
-        <th class="header" colspan="{$layout._colCount}">
+        <th class="header" colspan="{$layout._colCount + 1}">
           {l s='Discounts' d='Shop.Pdf' pdf='true'}
         </th>
       </tr>
     {/if}
     <tr class="discount">
-      <td class="white right" colspan="{$layout._colCount - 1}">
+      <td class="white right" colspan="{$layout._colCount}">
         {$cart_rule.name}
       </td>
       <td class="right white">
