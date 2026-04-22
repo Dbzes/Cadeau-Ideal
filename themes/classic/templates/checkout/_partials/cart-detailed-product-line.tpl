@@ -78,31 +78,7 @@
       <a class="label" href="{$product.url}" data-id_customization="{$product.id_customization|intval}">{$product.name}{if $mpeVariantSuffix} <span style="color:#ee7a03;font-weight:600;">{$mpeVariantSuffix}</span>{/if}</a>
     </div>
 
-    {if !$mpeCustomImg}
-    <div class="product-line-info product-price h5 {if $product.has_discount}has-discount{/if}">
-      {if $product.has_discount}
-        <div class="product-discount">
-          <span class="regular-price">{$product.regular_price}</span>
-          {if $product.discount_type === 'percentage'}
-            <span class="discount discount-percentage">
-                -{$product.discount_percentage_absolute}
-              </span>
-          {else}
-            <span class="discount discount-amount">
-                -{$product.discount_to_display}
-              </span>
-          {/if}
-        </div>
-      {/if}
-      <div class="current-price">
-        <span class="price">{$product.price}</span>
-        {if $product.unit_price_full}
-          <div class="unit-price-cart">{$product.unit_price_full}</div>
-        {/if}
-      </div>
-      {hook h='displayProductPriceBlock' product=$product type="unit_price"}
-    </div>
-    {/if}
+    {* Prix unitaire masqué — déjà affiché dans la colonne droite *}
 
     <br/>
 
