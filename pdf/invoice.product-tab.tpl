@@ -77,27 +77,32 @@
         {/foreach}
       {/foreach}
     {/if}
+    {if $pdfCustomImg && file_exists($pdfCustomImg)}
+      {assign var='cellPad' value='style="padding-top:8px;"'}
+    {else}
+      {assign var='cellPad' value=''}
+    {/if}
     <tr class="product {$bgcolor_class}">
 
       <td class="product center" valign="middle">
         {if $pdfCustomImg && file_exists($pdfCustomImg)}
-          <img src="{$pdfCustomImg}" style="width:45px;height:45px;" />
+          <img src="{$pdfCustomImg}" style="width:30px;height:30px;" />
         {/if}
       </td>
-      <td class="product center" valign="middle">
+      <td class="product center" {$cellPad}>
         {$order_detail.product_reference}
       </td>
-      <td class="product left" valign="middle">
+      <td class="product left" {$cellPad}>
         {$order_detail.product_name}{if $pdfVariant} ({$pdfVariant}){/if}
       </td>
       {if $isTaxEnabled}
-        <td class="product center" valign="middle">
+        <td class="product center" {$cellPad}>
           {$order_detail.order_detail_tax_label}
         </td>
       {/if}
 
       {if isset($layout.before_discount)}
-        <td class="product center" valign="middle">
+        <td class="product center" {$cellPad}>
           {if isset($order_detail.unit_price_tax_excl_before_specific_price)}
             {displayPrice currency=$order->id_currency price=$order_detail.unit_price_tax_excl_before_specific_price}
           {else}
@@ -106,17 +111,17 @@
         </td>
       {/if}
 
-      <td class="product right" valign="middle">
+      <td class="product right" {$cellPad}>
         {displayPrice currency=$order->id_currency price=$order_detail.unit_price_tax_excl_including_ecotax}
         {if $order_detail.ecotax_tax_excl > 0}
           <br>
           <small>{{displayPrice currency=$order->id_currency price=$order_detail.ecotax_tax_excl}|string_format:{l s='ecotax: %s' d='Shop.Pdf' pdf='true'}}</small>
         {/if}
       </td>
-      <td class="product center" valign="middle">
+      <td class="product center" {$cellPad}>
         {$order_detail.product_quantity}
       </td>
-      <td class="product right" valign="middle">
+      <td class="product right" {$cellPad}>
         {displayPrice currency=$order->id_currency price=$order_detail.total_price_tax_excl_including_ecotax}
       </td>
     </tr>
