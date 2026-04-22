@@ -40,6 +40,17 @@
               <a href="{$urls.pages.product}&id_product={$product.id_product}">
                 {$product.name}
               </a>
+              {assign var='mpeVariantSuffix' value=''}
+              {if $product.customizations}
+                {foreach from=$product.customizations item="vCust"}
+                  {foreach from=$vCust.fields item="vF"}
+                    {if $vF.type == 'text' && $vF.label == 'Variante'}
+                      {assign var='mpeVariantSuffix' value=$vF.text}
+                    {/if}
+                  {/foreach}
+                {/foreach}
+              {/if}
+              {if $mpeVariantSuffix} <span style="color:#ee7a03;font-weight:600;">{$mpeVariantSuffix}</span>{/if}
             </strong><br/>
             {if $product.product_reference}
               {l s='Reference' d='Shop.Theme.Catalog'}: {$product.product_reference}<br/>
@@ -53,49 +64,25 @@
             {if $product.customizations}
               {foreach from=$product.customizations item="customization"}
                 {assign var='mpeImg' value=''}
+                {assign var='mpeImgLarge' value=''}
                 {foreach from=$customization.fields item="f"}
                   {if $f.type == 'image' && $f.image.small.url}
                     {assign var='mpeImg' value=$f.image.small.url}
+                    {if isset($f.image.large.url) && $f.image.large.url}
+                      {assign var='mpeImgLarge' value=$f.image.large.url}
+                    {else}
+                      {assign var='mpeImgLarge' value=$f.image.small.url}
+                    {/if}
                   {/if}
                 {/foreach}
                 {if $mpeImg}
                   <div class="customization">
-                    <a href="#" class="mpe-preview-trigger" data-target="#mpe-od-preview-{$customization.id_customization}">Aperçu de la personnalisation</a>
+                    <a href="#" class="mpe-preview-trigger" data-target="#mpe-od-preview-{$customization.id_customization}" style="color:#004774;font-weight:700;text-decoration:none;">Aperçu de la personnalisation</a>
                   </div>
                   <div id="mpe-od-preview-{$customization.id_customization}" class="mpe-preview-modal" style="display:none;">
                     <div class="mpe-preview-backdrop"></div>
                     <button type="button" class="mpe-preview-close" aria-label="Fermer">&times;</button>
-                    <img src="{$mpeImg}" alt="Aperçu de la personnalisation" class="mpe-preview-img" />
-                  </div>
-                {else}
-                  <div class="customization">
-                    <a href="#" data-toggle="modal" data-target="#product-customizations-modal-{$customization.id_customization}">Aperçu de la personnalisation</a>
-                  </div>
-                  <div id="_desktop_product_customization_modal_wrapper_{$customization.id_customization}">
-                    <div class="modal fade customization-modal" id="product-customizations-modal-{$customization.id_customization}" tabindex="-1" role="dialog" aria-hidden="true">
-                      <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                          <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-label="{l s='Close' d='Shop.Theme.Global'}">
-                              <span aria-hidden="true">&times;</span>
-                            </button>
-                            <h4 class="modal-title">Aperçu de la personnalisation</h4>
-                          </div>
-                          <div class="modal-body">
-                            {foreach from=$customization.fields item="field"}
-                              <div class="product-customization-line row">
-                                <div class="col-sm-3 col-xs-4 label">{$field.label}</div>
-                                <div class="col-sm-9 col-xs-8 value">
-                                  {if $field.type == 'text'}
-                                    {if (int)$field.id_module}{$field.text nofilter}{else}{$field.text}{/if}
-                                  {/if}
-                                </div>
-                              </div>
-                            {/foreach}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                    <img src="{$mpeImgLarge}" alt="Aperçu de la personnalisation" class="mpe-preview-img" />
                   </div>
                 {/if}
               {/foreach}
@@ -136,7 +123,7 @@
       <div class="order-item">
         <div class="row">
           <div class="col-sm-5 desc">
-            <div class="name">{$product.name}</div>
+            <div class="name">{$product.name}{if $mpeVariantSuffix} <span style="color:#ee7a03;font-weight:600;">{$mpeVariantSuffix}</span>{/if}</div>
             {if $product.product_reference}
               <div class="ref">{l s='Reference' d='Shop.Theme.Catalog'}: {$product.product_reference}</div>
             {/if}
@@ -146,25 +133,26 @@
             {if $product.customizations}
               {foreach $product.customizations as $customization}
                 {assign var='mpeImgM' value=''}
+                {assign var='mpeImgMLarge' value=''}
                 {foreach from=$customization.fields item="f"}
                   {if $f.type == 'image' && $f.image.small.url}
                     {assign var='mpeImgM' value=$f.image.small.url}
+                    {if isset($f.image.large.url) && $f.image.large.url}
+                      {assign var='mpeImgMLarge' value=$f.image.large.url}
+                    {else}
+                      {assign var='mpeImgMLarge' value=$f.image.small.url}
+                    {/if}
                   {/if}
                 {/foreach}
                 {if $mpeImgM}
                   <div class="customization">
-                    <a href="#" class="mpe-preview-trigger" data-target="#mpe-od-preview-m-{$customization.id_customization}">Aperçu de la personnalisation</a>
+                    <a href="#" class="mpe-preview-trigger" data-target="#mpe-od-preview-m-{$customization.id_customization}" style="color:#004774;font-weight:700;text-decoration:none;">Aperçu de la personnalisation</a>
                   </div>
                   <div id="mpe-od-preview-m-{$customization.id_customization}" class="mpe-preview-modal" style="display:none;">
                     <div class="mpe-preview-backdrop"></div>
                     <button type="button" class="mpe-preview-close" aria-label="Fermer">&times;</button>
-                    <img src="{$mpeImgM}" alt="Aperçu de la personnalisation" class="mpe-preview-img" />
+                    <img src="{$mpeImgMLarge}" alt="Aperçu de la personnalisation" class="mpe-preview-img" />
                   </div>
-                {else}
-                  <div class="customization">
-                    <a href="#" data-toggle="modal" data-target="#product-customizations-modal-{$customization.id_customization}">Aperçu de la personnalisation</a>
-                  </div>
-                  <div id="_mobile_product_customization_modal_wrapper_{$customization.id_customization}"></div>
                 {/if}
               {/foreach}
             {/if}

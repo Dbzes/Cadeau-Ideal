@@ -49,11 +49,21 @@
       </style>
       {foreach from=$products item=product}
         {assign var='mpeCustomImg' value=''}
+        {assign var='mpeCustomImgLarge' value=''}
+        {assign var='mpeVariantSuffix' value=''}
         {if is_array($product.customizations) && $product.customizations|count}
           {foreach from=$product.customizations item="mpeCust"}
             {foreach from=$mpeCust.fields item="mpeField"}
               {if $mpeField.type == 'image' && $mpeField.image.small.url}
                 {assign var='mpeCustomImg' value=$mpeField.image.small.url}
+                {if isset($mpeField.image.large.url) && $mpeField.image.large.url}
+                  {assign var='mpeCustomImgLarge' value=$mpeField.image.large.url}
+                {else}
+                  {assign var='mpeCustomImgLarge' value=$mpeField.image.small.url}
+                {/if}
+              {/if}
+              {if $mpeField.type == 'text' && $mpeField.label == 'Variante'}
+                {assign var='mpeVariantSuffix' value=$mpeField.text}
               {/if}
             {/foreach}
           {/foreach}
@@ -80,7 +90,7 @@
           </div>
           <div class="col-sm-4 col-xs-9 details">
             {if $add_product_link}<a href="{$product.url}" target="_blank">{/if}
-              <span>{$product.name}</span>
+              <span>{$product.name}{if $mpeVariantSuffix} <span style="color:#ee7a03;font-weight:600;">{$mpeVariantSuffix}</span>{/if}</span>
             {if $add_product_link}</a>{/if}
             {if is_array($product.customizations) && $product.customizations|count}
               {foreach from=$product.customizations item="customization"}
@@ -91,7 +101,7 @@
                   <div id="mpe-oc-preview-{$customization.id_customization}" class="mpe-preview-modal" style="display:none;">
                     <div class="mpe-preview-backdrop"></div>
                     <button type="button" class="mpe-preview-close" aria-label="Fermer">&times;</button>
-                    <img src="{$mpeCustomImg}" alt="Aperçu de la création" class="mpe-preview-img" />
+                    <img src="{$mpeCustomImgLarge}" alt="Aperçu de la création" class="mpe-preview-img" />
                   </div>
                 {/if}
               {/foreach}

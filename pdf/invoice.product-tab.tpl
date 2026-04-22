@@ -62,6 +62,20 @@
         {$order_detail.product_reference}
       </td>
       <td class="product left">
+        {assign var='pdfVariant' value=''}
+        {if isset($order_detail.customizedDatas)}
+          {foreach $order_detail.customizedDatas as $cpa}
+            {foreach $cpa as $cid => $cdata}
+              {if isset($cdata.datas[Product::CUSTOMIZE_TEXTFIELD])}
+                {foreach $cdata.datas[Product::CUSTOMIZE_TEXTFIELD] as $ci}
+                  {if $ci.name == 'Variante'}
+                    {assign var='pdfVariant' value=$ci.value}
+                  {/if}
+                {/foreach}
+              {/if}
+            {/foreach}
+          {/foreach}
+        {/if}
         {if $display_product_images}
           <table width="100%">
             <tr>
@@ -72,12 +86,12 @@
               </td>
               <td width="5%">&nbsp;</td>
               <td width="80%">
-                {$order_detail.product_name}
+                {$order_detail.product_name}{if $pdfVariant} ({$pdfVariant}){/if}
               </td>
             </tr>
           </table>
         {else}
-          {$order_detail.product_name}
+          {$order_detail.product_name}{if $pdfVariant} ({$pdfVariant}){/if}
         {/if}
 
       </td>
@@ -115,18 +129,26 @@
     {foreach $order_detail.customizedDatas as $customizationPerAddress}
       {foreach $customizationPerAddress as $customizationId => $customization}
         {if isset($customization.datas[Product::CUSTOMIZE_TEXTFIELD]) && count($customization.datas[Product::CUSTOMIZE_TEXTFIELD]) > 0}
-          <tr class="customization_data {$bgcolor_class}">
-            <td class="center">&nbsp;</td>
-            <td colspan="{$layout._colCount - 1}">
-              <table style="width: 100%;">
-                {foreach $customization.datas[Product::CUSTOMIZE_TEXTFIELD] as $customization_infos}
-                  <tr>
-                    <td>{$customization_infos.name|escape:'html':'UTF-8'|string_format:{l s='%s:' d='Shop.Pdf' pdf='true'}} {if (int)$customization_infos.id_module}{$customization_infos.value nofilter}{else}{$customization_infos.value}{/if}</td>
-                  </tr>
-                {/foreach}
-              </table>
-            </td>
-          </tr>
+          {assign var='hasNonVariantText' value=false}
+          {foreach $customization.datas[Product::CUSTOMIZE_TEXTFIELD] as $customization_infos}
+            {if $customization_infos.name != 'Variante'}{assign var='hasNonVariantText' value=true}{/if}
+          {/foreach}
+          {if $hasNonVariantText}
+            <tr class="customization_data {$bgcolor_class}">
+              <td class="center">&nbsp;</td>
+              <td colspan="{$layout._colCount - 1}">
+                <table style="width: 100%;">
+                  {foreach $customization.datas[Product::CUSTOMIZE_TEXTFIELD] as $customization_infos}
+                    {if $customization_infos.name != 'Variante'}
+                      <tr>
+                        <td>{$customization_infos.name|escape:'html':'UTF-8'|string_format:{l s='%s:' d='Shop.Pdf' pdf='true'}} {if (int)$customization_infos.id_module}{$customization_infos.value nofilter}{else}{$customization_infos.value}{/if}</td>
+                      </tr>
+                    {/if}
+                  {/foreach}
+                </table>
+              </td>
+            </tr>
+          {/if}
         {/if}
         {if isset($customization.datas[Product::CUSTOMIZE_FILE]) && count($customization.datas[Product::CUSTOMIZE_FILE]) > 0}
           <tr class="customization_data {$bgcolor_class}">
