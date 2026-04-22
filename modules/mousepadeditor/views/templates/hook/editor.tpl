@@ -1043,6 +1043,10 @@ function mpeInit() {
           if (customField) customField.value = d.id_customization;
           bypass = true;
           btn.click();
+          setTimeout(function(){
+            bypass = false;
+            if (customField) customField.value = 0;
+          }, 800);
         })
         .catch(function(err){ hideLoader(); alert('Erreur réseau : ' + err); });
     }, true);
