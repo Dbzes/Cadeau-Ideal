@@ -35,18 +35,22 @@ class MugeditorAttachcustomModuleFrontController extends ModuleFrontController
                 }
             }
 
-            // Aperçu complet = bande 3 vues (fichier principal pour le lien "aperçu")
+            // Bande 3 vues → _preview (aperçu BO) + fichier principal (sera écrasé par HD au compose)
             if ($lowresPreview && strpos($lowresPreview, 'data:') === 0) {
                 $parts = explode(',', $lowresPreview, 2);
                 if (count($parts) === 2) {
                     $binary = base64_decode($parts[1]);
                     if ($binary !== false) {
-                        file_put_contents($dest, $binary);
+                        file_put_contents($dest . '_preview', $binary);
+                        file_put_contents($dest, $binary); // temporaire, sera écrasé par HD
                     }
                 }
             }
 
-            // Fallback si l'un manque
+            // Fallbacks
+            if (!file_exists($dest . '_preview') && file_exists($dest . '_small')) {
+                copy($dest . '_small', $dest . '_preview');
+            }
             if (!file_exists($dest) && file_exists($dest . '_small')) {
                 copy($dest . '_small', $dest);
             }

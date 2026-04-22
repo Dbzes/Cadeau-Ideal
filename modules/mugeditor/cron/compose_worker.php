@@ -54,15 +54,10 @@ foreach ($jobs as $job) {
         $cleanFile = $result['cleanFile'];
         $previewFile = $result['previewFile'];
 
-        // Patron HD clean → _hd (pour le lien "Planche de la création" en BO)
-        copy($cleanFile, $dest . '_hd');
+        // Patron HD clean → fichier principal (pour "Planche de la création" en BO)
+        // Écrase le low-res temporaire. _preview et _small restent intacts.
+        copy($cleanFile, $dest);
 
-        // Ne pas écraser $dest (bande 3 vues low-res) ni $dest_small (mug gauche)
-        // sauf si ils n'existent pas encore (fallback)
-        if (!file_exists($dest)) {
-            $thumbSource = file_exists($previewFile) ? $previewFile : $cleanFile;
-            copy($thumbSource, $dest);
-        }
         if (!file_exists($dest . '_small')) {
             @copy($cleanFile, $dest . '_small');
         }

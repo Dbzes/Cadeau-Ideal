@@ -27,7 +27,7 @@ class MousepadeditorAttachcustomModuleFrontController extends ModuleFrontControl
             $hash = md5($stateJson . microtime(true)) . '_' . substr(md5(uniqid('', true)), 0, 6);
             $dest = _PS_UPLOAD_DIR_ . $hash;
 
-            // Sauvegarder la vignette low-res comme fichier principal temporaire
+            // Sauvegarder la vignette low-res comme fichier principal temporaire + preview
             if ($lowres && strpos($lowres, 'data:') === 0) {
                 $parts = explode(',', $lowres, 2);
                 if (count($parts) === 2) {
@@ -35,6 +35,7 @@ class MousepadeditorAttachcustomModuleFrontController extends ModuleFrontControl
                     if ($binary !== false) {
                         file_put_contents($dest, $binary);
                         file_put_contents($dest . '_small', $binary);
+                        file_put_contents($dest . '_preview', $binary);
                     }
                 }
             }
@@ -45,10 +46,11 @@ class MousepadeditorAttachcustomModuleFrontController extends ModuleFrontControl
                 if (file_exists($placeholder)) {
                     copy($placeholder, $dest);
                     copy($placeholder, $dest . '_small');
+                    copy($placeholder, $dest . '_preview');
                 } else {
-                    // Créer une image vide minimale
                     file_put_contents($dest, '');
                     file_put_contents($dest . '_small', '');
+                    file_put_contents($dest . '_preview', '');
                 }
             }
 
