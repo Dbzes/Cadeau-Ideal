@@ -22,9 +22,14 @@
  * @copyright Since 2007 PrestaShop SA and Contributors
  * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License 3.0 (AFL-3.0)
  *}
+{literal}<style>
+#quantity_wanted::-webkit-outer-spin-button,
+#quantity_wanted::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+#quantity_wanted { -moz-appearance: textfield; }
+</style>{/literal}
 <div class="product-add-to-cart js-product-add-to-cart">
   {if !$configuration.is_catalog}
-    <span class="control-label">{l s='Quantity' d='Shop.Theme.Catalog'}</span>
+    {* Label Quantité masqué *}
 
     {block name='product_quantity'}
       <div class="product-quantity clearfix">
