@@ -24,6 +24,7 @@
  *}
 {literal}<style>
 .product-quantity .input-group-btn-vertical { display: none !important; }
+#quantity_wanted { text-align: center !important; }
 </style>{/literal}
 <div class="product-add-to-cart js-product-add-to-cart">
   {if !$configuration.is_catalog}
