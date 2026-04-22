@@ -56,10 +56,10 @@
     </a>
     {% if firstCustomValue %}
       <div class="mpe-custom-links mt-2 d-print-none">
-        <a href="#" class="mpe-bo-preview-trigger" data-img="{{ path('admin_orders_display_customization_image', {'orderId': orderForViewing.id, 'value': firstCustomValue ~ '_small'}) }}" data-title="Aperçu de la création" style="color:#004774;font-weight:700;text-decoration:none;margin-right:15px;">
+        <a href="#" class="mpe-bo-preview-trigger" data-img="{{ path('admin_orders_display_customization_image', {'orderId': orderForViewing.id, 'value': firstCustomValue}) }}" data-title="Aperçu de la création" style="color:#004774;font-weight:700;text-decoration:none;margin-right:15px;">
           <i class="material-icons" style="vertical-align:middle;font-size:18px;">visibility</i> Aperçu de la création
         </a>
-        <a href="#" class="mpe-bo-preview-trigger" data-img="{{ path('admin_orders_display_customization_image', {'orderId': orderForViewing.id, 'value': firstCustomValue}) }}" data-title="Planche de la création" style="color:#004774;font-weight:700;text-decoration:none;">
+        <a href="#" class="mpe-bo-preview-trigger" data-img="{{ path('admin_orders_display_customization_image', {'orderId': orderForViewing.id, 'value': firstCustomValue ~ '_hd'}) }}" data-title="Planche de la création" style="color:#004774;font-weight:700;text-decoration:none;">
           <i class="material-icons" style="vertical-align:middle;font-size:18px;">insert_drive_file</i> Planche de la création
         </a>
       </div>

@@ -54,19 +54,17 @@ foreach ($jobs as $job) {
         $cleanFile = $result['cleanFile'];
         $previewFile = $result['previewFile'];
 
-        copy($cleanFile, $dest);
+        // Patron HD clean → _hd (pour le lien "Planche de la création" en BO)
+        copy($cleanFile, $dest . '_hd');
 
-        $thumbSource = file_exists($previewFile) ? $previewFile : $cleanFile;
-        try {
-            $thumb = new Imagick($thumbSource);
-            $thumb->thumbnailImage(1200, 0);
-            $thumb->setImageCompressionQuality(90);
-            $thumb->setImageFormat('jpeg');
-            $thumb->stripImage();
-            $thumb->writeImage($dest . '_small');
-            $thumb->clear();
-        } catch (Exception $e) {
-            @copy($thumbSource, $dest . '_small');
+        // Ne pas écraser $dest (bande 3 vues low-res) ni $dest_small (mug gauche)
+        // sauf si ils n'existent pas encore (fallback)
+        if (!file_exists($dest)) {
+            $thumbSource = file_exists($previewFile) ? $previewFile : $cleanFile;
+            copy($thumbSource, $dest);
+        }
+        if (!file_exists($dest . '_small')) {
+            @copy($cleanFile, $dest . '_small');
         }
 
         @unlink($cleanFile);
