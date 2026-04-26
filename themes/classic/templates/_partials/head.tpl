@@ -601,6 +601,9 @@
       font-size: 1rem;
       font-weight: 600;
     }
+    .cat-focused-title:hover {
+      color: #ee7a03;
+    }
   </style>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
