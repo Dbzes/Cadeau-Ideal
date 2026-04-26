@@ -591,6 +591,11 @@
         max-height: 100vh;
       }
     }
+
+    #search_filters_brands,
+    #search_filters_suppliers {
+      display: none !important;
+    }
   </style>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
