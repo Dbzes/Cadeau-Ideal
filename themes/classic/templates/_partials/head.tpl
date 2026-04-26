@@ -593,7 +593,8 @@
     }
 
     #search_filters_brands,
-    #search_filters_suppliers {
+    #search_filters_suppliers,
+    #subcategories {
       display: none !important;
     }
 
