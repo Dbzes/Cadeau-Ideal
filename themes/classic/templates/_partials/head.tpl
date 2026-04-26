@@ -606,7 +606,7 @@
       color: #ee7a03;
     }
 
-    #category-description a {
+    #category-description p a {
       color: #004774 !important;
       font-weight: 700 !important;
     }
