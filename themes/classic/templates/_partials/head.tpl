@@ -606,8 +606,10 @@
       color: #ee7a03;
     }
 
-    #category-description p strong {
+    #category-description p strong,
+    #category-description p a {
       color: #004774 !important;
+      font-weight: 700 !important;
     }
   </style>
   <script>
