@@ -601,7 +601,8 @@
       font-size: 1rem;
       font-weight: 600;
     }
-    .cat-focused-title:hover {
+    .cat-focused-title:hover,
+    .block-categories .category-sub-link:hover {
       color: #ee7a03;
     }
   </style>
