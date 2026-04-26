@@ -124,6 +124,80 @@ class Ps_CategoryTree extends Module implements WidgetInterface
         ];
     }
 
+    private function getProductCount(int $idCategory): int
+    {
+        return (int) Db::getInstance()->getValue('
+            SELECT COUNT(DISTINCT cp.`id_product`)
+            FROM `' . _DB_PREFIX_ . 'category` c
+            INNER JOIN `' . _DB_PREFIX_ . 'category_product` cp ON cp.`id_category` = c.`id_category`
+            INNER JOIN `' . _DB_PREFIX_ . 'product_shop` ps ON ps.`id_product` = cp.`id_product`
+                AND ps.`id_shop` = ' . (int) $this->context->shop->id . '
+                AND ps.`active` = 1
+                AND ps.`visibility` IN (\'both\', \'catalog\')
+            WHERE c.`nleft` >= (SELECT `nleft` FROM `' . _DB_PREFIX_ . 'category` WHERE `id_category` = ' . (int) $idCategory . ')
+            AND c.`nright` <= (SELECT `nright` FROM `' . _DB_PREFIX_ . 'category` WHERE `id_category` = ' . (int) $idCategory . ')
+        ');
+    }
+
+    private function getDirectChildren(int $idParent): array
+    {
+        return Db::getInstance()->executeS('
+            SELECT c.`id_category`, c.`id_parent`, cl.`name`, cl.`link_rewrite`
+            FROM `' . _DB_PREFIX_ . 'category` c
+            INNER JOIN `' . _DB_PREFIX_ . 'category_lang` cl
+                ON cl.`id_category` = c.`id_category`
+                AND cl.`id_lang` = ' . (int) $this->context->language->id . '
+                AND cl.`id_shop` = ' . (int) $this->context->shop->id . '
+            INNER JOIN `' . _DB_PREFIX_ . 'category_shop` cs
+                ON cs.`id_category` = c.`id_category`
+                AND cs.`id_shop` = ' . (int) $this->context->shop->id . '
+            WHERE c.`id_parent` = ' . (int) $idParent . '
+            AND c.`active` = 1
+            ORDER BY cs.`position` ASC
+        ');
+    }
+
+    private function getFocusedCategoryData(Category $cat): ?array
+    {
+        $homeId = (int) Configuration::get('PS_HOME_CATEGORY');
+        if (!$cat->id || $cat->id === $homeId || $cat->is_root_category) {
+            return null;
+        }
+
+        $directChildren = $this->getDirectChildren($cat->id);
+
+        // Si la catégorie n'a pas de sous-catégories, remonter au parent
+        if (empty($directChildren)) {
+            $parent = $this->tryToGetParentCategoryIfAvailable($cat);
+            if (!$parent->id || $parent->id === $homeId) {
+                return null;
+            }
+            $cat = $parent;
+            $directChildren = $this->getDirectChildren($cat->id);
+        }
+
+        $currentId = $this->getCurrentCategory()->id;
+
+        $children = [];
+        foreach ($directChildren as $child) {
+            $children[] = [
+                'id' => $child['id_category'],
+                'name' => $child['name'],
+                'link' => $this->context->link->getCategoryLink((int) $child['id_category'], $child['link_rewrite']),
+                'product_count' => $this->getProductCount((int) $child['id_category']),
+                'is_current' => (int) $child['id_category'] === (int) $currentId,
+            ];
+        }
+
+        return [
+            'id' => $cat->id,
+            'name' => $cat->name,
+            'link' => $this->context->link->getCategoryLink($cat->id, $cat->link_rewrite),
+            'product_count' => $this->getProductCount($cat->id),
+            'children' => $children,
+        ];
+    }
+
     private function getCategories($category): array
     {
         // Determine max depth to get categories
@@ -297,6 +371,7 @@ class Ps_CategoryTree extends Module implements WidgetInterface
         return [
             'categories' => $this->getCategories($rootCategory),
             'currentCategory' => $rootCategory->id,
+            'focusedCategory' => $this->getFocusedCategoryData($this->getCurrentCategory()),
         ];
     }
 

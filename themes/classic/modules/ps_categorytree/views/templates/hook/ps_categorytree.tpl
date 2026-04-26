@@ -10,7 +10,7 @@
  * https://opensource.org/licenses/AFL-3.0
  * If you did not receive a copy of the license and are unable to
  * obtain it through the world-wide-web, please send an email
- * to license@prestashop.com so we can send you a copy immediately.
+ * to license@prestashop.com so we can find you a copy immediately.
  *
  * DISCLAIMER
  *
@@ -59,11 +59,36 @@
   {/strip}
 {/function}
 
-<div class="block-categories">
-  <ul class="category-top-menu">
-    <li><a class="text-uppercase h6" href="{$categories.link nofilter}">{$categories.name}</a></li>
-    {if !empty($categories.children)}
-      <li>{categories nodes=$categories.children}</li>
-    {/if}
-  </ul>
-</div>
+{if $focusedCategory}
+  <div class="block-categories">
+    <ul class="category-top-menu">
+      <li>
+        <a class="text-uppercase h6" href="{$focusedCategory.link nofilter}">
+          {$focusedCategory.name} ({$focusedCategory.product_count})
+        </a>
+      </li>
+      {if $focusedCategory.children}
+        <li>
+          <ul class="category-sub-menu">
+            {foreach from=$focusedCategory.children item=child}
+              <li data-depth="0" {if $child.is_current}class="current"{/if}>
+                <a class="category-sub-link{if $child.is_current} active{/if}" href="{$child.link nofilter}">
+                  {$child.name} ({$child.product_count})
+                </a>
+              </li>
+            {/foreach}
+          </ul>
+        </li>
+      {/if}
+    </ul>
+  </div>
+{else}
+  <div class="block-categories">
+    <ul class="category-top-menu">
+      <li><a class="text-uppercase h6" href="{$categories.link nofilter}">{$categories.name}</a></li>
+      {if !empty($categories.children)}
+        <li>{categories nodes=$categories.children}</li>
+      {/if}
+    </ul>
+  </div>
+{/if}
