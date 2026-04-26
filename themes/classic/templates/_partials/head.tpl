@@ -607,8 +607,8 @@
     }
 
     #category-description a {
-      color: #004774;
-      font-weight: 700;
+      color: #004774 !important;
+      font-weight: 700 !important;
     }
   </style>
   <script>
