@@ -63,7 +63,7 @@
   <div class="block-categories">
     <ul class="category-top-menu">
       <li>
-        <a class="text-uppercase h6" href="{$focusedCategory.link nofilter}">
+        <a class="cat-focused-title" href="{$focusedCategory.link nofilter}">
           {$focusedCategory.name} ({$focusedCategory.product_count})
         </a>
       </li>

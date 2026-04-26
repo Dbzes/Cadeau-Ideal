@@ -596,6 +596,11 @@
     #search_filters_suppliers {
       display: none !important;
     }
+
+    .cat-focused-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
   </style>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
