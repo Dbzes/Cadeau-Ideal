@@ -153,7 +153,7 @@ class Ps_CategoryTree extends Module implements WidgetInterface
                 AND cs.`id_shop` = ' . (int) $this->context->shop->id . '
             WHERE c.`id_parent` = ' . (int) $idParent . '
             AND c.`active` = 1
-            ORDER BY cs.`position` ASC
+            ORDER BY cl.`name` ASC
         ');
     }
 

@@ -605,6 +605,11 @@
     .block-categories .category-sub-link:hover {
       color: #ee7a03;
     }
+
+    #category-description a {
+      color: #004774;
+      font-weight: 700;
+    }
   </style>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
