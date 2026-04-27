@@ -5,7 +5,7 @@
         <a href="{$link.url}">{$link.title}</a>
       </li>
       {if !$smarty.foreach.cms_links.last}
-        <li class="cms-footer-sep" aria-hidden="true">|</li>
+        <li class="cms-footer-sep" aria-hidden="true"> - </li>
       {/if}
     {/foreach}
   </ul>
