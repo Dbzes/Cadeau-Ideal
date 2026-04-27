@@ -212,6 +212,10 @@ class Ps_BestSellers extends Module implements WidgetInterface
             return false;
         }
 
+        // Seuil minimum de meilleures ventes pour afficher le bloc
+        $minToDisplayBlock = 10;
+        $displayLimit = (int) Configuration::get('PS_BLOCK_BESTSELLERS_TO_DISPLAY');
+
         // We will use the default core search provider to get the products
         $searchProvider = new BestSalesProductSearchProvider(
             $this->context->getTranslator()
@@ -222,7 +226,7 @@ class Ps_BestSellers extends Module implements WidgetInterface
         // Build the search query
         $query = new ProductSearchQuery();
         $query
-            ->setResultsPerPage((int) Configuration::get('PS_BLOCK_BESTSELLERS_TO_DISPLAY'))
+            ->setResultsPerPage(max($displayLimit, $minToDisplayBlock))
             ->setPage(1)
             ->setSortOrder(new SortOrder('product', 'sales', 'desc'))
         ;
@@ -275,6 +279,11 @@ class Ps_BestSellers extends Module implements WidgetInterface
             );
         }
 
-        return $products_for_template;
+        // Masque le bloc tant qu'il n'y a pas assez de meilleures ventes
+        if (count($products_for_template) < $minToDisplayBlock) {
+            return [];
+        }
+
+        return array_slice($products_for_template, 0, $displayLimit);
     }
 }
