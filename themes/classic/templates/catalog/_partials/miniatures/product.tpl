@@ -23,11 +23,99 @@
  * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License 3.0 (AFL-3.0)
  *}
 {block name='product_miniature_item'}
+{literal}
 <style>
   .product-miniature .product-flag { background-color: #ee7a03 !important; }
   .product-miniature .product-flag.on-sale { display: none !important; }
   .product-miniature .wishlist-button-add, .product-miniature .wishlist-button-product { display: none !important; }
+
+  /* === Animation miniatures === */
+  .product-miniature {
+    position: relative;
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease, box-shadow 0.35s ease;
+    will-change: opacity, transform;
+  }
+  .product-miniature.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .product-miniature .thumbnail-container {
+    transition: box-shadow 0.35s ease;
+  }
+  .product-miniature .thumbnail-top {
+    position: relative;
+    overflow: hidden;
+  }
+  .product-miniature .thumbnail-top .product-thumbnail img {
+    transition: transform 0.5s ease;
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .product-miniature .thumbnail-top::after {
+    content: "Voir le produit";
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 71, 116, 0.62);
+    color: #fff;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 2;
+  }
+  .product-miniature .product-flag,
+  .product-miniature .highlighted-informations {
+    z-index: 3;
+  }
+
+  @media (hover: hover) {
+    .product-miniature:hover .thumbnail-container {
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+    }
+    .product-miniature:hover .thumbnail-top .product-thumbnail img {
+      transform: scale(1.06);
+    }
+    .product-miniature:hover .thumbnail-top::after {
+      opacity: 1;
+    }
+  }
+
+  /* Mobile : pulse léger quand la miniature entre dans le viewport */
+  @media (hover: none) {
+    .product-miniature.is-visible .thumbnail-top .product-thumbnail img {
+      animation: ci-mini-pulse 0.9s ease-out 0.15s 1;
+    }
+    @keyframes ci-mini-pulse {
+      0%   { transform: scale(1); }
+      55%  { transform: scale(1.04); }
+      100% { transform: scale(1); }
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .product-miniature {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+    .product-miniature .thumbnail-top .product-thumbnail img,
+    .product-miniature .thumbnail-top::after,
+    .product-miniature .thumbnail-container {
+      transition: none;
+      animation: none;
+    }
+  }
 </style>
+{/literal}
 <div class="js-product product{if !empty($productClasses)} {$productClasses}{/if}">
   <article class="product-miniature js-product-miniature" data-id-product="{$product.id_product}" data-id-product-attribute="{$product.id_product_attribute}">
     <div class="thumbnail-container">
@@ -125,4 +213,62 @@
     </div>
   </article>
 </div>
+{literal}
+<script>
+(function () {
+  if (window.__ciMiniatureInit) return;
+  window.__ciMiniatureInit = true;
+
+  function reveal(el) { el.classList.add('is-visible'); }
+
+  function init() {
+    var nodes = document.querySelectorAll('.product-miniature');
+    if (!nodes.length) return;
+
+    if (!('IntersectionObserver' in window)) {
+      nodes.forEach(reveal);
+      return;
+    }
+
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          reveal(entry.target);
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+
+    nodes.forEach(function (el) {
+      if (!el.classList.contains('is-visible')) io.observe(el);
+    });
+
+    // Capture les miniatures injectees apres coup (pagination ajax, sliders)
+    if ('MutationObserver' in window) {
+      var mo = new MutationObserver(function (muts) {
+        muts.forEach(function (m) {
+          m.addedNodes && m.addedNodes.forEach(function (n) {
+            if (n.nodeType !== 1) return;
+            if (n.classList && n.classList.contains('product-miniature')) {
+              io.observe(n);
+            } else if (n.querySelectorAll) {
+              n.querySelectorAll('.product-miniature:not(.is-visible)').forEach(function (sub) {
+                io.observe(sub);
+              });
+            }
+          });
+        });
+      });
+      mo.observe(document.body, { childList: true, subtree: true });
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+{/literal}
 {/block}
