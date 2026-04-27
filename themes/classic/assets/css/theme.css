@@ -12,3 +12,6 @@
 .cms-footer-links li a{color:#004774;text-decoration:none;transition:color .2s}
 .cms-footer-links li a:hover{color:#ee7a03;text-decoration:underline}
 .cms-footer-sep{color:#7a7a7a;pointer-events:none;user-select:none}
+
+/* Masquer blocs Produits et Notre société dans le footer */
+.footer-container .links{display:none}
