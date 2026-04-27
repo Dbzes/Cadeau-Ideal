@@ -6,18 +6,20 @@ if (!defined('_PS_VERSION_')) {
 
 class Cmsinfooter extends Module
 {
+    const FOOTER_CMS_ID = 8;
+
     public function __construct()
     {
         $this->name = 'cmsinfooter';
         $this->tab = 'front_office_features';
-        $this->version = '1.0.0';
+        $this->version = '1.1.0';
         $this->author = 'Le Cadeau Idéal';
         $this->need_instance = 0;
 
         parent::__construct();
 
         $this->displayName = $this->l('CMS Footer Links');
-        $this->description = $this->l('Affiche les pages CMS Informations en ligne dans le footer.');
+        $this->description = $this->l('Affiche le contenu de la page CMS "Liens footer" dans le footer.');
     }
 
     public function install()
@@ -32,28 +34,13 @@ class Cmsinfooter extends Module
 
     public function hookDisplayFooterAfter($params)
     {
-        $cms_pages = CMS::getCMSPages(
-            (int) $this->context->language->id,
-            2,
-            true
-        );
+        $cms = new CMS(self::FOOTER_CMS_ID, $this->context->language->id);
 
-        if (empty($cms_pages)) {
+        if (!Validate::isLoadedObject($cms) || !$cms->active) {
             return '';
         }
 
-        $links = [];
-        foreach ($cms_pages as $page) {
-            $links[] = [
-                'title' => $page['meta_title'],
-                'url'   => $this->context->link->getCMSLink(
-                    $page['id_cms'],
-                    $page['link_rewrite']
-                ),
-            ];
-        }
-
-        $this->context->smarty->assign('cms_footer_links', $links);
+        $this->context->smarty->assign('cms_footer_content', $cms->content);
 
         return $this->display(__FILE__, 'views/templates/hook/footer_cms.tpl');
     }
