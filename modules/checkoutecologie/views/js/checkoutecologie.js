@@ -47,11 +47,10 @@
           block.classList.remove('ceco-loading');
           if (resp.data && resp.data.success) {
             feedback.classList.remove('ceco-error');
-            feedback.textContent = active ? 'Réduction appliquée.' : 'Réduction retirée.';
-            // Demande à PrestaShop de rafraîchir le résumé du panier (totaux)
-            if (window.prestashop && typeof window.prestashop.emit === 'function') {
-              window.prestashop.emit('updateCart', { reason: { linkAction: 'cart-rule' } });
-            }
+            feedback.textContent = active ? 'Réduction appliquée. Mise à jour…' : 'Réduction retirée. Mise à jour…';
+            // Recharge la page pour garantir un résumé panier cohérent.
+            // L'event prestashop.emit('updateCart') a un handler buggé dans le checkout.
+            setTimeout(function () { window.location.reload(); }, 350);
           } else {
             // Si décocher et que le serveur dit "invalid_state" (cart rule pas appliquée),
             // c'est OK : on accepte la décoche silencieusement.
