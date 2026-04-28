@@ -367,7 +367,6 @@ class Ps_Emailsubscription extends Module implements WidgetInterface
             'delete' => [
                 'text' => $this->trans('Supprimer la sélection', [], 'Admin.Actions'),
                 'icon' => 'icon-trash',
-                'confirm' => $this->trans('Confirmer la suppression ? Les abonnés "guest" seront supprimés et les clients seront désabonnés.', [], 'Modules.Emailsubscription.Admin'),
             ],
         ];
 
@@ -383,7 +382,62 @@ class Ps_Emailsubscription extends Module implements WidgetInterface
         $pagination = ($pagination = Tools::getValue($helper_list->table . '_pagination')) ? $pagination : 50;
         $subscribers = $this->paginateSubscribers($subscribers, $page, $pagination);
 
-        return $helper_list->generateList($subscribers, $fields_list);
+        $listHtml = $helper_list->generateList($subscribers, $fields_list);
+
+        // Modal de confirmation in-page (remplace window.confirm() bloqué par certains navigateurs)
+        $listHtml .= '
+<div id="nl-confirm-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:99999;align-items:center;justify-content:center;">
+  <div style="background:#fff;padding:28px;border-radius:6px;max-width:440px;width:90%;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.3);">
+    <div style="font-size:42px;color:#e74c3c;margin-bottom:14px;">⚠</div>
+    <h3 style="margin:0 0 10px;color:#004774;font-size:18px;">Confirmer la suppression</h3>
+    <p id="nl-confirm-msg" style="margin:0 0 22px;font-size:14px;color:#444;line-height:1.5;"></p>
+    <button id="nl-confirm-yes" type="button" style="background:#e74c3c;color:#fff;border:0;padding:10px 22px;cursor:pointer;font-weight:600;margin-right:8px;border-radius:3px;">Oui, supprimer</button>
+    <button id="nl-confirm-no" type="button" style="background:#ddd;color:#333;border:0;padding:10px 22px;cursor:pointer;border-radius:3px;">Annuler</button>
+  </div>
+</div>
+<script>
+(function(){
+  var overlay = document.getElementById("nl-confirm-overlay");
+  var msg     = document.getElementById("nl-confirm-msg");
+  var btnYes  = document.getElementById("nl-confirm-yes");
+  var btnNo   = document.getElementById("nl-confirm-no");
+  var pending = null;
+
+  document.addEventListener("click", function(e){
+    var link = e.target.closest(".bulk-actions .dropdown-menu a");
+    if (!link) return;
+    var oc = link.getAttribute("onclick") || "";
+    var m  = oc.match(/sendBulkAction\\([^,]+,\\s*[\"\']([^\"\']+)[\"\']\\)/);
+    if (!m) return;
+    e.preventDefault();
+    e.stopPropagation();
+    var form = link.closest("form");
+    var action = m[1];
+    var checked = form ? form.querySelectorAll("input[type=checkbox][name$=\"Box[]\"]:checked").length : 0;
+    if (checked === 0) {
+      alert("Aucune ligne sélectionnée.");
+      return;
+    }
+    msg.textContent = "Tu vas supprimer " + checked + " inscrit(s). Les abonnés \\"guest\\" seront supprimés, les clients seront désabonnés (compte conservé).";
+    pending = { form: form, action: action };
+    overlay.style.display = "flex";
+  }, true);
+
+  btnYes.addEventListener("click", function(){
+    overlay.style.display = "none";
+    if (pending && typeof sendBulkAction === "function") {
+      sendBulkAction(pending.form, pending.action);
+    }
+    pending = null;
+  });
+  btnNo.addEventListener("click", function(){
+    overlay.style.display = "none";
+    pending = null;
+  });
+})();
+</script>';
+
+        return $listHtml;
     }
 
     public function displayViewCustomerLink($token = null, $id = null, $name = null)
