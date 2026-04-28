@@ -15,9 +15,10 @@
 
     checkbox.addEventListener('change', function () {
       var active = checkbox.checked ? 1 : 0;
+      console.log('[checkoutecologie] toggle clicked, active=' + active + ' url=' + url);
       block.classList.add('ceco-loading');
       feedback.classList.remove('ceco-error');
-      feedback.textContent = '';
+      feedback.textContent = 'Patientez…';
 
       var fd = new FormData();
       fd.append('active', active);
@@ -30,15 +31,19 @@
         headers: { 'X-Requested-With': 'XMLHttpRequest' }
       })
         .then(function (r) {
+          console.log('[checkoutecologie] response status=' + r.status + ' ct=' + r.headers.get('content-type'));
           return r.text().then(function (txt) {
+            console.log('[checkoutecologie] raw body (first 300):', txt.substring(0, 300));
             try {
-              return { ok: r.ok, data: JSON.parse(txt) };
+              return { ok: r.ok, status: r.status, data: JSON.parse(txt) };
             } catch (e) {
-              return { ok: r.ok, data: null, raw: txt };
+              console.error('[checkoutecologie] JSON parse failed:', e.message);
+              return { ok: r.ok, status: r.status, data: null, raw: txt };
             }
           });
         })
         .then(function (resp) {
+          console.log('[checkoutecologie] parsed:', resp);
           block.classList.remove('ceco-loading');
           if (resp.data && resp.data.success) {
             feedback.classList.remove('ceco-error');
