@@ -41,61 +41,57 @@
 
 {literal}
 <style>
+  .mr-summary,
+  .mr-summary * {
+    text-align: center !important;
+  }
   .mr-summary {
-    display: block;
-    width: 100%;
-    box-sizing: border-box;
-    padding: 0;
-    margin: 0;
+    display: block !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
   }
   .mr-summary__title {
-    font-size: 0.72rem !important;
-    font-weight: 700;
-    color: #004774;
-    margin: 0 0 6px 0;
-    line-height: 1.25;
-    text-align: center;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
+    font-size: 0.6rem !important;
+    font-weight: 700 !important;
+    color: #004774 !important;
+    margin: 0 auto 6px auto !important;
+    line-height: 1.25 !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
   }
   .mr-summary__address {
     font-size: 0.72rem !important;
-    line-height: 1.35;
-    color: #333;
-    margin: 0 0 10px 0;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
+    line-height: 1.35 !important;
+    color: #333 !important;
+    margin: 0 auto 10px auto !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
   }
   .mr-summary__address div {
-    padding: 0;
-    margin: 0;
+    padding: 0 !important;
+    margin: 0 auto !important;
+    text-align: center !important;
   }
   .mr-summary__button {
-    display: inline-block;
-    width: 100%;
-    max-width: 100%;
+    display: block !important;
+    width: auto !important;
+    max-width: 100% !important;
+    margin: 0 auto 6px auto !important;
     padding: 6px 10px !important;
     font-size: 0.68rem !important;
-    line-height: 1.2;
-    white-space: normal;
-    word-wrap: break-word;
-    box-sizing: border-box;
+    line-height: 1.2 !important;
+    white-space: normal !important;
+    word-wrap: break-word !important;
+    box-sizing: border-box !important;
   }
   .mr-summary__button i {
     font-size: 0.68rem !important;
   }
-  @media (min-width: 768px) {
-    .mr-summary__button {
-      width: auto;
-      max-width: 100%;
-    }
-  }
   @media (max-width: 767px) {
-    .mr-summary {
-      text-align: center;
-    }
     .mr-summary__title {
-      font-size: 0.65rem !important;
+      font-size: 0.55rem !important;
     }
     .mr-summary__address {
       font-size: 0.68rem !important;

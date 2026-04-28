@@ -41,6 +41,10 @@
       background-color: #003359 !important;
       border-color: #003359 !important;
     }
+    /* Centrage horizontal de tout le contenu carrier-extra (summary mondialrelay + bouton utiliser) */
+    .carrier-extra-content {
+      text-align: center !important;
+    }
     /* Bouton "Utiliser ce locker / Point Relais" dans le widget mondialrelay (liste/carte) */
     #checkout-delivery-step [class*="mondialrelay"] button,
     #checkout-delivery-step [class*="mondialrelay"] .btn,
@@ -57,6 +61,9 @@
       line-height: 1.2 !important;
       white-space: normal !important;
       word-wrap: break-word !important;
+      display: inline-block !important;
+      margin: 0 auto !important;
+      float: none !important;
     }
     @media (max-width: 767px) {
       #checkout-delivery-step [class*="mondialrelay"] button,
