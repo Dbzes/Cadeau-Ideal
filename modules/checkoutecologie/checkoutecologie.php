@@ -47,10 +47,18 @@ class Checkoutecologie extends Module
         Configuration::updateValue(self::CONF_BO_LABEL, 'Carton de seconde main demandé');
 
         // Colonne dédiée sur ps_orders (utilisée pour la prep)
-        Db::getInstance()->execute('
-            ALTER TABLE `' . _DB_PREFIX_ . 'orders`
-            ADD COLUMN IF NOT EXISTS `eco_packaging` TINYINT(1) NOT NULL DEFAULT 0
-        ');
+        $columnExists = (int) Db::getInstance()->getValue(
+            "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS
+             WHERE TABLE_SCHEMA = DATABASE()
+               AND TABLE_NAME = '" . _DB_PREFIX_ . "orders'
+               AND COLUMN_NAME = 'eco_packaging'"
+        );
+        if (!$columnExists) {
+            Db::getInstance()->execute('
+                ALTER TABLE `' . _DB_PREFIX_ . 'orders`
+                ADD COLUMN `eco_packaging` TINYINT(1) NOT NULL DEFAULT 0
+            ');
+        }
 
         $this->createCartRule((float) Configuration::get(self::CONF_AMOUNT));
 
