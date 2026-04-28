@@ -74,6 +74,7 @@ class Mugeditor extends Module
             && Configuration::updateValue('MUG_BACKGROUNDS', json_encode([]))
             && Configuration::updateValue('MUG_FONTS', json_encode([]))
             && Configuration::updateValue('MUG_PROPOSED_IMAGES', json_encode([]))
+            && Configuration::updateValue('MUG_PROPOSED_HIDDEN', json_encode([]))
             && Configuration::updateValue('MUG_PROPOSED_TEXT', '')
             && Configuration::updateValue('MUG_ENABLED_FONTS', json_encode(['Arial' => true, 'Open Sans' => true, 'Bebas Neue' => true]));
     }
@@ -85,6 +86,7 @@ class Mugeditor extends Module
         Configuration::deleteByName('MUG_BACKGROUNDS');
         Configuration::deleteByName('MUG_FONTS');
         Configuration::deleteByName('MUG_PROPOSED_IMAGES');
+        Configuration::deleteByName('MUG_PROPOSED_HIDDEN');
         Configuration::deleteByName('MUG_PROPOSED_TEXT');
         Configuration::deleteByName('MUG_ENABLED_FONTS');
 
@@ -248,6 +250,9 @@ class Mugeditor extends Module
         }
         if (Tools::getValue('deleteProposed')) {
             $output .= $this->handleProposedDelete(Tools::getValue('deleteProposed'));
+        }
+        if (Tools::getValue('toggleProposed')) {
+            $output .= $this->handleProposedToggle(Tools::getValue('toggleProposed'));
         }
         if (Tools::getValue('reorderProposed')) {
             $order = explode(',', Tools::getValue('reorderProposed'));
@@ -935,7 +940,46 @@ class Mugeditor extends Module
         }
         unset($list[$idx]);
         $this->saveProposedImages($list);
+
+        $hidden = $this->getProposedHidden();
+        $hidden = array_values(array_diff($hidden, [$filename]));
+        $this->saveProposedHidden($hidden);
+
         return $this->displayConfirmation($this->l('Image supprimée.'));
+    }
+
+    protected function getProposedHidden()
+    {
+        $raw = Configuration::get('MUG_PROPOSED_HIDDEN');
+        $list = json_decode($raw, true);
+        return is_array($list) ? $list : [];
+    }
+
+    protected function saveProposedHidden(array $list)
+    {
+        Configuration::updateValue('MUG_PROPOSED_HIDDEN', json_encode(array_values(array_unique($list))));
+    }
+
+    protected function isProposedHidden($filename)
+    {
+        return in_array($filename, $this->getProposedHidden(), true);
+    }
+
+    protected function handleProposedToggle($filename)
+    {
+        if (!in_array($filename, $this->getProposedImages(), true)) {
+            return '';
+        }
+        $hidden = $this->getProposedHidden();
+        if (in_array($filename, $hidden, true)) {
+            $hidden = array_values(array_diff($hidden, [$filename]));
+            $msg = $this->l('Image affichée côté client.');
+        } else {
+            $hidden[] = $filename;
+            $msg = $this->l('Image masquée côté client.');
+        }
+        $this->saveProposedHidden($hidden);
+        return $this->displayConfirmation($msg);
     }
 
     protected function renderProposedManager()
@@ -1000,11 +1044,27 @@ class Mugeditor extends Module
             $html .= '<p>' . $this->l('Aucune image proposée pour le moment.') . '</p>';
         } else {
             $html .= '<p style="color:#888;font-size:13px;margin-bottom:10px;"><i class="icon-info-circle"></i> ' . $this->l('Glissez-déposez les vignettes pour réorganiser l\'ordre d\'affichage côté client.') . '</p>';
+            $hiddenList = $this->getProposedHidden();
             $html .= '<div id="mue-proposed-list" style="display:flex;flex-wrap:wrap;gap:15px;">';
             foreach ($list as $f) {
-                $html .= '<div class="mue-bg-card" draggable="true" data-file="' . htmlspecialchars($f) . '" style="border:1px solid #ddd;padding:8px;width:160px;text-align:center;background:#fafafa;cursor:move;border-radius:4px;transition:all .15s;">';
+                $isHidden = in_array($f, $hiddenList, true);
+                $cardStyle = 'border:1px solid #ddd;padding:8px;width:160px;text-align:center;background:#fafafa;cursor:move;border-radius:4px;transition:all .15s;position:relative;';
+                if ($isHidden) {
+                    $cardStyle .= 'opacity:.45;background:#f5f5f5;';
+                }
+                $html .= '<div class="mue-bg-card" draggable="true" data-file="' . htmlspecialchars($f) . '" style="' . $cardStyle . '">';
+                if ($isHidden) {
+                    $html .= '<div style="position:absolute;top:6px;left:6px;background:#888;color:#fff;font-size:10px;padding:2px 6px;border-radius:3px;font-weight:600;text-transform:uppercase;">' . $this->l('Masquée') . '</div>';
+                }
                 $html .= '<img src="' . $url . $f . '" style="max-width:100%;height:100px;object-fit:contain;display:block;margin-bottom:6px;pointer-events:none;background-image:url(\'' . $checkerBg . '\');background-repeat:repeat;background-size:20px;" />';
-                $html .= '<a href="' . $base . '&deleteProposed=' . urlencode($f) . '" class="btn btn-danger btn-xs" onclick="return confirm(\'Supprimer cette image ?\')">✕ ' . $this->l('Supprimer') . '</a>';
+                $html .= '<div style="display:flex;gap:4px;justify-content:center;">';
+                if ($isHidden) {
+                    $html .= '<a href="' . $base . '&toggleProposed=' . urlencode($f) . '" class="btn btn-success btn-xs" title="' . $this->l('Afficher côté client') . '">👁 ' . $this->l('Afficher') . '</a>';
+                } else {
+                    $html .= '<a href="' . $base . '&toggleProposed=' . urlencode($f) . '" class="btn btn-default btn-xs" title="' . $this->l('Masquer côté client') . '">🚫 ' . $this->l('Masquer') . '</a>';
+                }
+                $html .= '<a href="' . $base . '&deleteProposed=' . urlencode($f) . '" class="btn btn-danger btn-xs" onclick="return confirm(\'Supprimer cette image ?\')">✕</a>';
+                $html .= '</div>';
                 $html .= '</div>';
             }
             $html .= '</div>';
@@ -1443,7 +1503,9 @@ class Mugeditor extends Module
             $fontOptionsHtml .= '<div class="mue-font-option" data-font="' . $esc . '" style="font-family:\'' . $esc . '\',sans-serif !important;font-size:18px;">' . $esc . '</div>';
         }
 
-        $proposedImages = $this->getProposedImages();
+        $proposedAll = $this->getProposedImages();
+        $proposedHidden = $this->getProposedHidden();
+        $proposedImages = array_values(array_diff($proposedAll, $proposedHidden));
         $proposedUrl = $this->_path . self::PROPOSED_DIR;
         $proposedText = (string) Configuration::get('MUG_PROPOSED_TEXT');
 
