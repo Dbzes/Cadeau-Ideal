@@ -473,6 +473,60 @@ class Ps_Emailsubscription extends Module implements WidgetInterface
     }
 
     /**
+     * Vérifie si l'IP cliente provient d'un pays autorisé (FR + limitrophes).
+     * En cas d'échec API, retourne true (failsafe : ne bloque pas un client légitime).
+     */
+    protected function isAllowedCountry($ip)
+    {
+        $allowed = ['FR', 'BE', 'LU', 'DE', 'CH', 'IT', 'ES'];
+
+        // IPs locales / privées : autoriser sans appel API (dev, admin interne)
+        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false) {
+            $this->logGeoNewsletter($ip, 'LOCAL', 'allowed');
+
+            return true;
+        }
+
+        $url = 'http://ip-api.com/json/' . urlencode($ip) . '?fields=status,countryCode';
+        $ctx = stream_context_create([
+            'http' => [
+                'timeout' => 3,
+                'header' => "User-Agent: Mozilla/5.0 PrestaShop\r\n",
+            ],
+        ]);
+        $response = @file_get_contents($url, false, $ctx);
+
+        if ($response === false) {
+            $this->logGeoNewsletter($ip, '?', 'fallback (API timeout)');
+
+            return true;
+        }
+
+        $data = json_decode($response, true);
+        if (!is_array($data) || ($data['status'] ?? '') !== 'success' || empty($data['countryCode'])) {
+            $this->logGeoNewsletter($ip, '?', 'fallback (invalid response)');
+
+            return true;
+        }
+
+        $country = (string) $data['countryCode'];
+        $isAllowed = in_array($country, $allowed, true);
+        $this->logGeoNewsletter($ip, $country, $isAllowed ? 'allowed' : 'blocked');
+
+        return $isAllowed;
+    }
+
+    protected function logGeoNewsletter($ip, $country, $result)
+    {
+        $logPath = _PS_ROOT_DIR_ . '/var/logs/newsletter_geo.log';
+        @file_put_contents(
+            $logPath,
+            date('c') . " | " . $result . " | ip=" . $ip . " | country=" . $country . "\n",
+            FILE_APPEND
+        );
+    }
+
+    /**
      * Check if this mail is registered for newsletters.
      *
      * @param string $customer_email
@@ -560,6 +614,11 @@ class Ps_Emailsubscription extends Module implements WidgetInterface
 
             return $this->valid = $this->trans('Unsubscription successful.', [], 'Modules.Emailsubscription.Shop');
         } elseif ($_POST['action'] == static::NEWSLETTER_SUBSCRIPTION) {
+            // Géo-blocage : autoriser uniquement FR + pays limitrophes (anti-spam bots)
+            if (!$this->isAllowedCountry(Tools::getRemoteAddr())) {
+                return $this->error = $this->trans('Inscription non disponible depuis votre pays.', [], 'Modules.Emailsubscription.Shop');
+            }
+
             $register_status = $this->isNewsletterRegistered($_POST['email']);
             if ($register_status > 0) {
                 return $this->error = $this->trans('This email address is already registered.', [], 'Modules.Emailsubscription.Shop');
