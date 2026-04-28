@@ -240,6 +240,36 @@ class Ps_Emailsubscription extends Module implements WidgetInterface
             }
 
             Tools::redirectAdmin($this->context->link->getAdminLink('AdminModules', false) . '&configure=' . $this->name . '&conf=4&token=' . Tools::getAdminTokenLite('AdminModules'));
+        } elseif (Tools::isSubmit('submitBulkdeletemerged')) {
+            $ids = Tools::getValue('mergedBox');
+            if (is_array($ids) && !empty($ids)) {
+                $deleted = 0;
+                $unsubscribed = 0;
+                foreach ($ids as $id) {
+                    if (preg_match('/(^N)/', $id)) {
+                        $realId = (int) Tools::substr($id, 1);
+                        $sql = 'DELETE FROM ' . _DB_PREFIX_ . 'emailsubscription WHERE id = ' . $realId;
+                        if (Db::getInstance()->execute($sql)) {
+                            $deleted++;
+                        }
+                    } else {
+                        $c = new Customer((int) $id);
+                        if (Validate::isLoadedObject($c)) {
+                            $c->newsletter = 0;
+                            if ($c->update()) {
+                                $unsubscribed++;
+                            }
+                        }
+                    }
+                }
+                $this->_html .= $this->displayConfirmation(
+                    sprintf(
+                        $this->trans('%d abonné(s) "guest" supprimé(s), %d client(s) désabonné(s).', [], 'Modules.Emailsubscription.Admin'),
+                        $deleted,
+                        $unsubscribed
+                    )
+                );
+            }
         } elseif (Tools::isSubmit('submitExport') && $action = Tools::getValue('action')) {
             $this->export_csv();
         } elseif (Tools::isSubmit('searchEmail')) {
@@ -294,7 +324,7 @@ class Ps_Emailsubscription extends Module implements WidgetInterface
             ],
             'newsletter_date_add' => [
                 'title' => $this->trans('Subscribed on', [], 'Modules.Emailsubscription.Admin'),
-                'type' => 'date',
+                'type' => 'datetime',
                 'search' => false,
             ],
         ];
@@ -315,6 +345,13 @@ class Ps_Emailsubscription extends Module implements WidgetInterface
         $helper_list->currentIndex = $this->context->link->getAdminLink('AdminModules', false) . '&configure=' . $this->name;
         $helper_list->token = Tools::getAdminTokenLite('AdminModules');
         $helper_list->actions = ['viewCustomer'];
+        $helper_list->bulk_actions = [
+            'delete' => [
+                'text' => $this->trans('Supprimer la sélection', [], 'Admin.Actions'),
+                'icon' => 'icon-trash',
+                'confirm' => $this->trans('Confirmer la suppression ? Les abonnés "guest" seront supprimés et les clients seront désabonnés.', [], 'Modules.Emailsubscription.Admin'),
+            ],
+        ];
 
         // This is needed for displayEnableLink to avoid code duplication
         $this->_helperlist = $helper_list;
