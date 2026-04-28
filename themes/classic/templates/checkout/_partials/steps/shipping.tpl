@@ -41,6 +41,38 @@
       background-color: #003359 !important;
       border-color: #003359 !important;
     }
+    /* Bouton "Utiliser ce locker / Point Relais" dans le widget mondialrelay (liste/carte) */
+    #checkout-delivery-step [class*="mondialrelay"] button,
+    #checkout-delivery-step [class*="mondialrelay"] .btn,
+    #checkout-delivery-step [id*="mondialrelay"] button,
+    #checkout-delivery-step [id*="mondialrelay"] .btn,
+    .carrier-extra-content button[class*="mondialrelay"],
+    .carrier-extra-content .btn[class*="mondialrelay"],
+    .carrier-extra-content .mondialrelay_select_relay,
+    .carrier-extra-content .mondialrelay_pin_button,
+    .carrier-extra-content .relay-list .btn,
+    .carrier-extra-content .relay-list button {
+      font-size: 0.7rem !important;
+      padding: 6px 10px !important;
+      line-height: 1.2 !important;
+      white-space: normal !important;
+      word-wrap: break-word !important;
+    }
+    @media (max-width: 767px) {
+      #checkout-delivery-step [class*="mondialrelay"] button,
+      #checkout-delivery-step [class*="mondialrelay"] .btn,
+      #checkout-delivery-step [id*="mondialrelay"] button,
+      #checkout-delivery-step [id*="mondialrelay"] .btn,
+      .carrier-extra-content button[class*="mondialrelay"],
+      .carrier-extra-content .btn[class*="mondialrelay"],
+      .carrier-extra-content .mondialrelay_select_relay,
+      .carrier-extra-content .mondialrelay_pin_button,
+      .carrier-extra-content .relay-list .btn,
+      .carrier-extra-content .relay-list button {
+        font-size: 0.62rem !important;
+        padding: 5px 8px !important;
+      }
+    }
   </style>
   <div id="hook-display-before-carrier">
     {$hookDisplayBeforeCarrier nofilter}
