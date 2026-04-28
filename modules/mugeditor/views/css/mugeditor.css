@@ -273,11 +273,18 @@
   border-color: #ddd;
 }
 
+.mue-proposed-text {
+  font-size: 13px;
+  color: #004774;
+  margin: 0 0 8px;
+  line-height: 1.4;
+}
+
 .mue-proposed-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
   gap: 6px;
-  margin: 10px 0 14px;
+  margin: 0 0 14px;
 }
 
 .mue-proposed-item {

@@ -74,6 +74,7 @@ class Mugeditor extends Module
             && Configuration::updateValue('MUG_BACKGROUNDS', json_encode([]))
             && Configuration::updateValue('MUG_FONTS', json_encode([]))
             && Configuration::updateValue('MUG_PROPOSED_IMAGES', json_encode([]))
+            && Configuration::updateValue('MUG_PROPOSED_TEXT', '')
             && Configuration::updateValue('MUG_ENABLED_FONTS', json_encode(['Arial' => true, 'Open Sans' => true, 'Bebas Neue' => true]));
     }
 
@@ -84,6 +85,7 @@ class Mugeditor extends Module
         Configuration::deleteByName('MUG_BACKGROUNDS');
         Configuration::deleteByName('MUG_FONTS');
         Configuration::deleteByName('MUG_PROPOSED_IMAGES');
+        Configuration::deleteByName('MUG_PROPOSED_TEXT');
         Configuration::deleteByName('MUG_ENABLED_FONTS');
 
         return parent::uninstall();
@@ -237,6 +239,12 @@ class Mugeditor extends Module
 
         if (Tools::isSubmit('submitMugProposedUpload')) {
             $output .= $this->handleProposedUpload();
+        }
+        if (Tools::isSubmit('submitMugProposedText')) {
+            $text = Tools::getValue('MUG_PROPOSED_TEXT');
+            $text = strip_tags((string) $text, '<br><strong><em><b><i><span>');
+            Configuration::updateValue('MUG_PROPOSED_TEXT', $text);
+            $output .= $this->displayConfirmation($this->l('Texte enregistré.'));
         }
         if (Tools::getValue('deleteProposed')) {
             $output .= $this->handleProposedDelete(Tools::getValue('deleteProposed'));
@@ -941,6 +949,13 @@ class Mugeditor extends Module
         $html = '<div class="panel"><h3><i class="icon-picture"></i> ' . $this->l('Images proposées') . '</h3>';
         $html .= '<p style="color:#888;font-size:13px;">' . $this->l('Images proposées au client dans la section "Importer des images" de l\'éditeur. PNG transparent recommandé.') . '</p>';
 
+        $proposedText = (string) Configuration::get('MUG_PROPOSED_TEXT');
+        $html .= '<form method="post" style="margin-bottom:18px;">';
+        $html .= '<label style="display:block;font-weight:600;color:#004774;margin-bottom:6px;">' . $this->l('Texte affiché au-dessus des images côté client') . '</label>';
+        $html .= '<textarea name="MUG_PROPOSED_TEXT" rows="2" style="width:100%;padding:8px;border:1px solid #ccd5e0;border-radius:4px;font-family:inherit;font-size:13px;" placeholder="' . $this->l('Ex: Choisissez parmi nos visuels prêts à l\'emploi') . '">' . htmlspecialchars($proposedText) . '</textarea>';
+        $html .= '<div style="margin-top:8px;text-align:right;"><button type="submit" name="submitMugProposedText" class="btn btn-default"><i class="process-icon-save"></i> ' . $this->l('Enregistrer le texte') . '</button></div>';
+        $html .= '</form>';
+
         $html .= '<form method="post" enctype="multipart/form-data" id="mue-proposed-form">';
         $html .= '<label class="mue-dropzone" id="mue-pdz">
             <div class="mue-dropzone-icon">🖼</div>
@@ -1430,12 +1445,14 @@ class Mugeditor extends Module
 
         $proposedImages = $this->getProposedImages();
         $proposedUrl = $this->_path . self::PROPOSED_DIR;
+        $proposedText = (string) Configuration::get('MUG_PROPOSED_TEXT');
 
         $this->context->smarty->assign([
             'mue_backgrounds' => $backgrounds,
             'mue_bg_url' => $bgUrl,
             'mue_proposed' => $proposedImages,
             'mue_proposed_url' => $proposedUrl,
+            'mue_proposed_text' => $proposedText,
             'mue_customer_bg' => $customerBg,
             'mue_upload_url' => $this->context->link->getModuleLink('mugeditor', 'upload', [], true),
             'mue_uploadimage_url' => $this->context->link->getModuleLink('mugeditor', 'uploadimage', [], true),

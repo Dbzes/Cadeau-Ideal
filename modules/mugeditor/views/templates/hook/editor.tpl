@@ -101,8 +101,10 @@
         <span class="mue-arrow">+</span>
       </button>
       <div class="mue-body" id="mue-images">
-        <p class="mue-hint">Ajoutez des images sur votre mug :</p>
         {if isset($mue_proposed) && $mue_proposed|count > 0}
+        {if isset($mue_proposed_text) && $mue_proposed_text}
+        <p class="mue-proposed-text">{$mue_proposed_text nofilter}</p>
+        {/if}
         <div class="mue-proposed-grid" id="mue-proposed-grid">
           {foreach $mue_proposed as $img}
           <button type="button" class="mue-proposed-item" data-src="{$mue_proposed_url|escape:'htmlall':'UTF-8'}{$img|escape:'htmlall':'UTF-8'}" data-name="{$img|escape:'htmlall':'UTF-8'}" title="Ajouter cette image">
@@ -111,6 +113,7 @@
           {/foreach}
         </div>
         {/if}
+        <p class="mue-hint">Ajoutez des images sur votre mug :</p>
         <label class="mue-upload" id="mue-img-upload-label">
           <input type="file" accept="image/*" id="mue-img-input" />
           <span>+ Ajouter une image</span>
