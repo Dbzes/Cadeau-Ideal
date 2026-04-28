@@ -33,10 +33,6 @@
       {/if}
     {/block}
 
-    {block name='search'}
-      {hook h='displaySearch'}
-    {/block}
-
     {block name='hook_not_found'}
       {hook h='displayNotFound'}
     {/block}
