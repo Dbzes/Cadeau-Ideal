@@ -275,15 +275,15 @@
 
 .mue-proposed-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
-  gap: 8px;
+  grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+  gap: 6px;
   margin: 10px 0 14px;
 }
 
 .mue-proposed-item {
   background: #fff;
-  border: 2px solid #e0e0e0;
-  padding: 4px;
+  border: 1px solid #e0e0e0;
+  padding: 2px;
   cursor: pointer;
   transition: border-color 0.15s, transform 0.15s;
   aspect-ratio: 1 / 1;
