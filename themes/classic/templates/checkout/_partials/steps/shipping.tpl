@@ -56,10 +56,28 @@
       text-align: center !important;
     }
     /* Délai estimé de livraison en orange (tous transporteurs, y compris Mondial Relay) */
-    .delivery-option .carrier-delay,
-    #checkout-delivery-step .carrier-delay {
+    /* Sélecteurs très spécifiques pour gagner contre body#checkout & label */
+    body#checkout span.carrier-delay,
+    body#checkout section.checkout-step span.carrier-delay,
+    body#checkout .delivery-option span.carrier-delay,
+    body#checkout #checkout-delivery-step span.carrier-delay,
+    body#checkout label .carrier-delay {
       color: #ee7a03 !important;
       font-weight: 600 !important;
+    }
+    /* Date estimée de livraison sous le délai */
+    .carrier-delay-estimate {
+      display: block;
+      font-size: 0.78rem;
+      color: #ee7a03;
+      font-weight: 500;
+      margin-top: 3px;
+      line-height: 1.25;
+    }
+    @media (max-width: 767px) {
+      .carrier-delay-estimate {
+        font-size: 0.72rem;
+      }
     }
     /* Titre h4 "Locker / Point Relais sélectionné" : taille réduite + centré */
     #mondialrelay_summary h4 {
@@ -119,6 +137,57 @@
       }
     }
   </style>
+  {literal}
+  <script>
+    (function () {
+      function formatFr(date) {
+        return date.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+      }
+      function addBusinessDays(date, days) {
+        var d = new Date(date.getTime());
+        var added = 0;
+        while (added < days) {
+          d.setDate(d.getDate() + 1);
+          var dow = d.getDay();
+          if (dow !== 0 && dow !== 6) added++;
+        }
+        return d;
+      }
+      function injectEstimates() {
+        var nodes = document.querySelectorAll('.carrier-delay');
+        nodes.forEach(function (el) {
+          if (el.dataset.estimateDone === '1') return;
+          var txt = el.textContent || '';
+          var rangeMatch = txt.match(/(\d+)\s*(?:à|-|à|et)\s*(\d+)\s*jour/i);
+          var singleMatch = !rangeMatch ? txt.match(/(\d+)\s*jour/i) : null;
+          if (!rangeMatch && !singleMatch) return;
+          var minDays, maxDays;
+          if (rangeMatch) { minDays = parseInt(rangeMatch[1], 10); maxDays = parseInt(rangeMatch[2], 10); }
+          else { minDays = parseInt(singleMatch[1], 10); maxDays = minDays; }
+          var today = new Date();
+          var minDate = addBusinessDays(today, minDays);
+          var maxDate = addBusinessDays(today, maxDays);
+          var estimate = document.createElement('span');
+          estimate.className = 'carrier-delay-estimate';
+          estimate.textContent = (minDays === maxDays)
+            ? 'Livraison estimée ' + formatFr(minDate)
+            : 'Entre ' + formatFr(minDate) + ' et ' + formatFr(maxDate);
+          el.parentNode.insertBefore(estimate, el.nextSibling);
+          el.dataset.estimateDone = '1';
+        });
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', injectEstimates);
+      } else {
+        injectEstimates();
+      }
+      if (typeof prestashop !== 'undefined' && prestashop.on) {
+        prestashop.on('updatedDeliveryForm', injectEstimates);
+        prestashop.on('updatedDeliveryOptions', injectEstimates);
+      }
+    })();
+  </script>
+  {/literal}
   <div id="hook-display-before-carrier">
     {$hookDisplayBeforeCarrier nofilter}
   </div>
