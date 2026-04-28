@@ -15,3 +15,7 @@
 
 /* Masquer blocs Produits et Notre société dans le footer */
 .footer-container .links{display:none}
+
+
+/* Pages CMS - images responsives (évite le débordement mobile) */
+.page-cms img{max-width:100%;height:auto;display:inline-block}
