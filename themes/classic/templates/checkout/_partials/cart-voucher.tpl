@@ -30,6 +30,7 @@
           {block name='cart_voucher_list'}
             <ul class="promo-name card-block">
               {foreach from=$cart.vouchers.added item=voucher}
+                {if !(isset($voucher.code) && $voucher.code === '__CECO_AUTO__')}
                 <li class="cart-summary-line">
                   <span class="label">{$voucher.name}</span>
                   <div class="float-xs-right">
@@ -39,6 +40,7 @@
                       {/if}
                   </div>
                 </li>
+                {/if}
               {/foreach}
             </ul>
           {/block}
@@ -79,11 +81,13 @@
           </p>
           <ul class="js-discount card-block promo-discounts">
             {foreach from=$cart.discounts item=discount}
+              {if !(isset($discount.code) && $discount.code === '__CECO_AUTO__')}
               <li class="cart-summary-line">
                 <span class="label">
                   <span class="code">{$discount.code}</span> - {$discount.name}
                 </span>
               </li>
+              {/if}
             {/foreach}
           </ul>
         {/if}
