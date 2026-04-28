@@ -55,28 +55,30 @@
       display: block !important;
       text-align: center !important;
     }
-    /* Délai estimé de livraison en orange (tous transporteurs, y compris Mondial Relay) */
-    /* Sélecteurs très spécifiques pour gagner contre body#checkout & label */
+    /* Délai de livraison : noir gras (tous transporteurs) */
     body#checkout span.carrier-delay,
     body#checkout section.checkout-step span.carrier-delay,
     body#checkout .delivery-option span.carrier-delay,
     body#checkout #checkout-delivery-step span.carrier-delay,
     body#checkout label .carrier-delay {
-      color: #ee7a03 !important;
-      font-weight: 600 !important;
+      color: #000 !important;
+      font-weight: 700 !important;
     }
-    /* Date estimée de livraison sous le délai */
+    /* Date estimée : ligne pleine largeur sous le prix, en orange */
     .carrier-delay-estimate {
       display: block;
-      font-size: 0.78rem;
+      width: 100%;
+      font-size: 0.82rem;
       color: #ee7a03;
-      font-weight: 500;
-      margin-top: 3px;
-      line-height: 1.25;
+      font-weight: 600;
+      margin-top: 6px;
+      text-align: left;
+      line-height: 1.3;
     }
     @media (max-width: 767px) {
       .carrier-delay-estimate {
-        font-size: 0.72rem;
+        font-size: 0.78rem;
+        text-align: center;
       }
     }
     /* Titre h4 "Locker / Point Relais sélectionné" : taille réduite + centré */
@@ -158,7 +160,7 @@
         nodes.forEach(function (el) {
           if (el.dataset.estimateDone === '1') return;
           var txt = el.textContent || '';
-          var rangeMatch = txt.match(/(\d+)\s*(?:à|-|à|et)\s*(\d+)\s*jour/i);
+          var rangeMatch = txt.match(/(\d+)\s*(?:à|-|et)\s*(\d+)\s*jour/i);
           var singleMatch = !rangeMatch ? txt.match(/(\d+)\s*jour/i) : null;
           if (!rangeMatch && !singleMatch) return;
           var minDays, maxDays;
@@ -167,12 +169,18 @@
           var today = new Date();
           var minDate = addBusinessDays(today, minDays);
           var maxDate = addBusinessDays(today, maxDays);
-          var estimate = document.createElement('span');
+          var estimate = document.createElement('div');
           estimate.className = 'carrier-delay-estimate';
           estimate.textContent = (minDays === maxDays)
-            ? 'Livraison estimée ' + formatFr(minDate)
-            : 'Entre ' + formatFr(minDate) + ' et ' + formatFr(maxDate);
-          el.parentNode.insertBefore(estimate, el.nextSibling);
+            ? 'Livraison estimée le ' + formatFr(minDate)
+            : 'Livraison estimée entre ' + formatFr(minDate) + ' et ' + formatFr(maxDate);
+          // Insérer après le .row qui contient délai + prix (donc sous le prix, ligne pleine largeur)
+          var row = el.closest('.row');
+          var anchor = row || el.parentNode;
+          var parent = anchor.parentNode;
+          if (parent) {
+            parent.insertBefore(estimate, anchor.nextSibling);
+          }
           el.dataset.estimateDone = '1';
         });
       }
