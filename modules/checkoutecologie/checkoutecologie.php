@@ -14,13 +14,8 @@ class Checkoutecologie extends Module
     const CONF_ENABLED = 'CECO_ENABLED';
     const CONF_LABEL = 'CECO_LABEL';
     const CONF_AMOUNT = 'CECO_AMOUNT';
-    const CONF_ICON = 'CECO_ICON';
     const CONF_BO_LABEL = 'CECO_BO_LABEL';
     const CONF_CART_RULE_ID = 'CECO_CART_RULE_ID';
-
-    const ICON_DIR = 'upload/';
-    const ICON_MAX_SIZE = 524288; // 512 Ko
-    const ICON_ALLOWED = ['png', 'jpg', 'jpeg', 'webp', 'svg'];
 
     public function __construct()
     {
@@ -43,7 +38,6 @@ class Checkoutecologie extends Module
         Configuration::updateValue(self::CONF_ENABLED, 1);
         Configuration::updateValue(self::CONF_LABEL, 'Je veux que mon colis soit emballé dans un carton de seconde main, -0.50€');
         Configuration::updateValue(self::CONF_AMOUNT, '0.50');
-        Configuration::updateValue(self::CONF_ICON, '');
         Configuration::updateValue(self::CONF_BO_LABEL, 'Carton de seconde main demandé');
 
         // Colonne dédiée sur ps_orders (utilisée pour la prep)
@@ -82,7 +76,7 @@ class Checkoutecologie extends Module
         Configuration::deleteByName(self::CONF_ENABLED);
         Configuration::deleteByName(self::CONF_LABEL);
         Configuration::deleteByName(self::CONF_AMOUNT);
-        Configuration::deleteByName(self::CONF_ICON);
+        Configuration::deleteByName('CECO_ICON'); // ancienne conf, suppression défensive
         Configuration::deleteByName(self::CONF_BO_LABEL);
         Configuration::deleteByName(self::CONF_CART_RULE_ID);
 
@@ -152,86 +146,15 @@ class Checkoutecologie extends Module
             // Synchroniser la cart rule sur le nouveau montant
             $this->syncCartRuleAmount($amount);
 
-            // Upload icône
-            if (!empty($_FILES['CECO_ICON_FILE']) && $_FILES['CECO_ICON_FILE']['error'] === UPLOAD_ERR_OK) {
-                $output .= $this->handleIconUpload();
-            }
-
             $output .= $this->displayConfirmation($this->l('Paramètres enregistrés.'));
-        }
-
-        if (Tools::getValue('deleteIcon')) {
-            $output .= $this->handleIconDelete();
         }
 
         return $output . $this->renderForm();
     }
 
-    protected function handleIconUpload()
-    {
-        $f = $_FILES['CECO_ICON_FILE'];
-        $ext = strtolower(pathinfo($f['name'], PATHINFO_EXTENSION));
-        if (!in_array($ext, self::ICON_ALLOWED, true)) {
-            return $this->displayWarning($this->l('Format d\'icône non autorisé (PNG, JPG, WEBP, SVG).'));
-        }
-        if ($f['size'] > self::ICON_MAX_SIZE) {
-            return $this->displayWarning($this->l('Icône trop volumineuse (max 512 Ko).'));
-        }
-
-        $dir = _PS_MODULE_DIR_ . $this->name . '/' . self::ICON_DIR;
-        if (!is_dir($dir)) {
-            @mkdir($dir, 0755, true);
-        }
-        // Supprimer ancienne icône
-        $old = (string) Configuration::get(self::CONF_ICON);
-        if ($old && file_exists($dir . $old)) {
-            @unlink($dir . $old);
-        }
-        $newName = 'icon_' . uniqid() . '.' . $ext;
-        if (!move_uploaded_file($f['tmp_name'], $dir . $newName)) {
-            return $this->displayWarning($this->l('Échec de l\'upload de l\'icône.'));
-        }
-        Configuration::updateValue(self::CONF_ICON, $newName);
-
-        return $this->displayConfirmation($this->l('Icône mise à jour.'));
-    }
-
-    protected function handleIconDelete()
-    {
-        $old = (string) Configuration::get(self::CONF_ICON);
-        if ($old) {
-            $path = _PS_MODULE_DIR_ . $this->name . '/' . self::ICON_DIR . $old;
-            if (file_exists($path)) {
-                @unlink($path);
-            }
-            Configuration::updateValue(self::CONF_ICON, '');
-
-            return $this->displayConfirmation($this->l('Icône supprimée.'));
-        }
-
-        return '';
-    }
-
-    protected function getIconUrl()
-    {
-        $icon = (string) Configuration::get(self::CONF_ICON);
-        if (!$icon) {
-            return '';
-        }
-        $path = _PS_MODULE_DIR_ . $this->name . '/' . self::ICON_DIR . $icon;
-        if (!file_exists($path)) {
-            return '';
-        }
-
-        return $this->_path . self::ICON_DIR . $icon . '?t=' . filemtime($path);
-    }
-
     protected function renderForm()
     {
-        $iconUrl = $this->getIconUrl();
-        $deleteIconUrl = AdminController::$currentIndex . '&configure=' . $this->name . '&token=' . Tools::getAdminTokenLite('AdminModules') . '&deleteIcon=1';
-
-        $html = '<form method="post" enctype="multipart/form-data" class="defaultForm form-horizontal">';
+        $html = '<form method="post" class="defaultForm form-horizontal">';
         $html .= '<div class="panel"><h3><i class="icon-leaf"></i> ' . $this->l('Configuration Checkout Ecologie') . '</h3>';
 
         // Toggle activé
@@ -267,20 +190,6 @@ class Checkoutecologie extends Module
         $html .= '<div class="col-lg-9">';
         $html .= '<input type="text" name="CECO_BO_LABEL" value="' . htmlspecialchars((string) Configuration::get(self::CONF_BO_LABEL), ENT_QUOTES) . '" class="form-control" />';
         $html .= '<p class="help-block">' . $this->l('Visible par les préparateurs sur la fiche commande quand le client a coché l\'option.') . '</p>';
-        $html .= '</div></div>';
-
-        // Icône
-        $html .= '<div class="form-group">';
-        $html .= '<label class="control-label col-lg-3">' . $this->l('Icône (facultatif)') . '</label>';
-        $html .= '<div class="col-lg-9">';
-        if ($iconUrl) {
-            $html .= '<div style="margin-bottom:10px;display:flex;align-items:center;gap:12px;">';
-            $html .= '<img src="' . $iconUrl . '" style="max-width:64px;max-height:64px;border:1px solid #ddd;padding:4px;background:#fafafa;" />';
-            $html .= '<a href="' . $deleteIconUrl . '" class="btn btn-danger btn-sm" onclick="return confirm(\'Supprimer l\\\'icône ?\')"><i class="icon-trash"></i> ' . $this->l('Supprimer') . '</a>';
-            $html .= '</div>';
-        }
-        $html .= '<input type="file" name="CECO_ICON_FILE" accept="image/png,image/jpeg,image/webp,image/svg+xml" />';
-        $html .= '<p class="help-block">' . $this->l('PNG, JPG, WEBP, SVG · max 512 Ko. Affichée à gauche du texte de la case.') . '</p>';
         $html .= '</div></div>';
 
         $html .= '</div>'; // panel
@@ -336,7 +245,6 @@ class Checkoutecologie extends Module
         $this->context->smarty->assign([
             'ceco_label' => (string) Configuration::get(self::CONF_LABEL),
             'ceco_amount' => (float) Configuration::get(self::CONF_AMOUNT),
-            'ceco_icon_url' => $this->getIconUrl(),
             'ceco_active' => $isActive,
             'ceco_toggle_url' => $this->context->link->getModuleLink($this->name, 'toggle', [], true),
         ]);
@@ -389,7 +297,6 @@ class Checkoutecologie extends Module
 
         $this->context->smarty->assign([
             'ceco_bo_label' => (string) Configuration::get(self::CONF_BO_LABEL),
-            'ceco_icon_url' => $this->getIconUrl(),
         ]);
 
         return $this->display(__FILE__, 'views/templates/hook/orderdetail.tpl');
