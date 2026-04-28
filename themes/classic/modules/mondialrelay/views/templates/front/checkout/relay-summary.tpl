@@ -86,5 +86,17 @@
       max-width: 100%;
     }
   }
+  @media (max-width: 767px) {
+    .mr-summary__title {
+      font-size: 0.8rem;
+    }
+    .mr-summary__address {
+      font-size: 0.75rem;
+    }
+    .mr-summary__button {
+      font-size: 0.7rem;
+      padding: 6px 10px;
+    }
+  }
 </style>
 {/literal}
