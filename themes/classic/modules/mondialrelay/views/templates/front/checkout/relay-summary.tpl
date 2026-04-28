@@ -90,6 +90,9 @@
     }
   }
   @media (max-width: 767px) {
+    .mr-summary {
+      text-align: center;
+    }
     .mr-summary__title {
       font-size: 0.72rem !important;
     }
