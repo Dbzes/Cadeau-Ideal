@@ -106,8 +106,8 @@ class Checkoutecologie extends Module
         $cartRule->reduction_currency = (int) Configuration::get('PS_CURRENCY_DEFAULT');
         $cartRule->date_from = date('Y-m-d 00:00:00');
         $cartRule->date_to = date('Y-m-d 00:00:00', strtotime('+10 years'));
-        $cartRule->quantity = 0;
-        $cartRule->quantity_per_user = 0;
+        $cartRule->quantity = 9999999; // PrestaShop interprète 0 comme "épuisé"
+        $cartRule->quantity_per_user = 9999999;
         $cartRule->cart_rule_restriction = 0;
         $cartRule->minimum_amount = 0;
         $cartRule->add();

@@ -11,22 +11,8 @@ class CheckoutecologieToggleModuleFrontController extends ModuleFrontController
         $cart = $this->context->cart;
         $cartRuleId = (int) Configuration::get('CECO_CART_RULE_ID');
 
-        $debug = [
-            'active' => $active,
-            'cart_id' => $cart ? (int) $cart->id : 0,
-            'cart_loaded' => $cart ? Validate::isLoadedObject($cart) : false,
-            'cart_rule_id' => $cartRuleId,
-            'cart_total_products' => $cart ? (float) $cart->getOrderTotal(true, Cart::ONLY_PRODUCTS) : 0,
-            'customer_logged' => $this->context->customer ? (bool) $this->context->customer->isLogged() : false,
-        ];
-        @file_put_contents(
-            _PS_ROOT_DIR_ . '/var/logs/checkoutecologie_debug.log',
-            date('c') . ' | ' . json_encode($debug) . "\n",
-            FILE_APPEND
-        );
-
         if (!Validate::isLoadedObject($cart) || !$cartRuleId) {
-            $this->ajaxReturn(['success' => false, 'error' => 'invalid_state', 'debug' => $debug]);
+            $this->ajaxReturn(['success' => false, 'error' => 'invalid_state']);
         }
 
         $current = [];
