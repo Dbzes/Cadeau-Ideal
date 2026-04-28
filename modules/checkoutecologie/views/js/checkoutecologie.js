@@ -42,20 +42,7 @@
           block.classList.remove('ceco-loading');
           if (resp.data && resp.data.success) {
             feedback.classList.remove('ceco-error');
-            feedback.textContent = active ? 'Réduction appliquée.' : 'Réduction retirée.';
-            if (window.prestashop && typeof window.prestashop.emit === 'function') {
-              window.prestashop.emit('updateCart', { reason: { linkAction: 'cart-rule' } });
-            }
-            var deliveryForm = document.getElementById('js-delivery');
-            if (deliveryForm && typeof window.$ !== 'undefined') {
-              try {
-                window.$.ajax({
-                  url: deliveryForm.getAttribute('data-url-update'),
-                  method: 'POST',
-                  data: window.$(deliveryForm).serialize() + '&ajax=1'
-                });
-              } catch (e) {}
-            }
+            feedback.textContent = active ? 'Réduction appliquée. Le total sera mis à jour à l\'étape suivante.' : 'Réduction retirée.';
           } else {
             // Si décocher et que le serveur dit "invalid_state" (cart rule pas appliquée),
             // c'est OK : on accepte la décoche silencieusement.
@@ -92,11 +79,4 @@
     init();
   }
 
-  // PrestaShop charge les étapes du checkout en partial — on réinitialise
-  // si la zone disparaît / réapparaît
-  if (window.prestashop && typeof window.prestashop.on === 'function') {
-    window.prestashop.on('updatedDeliveryForm', function () {
-      init();
-    });
-  }
 })();
