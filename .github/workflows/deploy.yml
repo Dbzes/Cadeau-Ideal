@@ -24,4 +24,5 @@ jobs:
             git reset --hard origin/main
             echo 'mmauhlea' | sudo -S chown -R www-data:www-data /home/davidmahe/prestashop/data/prestashop
             echo 'mmauhlea' | sudo -S chown -R davidmahe:davidmahe /home/davidmahe/prestashop/data/prestashop/.git
+            docker exec prestashop_app php bin/console cache:clear --env=prod --no-warmup
             echo "Deploiement OK - $(date)"
