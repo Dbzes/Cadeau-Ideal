@@ -1,0 +1,86 @@
+.ceco-block {
+  background: #f0f7fc;
+  border: 1px solid #cfe2f0;
+  padding: 14px 16px;
+  margin: 0 0 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.ceco-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  margin: 0;
+  font-size: 14px;
+  color: #004774;
+  font-weight: 500;
+  flex: 1;
+  min-width: 0;
+}
+
+.ceco-label input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ceco-mark {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  background: #fff;
+  border: 2px solid #004774;
+  display: inline-block;
+  position: relative;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.ceco-label input[type="checkbox"]:checked ~ .ceco-mark {
+  background: #ee7a03;
+  border-color: #ee7a03;
+}
+
+.ceco-label input[type="checkbox"]:checked ~ .ceco-mark::after {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 1px;
+  width: 6px;
+  height: 12px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.ceco-icon {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.ceco-text {
+  flex: 1;
+  line-height: 1.4;
+}
+
+.ceco-feedback {
+  font-size: 12px;
+  color: #27ae60;
+  font-weight: 600;
+  margin-left: 12px;
+  min-height: 18px;
+}
+
+.ceco-feedback.ceco-error {
+  color: #e74c3c;
+}
+
+.ceco-block.ceco-loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
