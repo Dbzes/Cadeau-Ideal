@@ -55,9 +55,15 @@
       display: block !important;
       text-align: center !important;
     }
+    /* Délai estimé de livraison en orange (tous transporteurs, y compris Mondial Relay) */
+    .delivery-option .carrier-delay,
+    #checkout-delivery-step .carrier-delay {
+      color: #ee7a03 !important;
+      font-weight: 600 !important;
+    }
     /* Titre h4 "Locker / Point Relais sélectionné" : taille réduite + centré */
     #mondialrelay_summary h4 {
-      font-size: 0.8rem !important;
+      font-size: 0.9rem !important;
       font-weight: 700 !important;
       color: #004774 !important;
       text-align: center !important;
@@ -67,7 +73,7 @@
     /* Adresse */
     #mondialrelay_summary .col-md-12 > .col-md-12,
     #mondialrelay_summary > .clearfix > .pull-left > .col-md-12 {
-      font-size: 0.82rem !important;
+      font-size: 0.92rem !important;
       text-align: center !important;
       padding: 0 !important;
       margin: 0 auto !important;
@@ -85,8 +91,8 @@
     #checkout-delivery-step [class*="mondialrelay"] .btn,
     .carrier-extra-content button[class*="mondialrelay"],
     .carrier-extra-content .btn[class*="mondialrelay"] {
-      font-size: 0.8rem !important;
-      padding: 7px 12px !important;
+      font-size: 0.9rem !important;
+      padding: 8px 14px !important;
       line-height: 1.2 !important;
       white-space: normal !important;
       word-wrap: break-word !important;
@@ -96,11 +102,11 @@
     }
     @media (max-width: 767px) {
       #mondialrelay_summary h4 {
-        font-size: 0.72rem !important;
+        font-size: 0.82rem !important;
       }
       #mondialrelay_summary .col-md-12 > .col-md-12,
       #mondialrelay_summary > .clearfix > .pull-left > .col-md-12 {
-        font-size: 0.78rem !important;
+        font-size: 0.88rem !important;
       }
       #mondialrelay_summary .mondialrelay_change-relay,
       .mondialrelay_save-relay,
@@ -108,8 +114,8 @@
       #checkout-delivery-step [class*="mondialrelay"] .btn,
       .carrier-extra-content button[class*="mondialrelay"],
       .carrier-extra-content .btn[class*="mondialrelay"] {
-        font-size: 0.72rem !important;
-        padding: 6px 10px !important;
+        font-size: 0.82rem !important;
+        padding: 7px 12px !important;
       }
     }
   </style>
