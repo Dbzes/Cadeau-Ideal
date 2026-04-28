@@ -47,7 +47,11 @@
           block.classList.remove('ceco-loading');
           if (resp.data && resp.data.success) {
             feedback.classList.remove('ceco-error');
-            feedback.textContent = active ? 'Réduction appliquée. Le total sera mis à jour à l\'étape suivante.' : 'Réduction retirée.';
+            feedback.textContent = active ? 'Réduction appliquée.' : 'Réduction retirée.';
+            // Demande à PrestaShop de rafraîchir le résumé du panier (totaux)
+            if (window.prestashop && typeof window.prestashop.emit === 'function') {
+              window.prestashop.emit('updateCart', { reason: { linkAction: 'cart-rule' } });
+            }
           } else {
             // Si décocher et que le serveur dit "invalid_state" (cart rule pas appliquée),
             // c'est OK : on accepte la décoche silencieusement.

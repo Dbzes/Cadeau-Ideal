@@ -98,7 +98,7 @@ class Checkoutecologie extends Module
             (int) Configuration::get('PS_LANG_DEFAULT') => 'Carton de seconde main',
         ];
         $cartRule->description = 'Réduction automatique pour le choix d\'un carton de seconde main (module Checkout Ecologie).';
-        $cartRule->code = '';
+        $cartRule->code = '__CECO_AUTO__'; // Code interne pour empêcher autoAddToCart de la réappliquer
         $cartRule->active = 1;
         $cartRule->highlight = 0;
         $cartRule->reduction_amount = (float) $amount;
