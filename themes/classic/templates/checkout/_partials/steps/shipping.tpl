@@ -57,7 +57,7 @@
     }
     /* Titre h4 "Locker / Point Relais sélectionné" : taille réduite + centré */
     #mondialrelay_summary h4 {
-      font-size: 0.7rem !important;
+      font-size: 0.8rem !important;
       font-weight: 700 !important;
       color: #004774 !important;
       text-align: center !important;
@@ -67,7 +67,7 @@
     /* Adresse */
     #mondialrelay_summary .col-md-12 > .col-md-12,
     #mondialrelay_summary > .clearfix > .pull-left > .col-md-12 {
-      font-size: 0.72rem !important;
+      font-size: 0.82rem !important;
       text-align: center !important;
       padding: 0 !important;
       margin: 0 auto !important;
@@ -85,8 +85,8 @@
     #checkout-delivery-step [class*="mondialrelay"] .btn,
     .carrier-extra-content button[class*="mondialrelay"],
     .carrier-extra-content .btn[class*="mondialrelay"] {
-      font-size: 0.7rem !important;
-      padding: 6px 10px !important;
+      font-size: 0.8rem !important;
+      padding: 7px 12px !important;
       line-height: 1.2 !important;
       white-space: normal !important;
       word-wrap: break-word !important;
@@ -96,11 +96,11 @@
     }
     @media (max-width: 767px) {
       #mondialrelay_summary h4 {
-        font-size: 0.62rem !important;
+        font-size: 0.72rem !important;
       }
       #mondialrelay_summary .col-md-12 > .col-md-12,
       #mondialrelay_summary > .clearfix > .pull-left > .col-md-12 {
-        font-size: 0.68rem !important;
+        font-size: 0.78rem !important;
       }
       #mondialrelay_summary .mondialrelay_change-relay,
       .mondialrelay_save-relay,
@@ -108,8 +108,8 @@
       #checkout-delivery-step [class*="mondialrelay"] .btn,
       .carrier-extra-content button[class*="mondialrelay"],
       .carrier-extra-content .btn[class*="mondialrelay"] {
-        font-size: 0.62rem !important;
-        padding: 5px 8px !important;
+        font-size: 0.72rem !important;
+        padding: 6px 10px !important;
       }
     }
   </style>
