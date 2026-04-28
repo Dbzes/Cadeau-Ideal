@@ -29,16 +29,23 @@
         credentials: 'same-origin',
         headers: { 'X-Requested-With': 'XMLHttpRequest' }
       })
-        .then(function (r) { return r.json(); })
-        .then(function (data) {
+        .then(function (r) {
+          return r.text().then(function (txt) {
+            try {
+              return { ok: r.ok, data: JSON.parse(txt) };
+            } catch (e) {
+              return { ok: r.ok, data: null, raw: txt };
+            }
+          });
+        })
+        .then(function (resp) {
           block.classList.remove('ceco-loading');
-          if (data && data.success) {
+          if (resp.data && resp.data.success) {
+            feedback.classList.remove('ceco-error');
             feedback.textContent = active ? 'Réduction appliquée.' : 'Réduction retirée.';
-            // Demander à PrestaShop de rafraîchir le résumé panier + checkout
             if (window.prestashop && typeof window.prestashop.emit === 'function') {
               window.prestashop.emit('updateCart', { reason: { linkAction: 'cart-rule' } });
             }
-            // Rafraîchir l'étape livraison (recalcul prix transporteur, etc.)
             var deliveryForm = document.getElementById('js-delivery');
             if (deliveryForm && typeof window.$ !== 'undefined') {
               try {
@@ -50,17 +57,31 @@
               } catch (e) {}
             }
           } else {
-            // Rollback visuel
+            // Si décocher et que le serveur dit "invalid_state" (cart rule pas appliquée),
+            // c'est OK : on accepte la décoche silencieusement.
+            if (!active && resp.data && resp.data.error === 'invalid_state') {
+              feedback.classList.remove('ceco-error');
+              feedback.textContent = 'Réduction retirée.';
+              return;
+            }
             checkbox.checked = !active;
             feedback.classList.add('ceco-error');
-            feedback.textContent = 'Erreur. Veuillez réessayer.';
+            var msg = 'Action impossible.';
+            if (resp.data && resp.data.error) {
+              msg = 'Erreur : ' + resp.data.error;
+            } else if (resp.raw) {
+              msg = 'Réponse inattendue (HTTP ' + (resp.ok ? '200' : 'erreur') + ').';
+              console.error('[checkoutecologie] non-JSON response:', resp.raw.substring(0, 200));
+            }
+            feedback.textContent = msg;
           }
         })
-        .catch(function () {
+        .catch(function (err) {
           block.classList.remove('ceco-loading');
           checkbox.checked = !active;
           feedback.classList.add('ceco-error');
-          feedback.textContent = 'Erreur réseau.';
+          feedback.textContent = 'Erreur réseau (' + (err && err.message ? err.message : 'inconnue') + ').';
+          console.error('[checkoutecologie] fetch error:', err);
         });
     });
   }

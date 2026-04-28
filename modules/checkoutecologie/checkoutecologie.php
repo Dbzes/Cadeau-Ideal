@@ -320,12 +320,18 @@ class Checkoutecologie extends Module
 
         $cartRuleId = (int) Configuration::get(self::CONF_CART_RULE_ID);
         $isActive = false;
-        foreach ($cart->getCartRules() as $cr) {
-            if ((int) $cr['id_cart_rule'] === $cartRuleId) {
-                $isActive = true;
-                break;
+        if ($cartRuleId) {
+            foreach ($cart->getCartRules() as $cr) {
+                if ((int) $cr['id_cart_rule'] === $cartRuleId) {
+                    $isActive = true;
+                    break;
+                }
             }
         }
+
+        // Désactive le cache Smarty pour ce hook : son rendu dépend du cart en cours
+        $previousCaching = $this->context->smarty->caching;
+        $this->context->smarty->caching = 0;
 
         $this->context->smarty->assign([
             'ceco_label' => (string) Configuration::get(self::CONF_LABEL),
@@ -335,7 +341,11 @@ class Checkoutecologie extends Module
             'ceco_toggle_url' => $this->context->link->getModuleLink($this->name, 'toggle', [], true),
         ]);
 
-        return $this->display(__FILE__, 'views/templates/hook/beforecarrier.tpl');
+        $html = $this->display(__FILE__, 'views/templates/hook/beforecarrier.tpl');
+
+        $this->context->smarty->caching = $previousCaching;
+
+        return $html;
     }
 
     public function hookActionValidateOrder($params)

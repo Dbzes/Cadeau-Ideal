@@ -1,6 +1,7 @@
 {**
  * Affiché juste avant la liste des transporteurs dans le tunnel de commande.
  *}
+{nocache}
 <div class="ceco-block">
   <label for="ceco-checkbox" class="ceco-label">
     <input type="checkbox" id="ceco-checkbox" name="ceco-checkbox" value="1"{if $ceco_active} checked="checked"{/if} data-toggle-url="{$ceco_toggle_url|escape:'htmlall':'UTF-8'}" />
@@ -12,3 +13,4 @@
   </label>
   <span class="ceco-feedback" id="ceco-feedback"></span>
 </div>
+{/nocache}
