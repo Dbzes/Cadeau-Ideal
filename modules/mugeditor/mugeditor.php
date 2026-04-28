@@ -17,9 +17,11 @@ class Mugeditor extends Module
     const FONT_DIR = 'uploads/fonts/';
     const TEMPLATE_DIR = 'uploads/template/';
     const RENDER_DIR = 'uploads/render/';
+    const PROPOSED_DIR = 'uploads/proposed/';
     const MAX_SIZE = 5242880; // 5 Mo
     const FONT_MAX_SIZE = 2097152; // 2 Mo
     const ALLOWED = ['jpg', 'jpeg', 'png', 'webp'];
+    const PROPOSED_ALLOWED = ['png'];
     const FONT_ALLOWED = ['ttf', 'otf', 'woff', 'woff2'];
 
     const WEB_SAFE_FONTS = ['Arial', 'Helvetica', 'Times New Roman', 'Georgia', 'Verdana', 'Tahoma', 'Trebuchet MS', 'Courier New', 'Impact', 'Comic Sans MS'];
@@ -71,6 +73,7 @@ class Mugeditor extends Module
             && Configuration::updateValue('MUG_PRODUCT_IDS', '')
             && Configuration::updateValue('MUG_BACKGROUNDS', json_encode([]))
             && Configuration::updateValue('MUG_FONTS', json_encode([]))
+            && Configuration::updateValue('MUG_PROPOSED_IMAGES', json_encode([]))
             && Configuration::updateValue('MUG_ENABLED_FONTS', json_encode(['Arial' => true, 'Open Sans' => true, 'Bebas Neue' => true]));
     }
 
@@ -80,6 +83,7 @@ class Mugeditor extends Module
         Configuration::deleteByName('MUG_PRODUCT_IDS');
         Configuration::deleteByName('MUG_BACKGROUNDS');
         Configuration::deleteByName('MUG_FONTS');
+        Configuration::deleteByName('MUG_PROPOSED_IMAGES');
         Configuration::deleteByName('MUG_ENABLED_FONTS');
 
         return parent::uninstall();
@@ -231,6 +235,29 @@ class Mugeditor extends Module
             $output .= $this->handleTemplateDelete();
         }
 
+        if (Tools::isSubmit('submitMugProposedUpload')) {
+            $output .= $this->handleProposedUpload();
+        }
+        if (Tools::getValue('deleteProposed')) {
+            $output .= $this->handleProposedDelete(Tools::getValue('deleteProposed'));
+        }
+        if (Tools::getValue('reorderProposed')) {
+            $order = explode(',', Tools::getValue('reorderProposed'));
+            $current = $this->getProposedImages();
+            $new = [];
+            foreach ($order as $f) {
+                if (in_array($f, $current)) {
+                    $new[] = $f;
+                }
+            }
+            if (count($new) === count($current)) {
+                $this->saveProposedImages($new);
+            }
+            if (Tools::getValue('ajax')) {
+                die('OK');
+            }
+        }
+
         if (Tools::isSubmit('submitMugRenderUpload')) {
             $output .= $this->handleRenderUpload();
         }
@@ -246,7 +273,7 @@ class Mugeditor extends Module
             Tools::redirectAdmin($clean);
         }
 
-        return $output . $this->renderForm() . $this->renderMugRenderManager() . $this->renderTemplateManager() . $this->renderFontsManager();
+        return $output . $this->renderForm() . $this->renderMugRenderManager() . $this->renderTemplateManager() . $this->renderProposedManager() . $this->renderFontsManager();
     }
 
     protected function getBackgrounds()
@@ -807,6 +834,198 @@ class Mugeditor extends Module
         return $html;
     }
 
+    protected function getProposedImages()
+    {
+        $raw = Configuration::get('MUG_PROPOSED_IMAGES');
+        $list = json_decode($raw, true);
+        return is_array($list) ? $list : [];
+    }
+
+    protected function saveProposedImages(array $list)
+    {
+        Configuration::updateValue('MUG_PROPOSED_IMAGES', json_encode(array_values($list)));
+    }
+
+    protected function handleProposedUpload()
+    {
+        if (empty($_FILES['mug_proposed']) || empty($_FILES['mug_proposed']['name'][0])) {
+            return $this->displayWarning($this->l('Aucun fichier sélectionné.'));
+        }
+
+        $dir = _PS_MODULE_DIR_ . $this->name . '/' . self::PROPOSED_DIR;
+        if (!is_dir($dir)) {
+            @mkdir($dir, 0755, true);
+        }
+
+        $list = $this->getProposedImages();
+        $errors = [];
+        $count = 0;
+
+        $files = $_FILES['mug_proposed'];
+        $total = count($files['name']);
+
+        for ($i = 0; $i < $total; $i++) {
+            if ($files['error'][$i] !== UPLOAD_ERR_OK) {
+                continue;
+            }
+            $size = $files['size'][$i];
+            $name = $files['name'][$i];
+            $tmp = $files['tmp_name'][$i];
+            $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
+
+            if (!in_array($ext, self::PROPOSED_ALLOWED)) {
+                $errors[] = sprintf($this->l('%s : format non autorisé (PNG uniquement).'), $name);
+                continue;
+            }
+            if ($size > self::MAX_SIZE) {
+                $errors[] = sprintf($this->l('%s : dépasse 5 Mo.'), $name);
+                continue;
+            }
+
+            $newName = uniqid('img_', true) . '.' . $ext;
+            if (move_uploaded_file($tmp, $dir . $newName)) {
+                if (extension_loaded('imagick')) {
+                    try {
+                        $im = new \Imagick($dir . $newName);
+                        $w = $im->getImageWidth();
+                        $h = $im->getImageHeight();
+                        if ($w > 2000 || $h > 2000) {
+                            $im->thumbnailImage(2000, 2000, true);
+                            $im->stripImage();
+                            $im->writeImage($dir . $newName);
+                        }
+                        $im->clear();
+                    } catch (\Exception $e) {}
+                }
+                $list[] = $newName;
+                $count++;
+            }
+        }
+
+        $this->saveProposedImages($list);
+
+        $msg = '';
+        if ($count > 0) {
+            $msg .= $this->displayConfirmation(sprintf($this->l('%d image(s) ajoutée(s).'), $count));
+        }
+        if (!empty($errors)) {
+            $msg .= $this->displayWarning(implode('<br>', $errors));
+        }
+        return $msg;
+    }
+
+    protected function handleProposedDelete($filename)
+    {
+        $list = $this->getProposedImages();
+        $idx = array_search($filename, $list);
+        if ($idx === false) {
+            return '';
+        }
+        $path = _PS_MODULE_DIR_ . $this->name . '/' . self::PROPOSED_DIR . $filename;
+        if (file_exists($path)) {
+            @unlink($path);
+        }
+        unset($list[$idx]);
+        $this->saveProposedImages($list);
+        return $this->displayConfirmation($this->l('Image supprimée.'));
+    }
+
+    protected function renderProposedManager()
+    {
+        $list = $this->getProposedImages();
+        $url = $this->_path . self::PROPOSED_DIR;
+        $base = AdminController::$currentIndex . '&configure=' . $this->name . '&token=' . Tools::getAdminTokenLite('AdminModules');
+
+        $checkerBg = 'data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2220%22 height=%2220%22><rect width=%2210%22 height=%2210%22 fill=%22%23ddd%22/><rect x=%2210%22 y=%2210%22 width=%2210%22 height=%2210%22 fill=%22%23ddd%22/></svg>';
+
+        $html = '<div class="panel"><h3><i class="icon-picture"></i> ' . $this->l('Images proposées') . '</h3>';
+        $html .= '<p style="color:#888;font-size:13px;">' . $this->l('Images proposées au client dans la section "Importer des images" de l\'éditeur. PNG transparent recommandé.') . '</p>';
+
+        $html .= '<form method="post" enctype="multipart/form-data" id="mue-proposed-form">';
+        $html .= '<label class="mue-dropzone" id="mue-pdz">
+            <div class="mue-dropzone-icon">🖼</div>
+            <div class="mue-dropzone-title">' . $this->l('Glissez vos images ici') . '</div>
+            <div class="mue-dropzone-sub">' . $this->l('ou cliquez pour parcourir — PNG uniquement · max 5 Mo') . '</div>
+            <input type="file" name="mug_proposed[]" id="mue-pfile" multiple accept="image/png" />
+            <div class="mue-preview" id="mue-ppreview"></div>
+        </label>';
+        $html .= '<div style="margin-top:15px;text-align:right;"><button type="submit" name="submitMugProposedUpload" class="btn btn-primary">'
+            . '<i class="process-icon-save"></i> ' . $this->l('Uploader') . '</button></div>';
+        $html .= '</form>';
+        $html .= '<script>
+            (function(){
+                var dz=document.getElementById("mue-pdz"),inp=document.getElementById("mue-pfile"),pv=document.getElementById("mue-ppreview");
+                if(!dz)return;
+                ["dragenter","dragover"].forEach(function(e){dz.addEventListener(e,function(ev){ev.preventDefault();ev.stopPropagation();dz.classList.add("mue-drag");});});
+                ["dragleave","drop"].forEach(function(e){dz.addEventListener(e,function(ev){ev.preventDefault();ev.stopPropagation();dz.classList.remove("mue-drag");});});
+                dz.addEventListener("drop",function(ev){
+                    var dt=new DataTransfer();
+                    Array.from(ev.dataTransfer.files).forEach(function(f){dt.items.add(f);});
+                    inp.files=dt.files;render();
+                });
+                inp.addEventListener("change",render);
+                inp.addEventListener("click",function(e){e.stopPropagation();});
+                function render(){
+                    pv.innerHTML="";
+                    Array.from(inp.files).forEach(function(f){
+                        var r=new FileReader();
+                        r.onload=function(e){
+                            var d=document.createElement("div");
+                            d.className="mue-preview-item";
+                            d.style.backgroundImage="url("+e.target.result+")";
+                            pv.appendChild(d);
+                        };
+                        r.readAsDataURL(f);
+                    });
+                }
+            })();
+        </script><hr/>';
+
+        if (empty($list)) {
+            $html .= '<p>' . $this->l('Aucune image proposée pour le moment.') . '</p>';
+        } else {
+            $html .= '<p style="color:#888;font-size:13px;margin-bottom:10px;"><i class="icon-info-circle"></i> ' . $this->l('Glissez-déposez les vignettes pour réorganiser l\'ordre d\'affichage côté client.') . '</p>';
+            $html .= '<div id="mue-proposed-list" style="display:flex;flex-wrap:wrap;gap:15px;">';
+            foreach ($list as $f) {
+                $html .= '<div class="mue-bg-card" draggable="true" data-file="' . htmlspecialchars($f) . '" style="border:1px solid #ddd;padding:8px;width:160px;text-align:center;background:#fafafa;cursor:move;border-radius:4px;transition:all .15s;">';
+                $html .= '<img src="' . $url . $f . '" style="max-width:100%;height:100px;object-fit:contain;display:block;margin-bottom:6px;pointer-events:none;background-image:url(\'' . $checkerBg . '\');background-repeat:repeat;background-size:20px;" />';
+                $html .= '<a href="' . $base . '&deleteProposed=' . urlencode($f) . '" class="btn btn-danger btn-xs" onclick="return confirm(\'Supprimer cette image ?\')">✕ ' . $this->l('Supprimer') . '</a>';
+                $html .= '</div>';
+            }
+            $html .= '</div>';
+            $html .= '<script>
+                (function(){
+                    var list=document.getElementById("mue-proposed-list");
+                    if(!list)return;
+                    var dragEl=null;
+                    var cards=list.querySelectorAll(".mue-bg-card");
+                    cards.forEach(function(c){
+                        c.addEventListener("dragstart",function(e){dragEl=c;c.classList.add("mue-dragging");e.dataTransfer.effectAllowed="move";});
+                        c.addEventListener("dragend",function(){c.classList.remove("mue-dragging");cards.forEach(function(x){x.classList.remove("mue-over");});save();});
+                        c.addEventListener("dragover",function(e){e.preventDefault();e.dataTransfer.dropEffect="move";});
+                        c.addEventListener("dragenter",function(){if(c!==dragEl)c.classList.add("mue-over");});
+                        c.addEventListener("dragleave",function(){c.classList.remove("mue-over");});
+                        c.addEventListener("drop",function(e){
+                            e.preventDefault();
+                            if(c===dragEl)return;
+                            var rect=c.getBoundingClientRect();
+                            var after=(e.clientX-rect.left)>rect.width/2;
+                            list.insertBefore(dragEl,after?c.nextSibling:c);
+                        });
+                    });
+                    function save(){
+                        var order=Array.from(list.querySelectorAll(".mue-bg-card")).map(function(c){return c.dataset.file;}).join(",");
+                        var url="' . $base . '&reorderProposed="+encodeURIComponent(order)+"&ajax=1";
+                        fetch(url,{credentials:"same-origin"});
+                    }
+                })();
+            </script>';
+        }
+
+        $html .= '</div>';
+        return $html;
+    }
+
     protected function renderBackgroundsManager()
     {
         $list = $this->getBackgrounds();
@@ -1209,9 +1428,14 @@ class Mugeditor extends Module
             $fontOptionsHtml .= '<div class="mue-font-option" data-font="' . $esc . '" style="font-family:\'' . $esc . '\',sans-serif !important;font-size:18px;">' . $esc . '</div>';
         }
 
+        $proposedImages = $this->getProposedImages();
+        $proposedUrl = $this->_path . self::PROPOSED_DIR;
+
         $this->context->smarty->assign([
             'mue_backgrounds' => $backgrounds,
             'mue_bg_url' => $bgUrl,
+            'mue_proposed' => $proposedImages,
+            'mue_proposed_url' => $proposedUrl,
             'mue_customer_bg' => $customerBg,
             'mue_upload_url' => $this->context->link->getModuleLink('mugeditor', 'upload', [], true),
             'mue_uploadimage_url' => $this->context->link->getModuleLink('mugeditor', 'uploadimage', [], true),

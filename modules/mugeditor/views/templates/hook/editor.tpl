@@ -102,6 +102,15 @@
       </button>
       <div class="mue-body" id="mue-images">
         <p class="mue-hint">Ajoutez des images sur votre mug :</p>
+        {if isset($mue_proposed) && $mue_proposed|count > 0}
+        <div class="mue-proposed-grid" id="mue-proposed-grid">
+          {foreach $mue_proposed as $img}
+          <button type="button" class="mue-proposed-item" data-src="{$mue_proposed_url|escape:'htmlall':'UTF-8'}{$img|escape:'htmlall':'UTF-8'}" data-name="{$img|escape:'htmlall':'UTF-8'}" title="Ajouter cette image">
+            <img src="{$mue_proposed_url|escape:'htmlall':'UTF-8'}{$img|escape:'htmlall':'UTF-8'}" alt="" />
+          </button>
+          {/foreach}
+        </div>
+        {/if}
         <label class="mue-upload" id="mue-img-upload-label">
           <input type="file" accept="image/*" id="mue-img-input" />
           <span>+ Ajouter une image</span>
@@ -937,6 +946,39 @@ function mueInit() {
     reader.readAsDataURL(file);
     imgInput.value = '';
   });
+
+  // Images proposées (galerie BO)
+  var proposedGrid = document.getElementById('mue-proposed-grid');
+  if (proposedGrid) {
+    proposedGrid.querySelectorAll('.mue-proposed-item').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        if (!fabricReady || !canvas) { alert('Éditeur non chargé.'); return; }
+        if (imageCount >= MAX_IMAGES) { alert('Maximum ' + MAX_IMAGES + ' images.'); return; }
+        var src = btn.getAttribute('data-src');
+        var name = btn.getAttribute('data-name') || 'image';
+        if (!src) return;
+        fabric.Image.fromURL(src, function(img){
+          var maxDim = W / 3;
+          var scale = Math.min(maxDim / img.width, maxDim / img.height);
+          img.set({
+            left: W / 2, top: H / 2,
+            originX: 'center', originY: 'center',
+            scaleX: scale, scaleY: scale,
+            cornerColor: '#ee7a03', borderColor: '#ee7a03', cornerSize: 10, transparentCorners: false
+          });
+          img.__mueFileName = name;
+          canvas.add(img);
+          canvas.setActiveObject(img);
+          bringTemplateToFront();
+          canvas.renderAll();
+          imageCount++;
+          updateImgCounter();
+          addImgThumb(img, src, name);
+          saveState();
+        }, { crossOrigin: 'anonymous' });
+      });
+    });
+  }
 
   var __mueIdCounter = 0;
   function createLayerItem(fabricObj, opts) {

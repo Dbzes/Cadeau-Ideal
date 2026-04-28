@@ -273,6 +273,37 @@
   border-color: #ddd;
 }
 
+.mue-proposed-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+  gap: 8px;
+  margin: 10px 0 14px;
+}
+
+.mue-proposed-item {
+  background: #fff;
+  border: 2px solid #e0e0e0;
+  padding: 4px;
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.15s;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mue-proposed-item:hover {
+  border-color: #ee7a03;
+  transform: translateY(-2px);
+}
+
+.mue-proposed-item img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
 .mue-upload {
   display: inline-flex;
   align-items: center;
