@@ -240,11 +240,24 @@ class Ps_Emailsubscription extends Module implements WidgetInterface
             }
 
             Tools::redirectAdmin($this->context->link->getAdminLink('AdminModules', false) . '&configure=' . $this->name . '&conf=4&token=' . Tools::getAdminTokenLite('AdminModules'));
-        } elseif (Tools::isSubmit('submitBulkdeletemerged')) {
+        } elseif (Tools::isSubmit('submitBulkdeletemerged') || Tools::getValue('action') === 'submitBulkdeletemerged') {
             $ids = Tools::getValue('mergedBox');
+            // Fallback : dans certaines configs HelperList, le name peut être différent
+            if (!is_array($ids) || empty($ids)) {
+                $ids = Tools::getValue('emailsubscriptionBox');
+            }
+            if (!is_array($ids) || empty($ids)) {
+                foreach ($_REQUEST as $k => $v) {
+                    if (preg_match('/Box$/', $k) && is_array($v) && !empty($v)) {
+                        $ids = $v;
+                        break;
+                    }
+                }
+            }
+
+            $deleted = 0;
+            $unsubscribed = 0;
             if (is_array($ids) && !empty($ids)) {
-                $deleted = 0;
-                $unsubscribed = 0;
                 foreach ($ids as $id) {
                     if (preg_match('/(^N)/', $id)) {
                         $realId = (int) Tools::substr($id, 1);
@@ -262,14 +275,19 @@ class Ps_Emailsubscription extends Module implements WidgetInterface
                         }
                     }
                 }
-                $this->_html .= $this->displayConfirmation(
-                    sprintf(
-                        $this->trans('%d abonné(s) "guest" supprimé(s), %d client(s) désabonné(s).', [], 'Modules.Emailsubscription.Admin'),
-                        $deleted,
-                        $unsubscribed
-                    )
-                );
             }
+
+            // Log pour debug
+            @file_put_contents(
+                _PS_ROOT_DIR_ . '/var/logs/bulk_newsletter_debug.log',
+                date('c') . " | ids=" . json_encode($ids) . " | deleted=$deleted | unsubscribed=$unsubscribed | _REQUEST keys=" . implode(',', array_keys($_REQUEST)) . "\n",
+                FILE_APPEND
+            );
+
+            $msg = ($deleted + $unsubscribed > 0)
+                ? sprintf($this->trans('%d abonné(s) "guest" supprimé(s), %d client(s) désabonné(s).', [], 'Modules.Emailsubscription.Admin'), $deleted, $unsubscribed)
+                : $this->trans('Aucune ligne sélectionnée. Coche les cases puis "Actions groupées → Supprimer la sélection".', [], 'Modules.Emailsubscription.Admin');
+            $this->_html .= ($deleted + $unsubscribed > 0) ? $this->displayConfirmation($msg) : $this->displayWarning($msg);
         } elseif (Tools::isSubmit('submitExport') && $action = Tools::getValue('action')) {
             $this->export_csv();
         } elseif (Tools::isSubmit('searchEmail')) {
