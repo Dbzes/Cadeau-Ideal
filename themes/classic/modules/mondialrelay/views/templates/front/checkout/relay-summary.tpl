@@ -49,11 +49,12 @@
     margin: 0;
   }
   .mr-summary__title {
-    font-size: 0.78rem !important;
+    font-size: 0.72rem !important;
     font-weight: 700;
     color: #004774;
     margin: 0 0 6px 0;
     line-height: 1.25;
+    text-align: center;
     word-wrap: break-word;
     overflow-wrap: break-word;
   }
@@ -94,7 +95,7 @@
       text-align: center;
     }
     .mr-summary__title {
-      font-size: 0.72rem !important;
+      font-size: 0.65rem !important;
     }
     .mr-summary__address {
       font-size: 0.68rem !important;
