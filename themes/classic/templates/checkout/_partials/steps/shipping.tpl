@@ -64,21 +64,20 @@
       color: #000 !important;
       font-weight: 700 !important;
     }
-    /* Date estimée : ligne pleine largeur sous le prix, en orange */
+    /* Date estimée : ligne pleine largeur sous le prix, centrée, en orange */
     .carrier-delay-estimate {
       display: block;
       width: 100%;
       font-size: 0.82rem;
       color: #ee7a03;
       font-weight: 600;
-      margin-top: 6px;
-      text-align: left;
+      margin: 6px auto 0 auto;
+      text-align: center;
       line-height: 1.3;
     }
     @media (max-width: 767px) {
       .carrier-delay-estimate {
         font-size: 0.78rem;
-        text-align: center;
       }
     }
     /* Titre h4 "Locker / Point Relais sélectionné" : taille réduite + centré */
