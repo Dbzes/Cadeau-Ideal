@@ -518,6 +518,70 @@
         flex-shrink: 0;
       }
     }
+    /* Panier : layout en grille — qté/prix/poubelle alignés au bas de l'image, titre tronqué */
+    .cart-item .product-line-grid {
+      display: grid !important;
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+    }
+    @media (max-width: 767px) {
+      .cart-item .product-line-grid {
+        grid-template-columns: 33% 1fr;
+        grid-template-rows: 1fr auto;
+        grid-template-areas:
+          "image body"
+          "image right";
+        column-gap: 12px;
+        row-gap: 0;
+      }
+    }
+    @media (min-width: 768px) {
+      .cart-item .product-line-grid {
+        grid-template-columns: 25% 1fr 1fr;
+        grid-template-areas: "image body right";
+        column-gap: 12px;
+      }
+    }
+    .cart-item .product-line-grid > .product-line-grid-left {
+      grid-area: image;
+      max-width: 100% !important;
+      flex: none !important;
+      width: auto !important;
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+    }
+    .cart-item .product-line-grid > .product-line-grid-body {
+      grid-area: body;
+      max-width: 100% !important;
+      flex: none !important;
+      width: auto !important;
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+      min-width: 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+    .cart-item .product-line-grid > .product-line-grid-right {
+      grid-area: right;
+      max-width: 100% !important;
+      flex: none !important;
+      width: auto !important;
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+    /* Titre tronqué sur 1 ligne avec ellipsis */
+    .cart-item .product-line-grid .product-line-grid-body .product-line-info a.label {
+      display: block;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
     /* Panier : cadre uniforme pour les vignettes produit */
     .cart-item .product-line-grid-left .product-image,
     .product-line-grid .product-line-grid-left .product-image {
