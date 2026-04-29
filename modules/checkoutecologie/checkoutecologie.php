@@ -21,7 +21,7 @@ class Checkoutecologie extends Module
     {
         $this->name = 'checkoutecologie';
         $this->tab = 'checkout';
-        $this->version = '1.0.0';
+        $this->version = '1.0.1';
         $this->author = 'Le Cadeau Idéal';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -60,7 +60,8 @@ class Checkoutecologie extends Module
             && $this->registerHook('displayBeforeCarrier')
             && $this->registerHook('displayHeader')
             && $this->registerHook('actionValidateOrder')
-            && $this->registerHook('displayAdminOrderMain');
+            && $this->registerHook('displayAdminOrderMain')
+            && $this->registerHook('displayPDFInvoice');
     }
 
     public function uninstall()
@@ -300,5 +301,24 @@ class Checkoutecologie extends Module
         ]);
 
         return $this->display(__FILE__, 'views/templates/hook/orderdetail.tpl');
+    }
+
+    public function hookDisplayPDFInvoice($params)
+    {
+        if (!isset($params['object']) || !($params['object'] instanceof OrderInvoice)) {
+            return '';
+        }
+        $idOrder = (int) $params['object']->id_order;
+        if (!$idOrder) {
+            return '';
+        }
+        $eco = (int) Db::getInstance()->getValue(
+            'SELECT `eco_packaging` FROM `' . _DB_PREFIX_ . 'orders` WHERE `id_order` = ' . $idOrder
+        );
+        if (!$eco) {
+            return '';
+        }
+
+        return $this->display(__FILE__, 'views/templates/hook/pdfinvoice.tpl');
     }
 }
