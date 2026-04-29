@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<module>
+  <name>gtm</name>
+  <displayName><![CDATA[Google Tag Manager]]></displayName>
+  <version><![CDATA[1.0.0]]></version>
+  <description><![CDATA[Intègre les balises Google Tag Manager (head + body noscript) sur le front-office.]]></description>
+  <author><![CDATA[Claude]]></author>
+  <tab><![CDATA[advertising_marketing]]></tab>
+  <is_configurable>1</is_configurable>
+  <need_instance>0</need_instance>
+  <limited_countries></limited_countries>
+</module>
