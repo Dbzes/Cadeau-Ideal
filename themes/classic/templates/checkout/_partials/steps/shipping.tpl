@@ -104,6 +104,8 @@
       width: 100% !important;
     }
     /* Boutons mondialrelay : "Changer" + "Utiliser ce locker" — vrais sélecteurs */
+    /* NB : pas de "display" ici — les 3 boutons .mondialrelay_save-relay (MED/APM/24R)
+       ont un style="display:none" inline géré par le JS du module, ne pas l'écraser */
     #mondialrelay_summary .mondialrelay_change-relay,
     .mondialrelay_save-relay,
     #checkout-delivery-step [class*="mondialrelay"] button,
@@ -115,7 +117,6 @@
       line-height: 1.2 !important;
       white-space: normal !important;
       word-wrap: break-word !important;
-      display: inline-block !important;
       margin: 4px auto !important;
       float: none !important;
     }
