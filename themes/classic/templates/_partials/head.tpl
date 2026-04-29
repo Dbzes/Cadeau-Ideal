@@ -631,16 +631,13 @@
         font-size: 0.92rem !important;
       }
     }
-    /* Footer mobile : liens légaux (CGV, RGPD, Contact, Plan) — 2 par ligne, sans séparateur ni césure */
+    /* Footer mobile : liens légaux — 2 par ligne avec " - ", saut entre paires, pas de "-" résiduel */
     @media (max-width: 767px) {
       .footer-container .cms-footer-links p {
-        display: flex !important;
-        flex-wrap: wrap !important;
-        justify-content: center;
-        align-items: center;
+        text-align: center;
         margin: 0 !important;
         padding: 0 !important;
-        font-size: 0 !important;
+        font-size: 0 !important;       /* masque les " - " présents en HTML entre les <a> */
         line-height: 0;
         hyphens: none !important;
         -webkit-hyphens: none !important;
@@ -648,17 +645,24 @@
         word-break: normal !important;
       }
       .footer-container .cms-footer-links p a {
-        flex: 0 0 50% !important;
-        box-sizing: border-box;
-        padding: 6px 8px;
         font-size: 0.78rem !important;
-        line-height: 1.4;
-        text-align: center;
-        white-space: normal;
+        line-height: 1.9;
         hyphens: none !important;
         -webkit-hyphens: none !important;
         overflow-wrap: normal !important;
         word-break: normal !important;
+      }
+      /* Séparateur " - " réinjecté uniquement entre les 2 liens d'une même ligne */
+      .footer-container .cms-footer-links p a:nth-child(2)::before,
+      .footer-container .cms-footer-links p a:nth-child(4)::before {
+        content: ' - ';
+        font-size: 0.78rem;
+      }
+      /* Saut de ligne forcé avant le 3e <a> (pas de séparateur visible) */
+      .footer-container .cms-footer-links p a:nth-child(3)::before {
+        content: '\A';
+        white-space: pre;
+        font-size: 0.78rem;
       }
     }
   </style>
