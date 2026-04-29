@@ -125,10 +125,22 @@
       display: none !important;
     }
     .product-miniature .product-title a {
-      white-space: normal !important;
-      overflow: visible !important;
-      text-overflow: unset !important;
       color: #000 !important;
+    }
+    /* Titre produit sur 1 ligne avec ellipsis dans toutes les vignettes */
+    .product-miniature .product-title {
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      margin-bottom: 6px;
+    }
+    .product-miniature .product-title a {
+      display: inline-block;
+      max-width: 100%;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      vertical-align: bottom;
     }
     .header-top-bar {
       width: 100%;
