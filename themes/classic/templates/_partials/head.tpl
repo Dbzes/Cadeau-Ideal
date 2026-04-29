@@ -612,6 +612,25 @@
       color: #004774 !important;
       font-weight: 700 !important;
     }
+
+    /* Footer mobile : police -1 cran */
+    @media (max-width: 767px) {
+      .footer-container,
+      .footer-container p,
+      .footer-container li,
+      .footer-container a,
+      .footer-container h3,
+      .footer-container .h3,
+      .footer-container .title,
+      .footer-container .block_newsletter {
+        font-size: 0.78rem !important;
+      }
+      .footer-container h3,
+      .footer-container .h3,
+      .footer-container .title {
+        font-size: 0.92rem !important;
+      }
+    }
   </style>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
