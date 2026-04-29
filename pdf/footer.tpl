@@ -29,7 +29,7 @@
 				{l s='An electronic version of this invoice is available in your account. To access it, log in to our website using your e-mail address and password (which you created when placing your first order).' d='Shop.Pdf' pdf='true'}
 				<br />
 			{/if}
-			{$shop_address|escape:'html':'UTF-8'}<br />
+			Le Cadeau Ideal - AE David Mahe - 41 Rue Patrick Descamps 59239 Thumeries - SIRET : 533 217 717 00032<br />
 
 			{if !empty($shop_phone) OR !empty($shop_fax)}
 				{l s='For more assistance, contact Support:' d='Shop.Pdf' pdf='true'}<br />

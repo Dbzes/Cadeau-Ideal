@@ -102,3 +102,4 @@
     </tr>
   {/if}
 </table>
+<p style="margin-top:8px; font-style:italic; font-size:8pt;">TVA non applicable, article 293B du CGI</p>
