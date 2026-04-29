@@ -524,7 +524,10 @@
       margin-left: 0 !important;
       margin-right: 0 !important;
     }
-    /* Panier : étaler qté + prix + poubelle sur la largeur de la zone droite */
+    /* Panier : étaler qté + prix + poubelle sur la largeur de la zone droite,
+       alignée à gauche avec le titre (display: contents fait disparaître les wrappers
+       Bootstrap col-md-10 / .row intermédiaire pour que qté/prix/poubelle soient
+       directement enfants flex du .row externe). */
     .cart-item .product-line-grid-right > .row {
       display: flex !important;
       align-items: center;
@@ -538,34 +541,21 @@
       display: none !important;
     }
     .cart-item .product-line-grid-right > .row > .col-md-10 {
-      flex: 1 1 auto !important;
-      max-width: none !important;
-      width: auto !important;
-      padding-left: 0 !important;
-      padding-right: 0 !important;
+      display: contents !important;
     }
     .cart-item .product-line-grid-right > .row > .col-md-10 > .row {
-      display: flex !important;
-      align-items: center;
-      justify-content: space-between !important;
-      flex-wrap: nowrap !important;
-      margin: 0 !important;
-      width: 100% !important;
+      display: contents !important;
     }
-    .cart-item .product-line-grid-right > .row > .col-md-10 > .row > .qty,
-    .cart-item .product-line-grid-right > .row > .col-md-10 > .row > .price {
+    .cart-item .product-line-grid-right .qty,
+    .cart-item .product-line-grid-right .price,
+    .cart-item .product-line-grid-right .col-md-2 {
       flex: 0 0 auto !important;
       max-width: none !important;
       width: auto !important;
       padding-left: 0 !important;
       padding-right: 0 !important;
     }
-    .cart-item .product-line-grid-right > .row > .col-md-2 {
-      flex: 0 0 auto !important;
-      max-width: none !important;
-      width: auto !important;
-      padding-left: 0 !important;
-      padding-right: 0 !important;
+    .cart-item .product-line-grid-right .col-md-2 {
       text-align: right;
     }
     @media (max-width: 767px) {
