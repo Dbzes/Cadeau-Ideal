@@ -144,7 +144,7 @@
     [id^="product-description-short"] a * {
       color: #ee7a03 !important;
       font-weight: 700 !important;
-      text-decoration: underline;
+      text-decoration: none !important;
     }
     .product-description-block a:hover,
     .product-description a:hover,
