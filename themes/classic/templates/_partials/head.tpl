@@ -524,6 +524,50 @@
       margin-left: 0 !important;
       margin-right: 0 !important;
     }
+    /* Panier : étaler qté + prix + poubelle sur la largeur de la zone droite */
+    .cart-item .product-line-grid-right > .row {
+      display: flex !important;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: nowrap;
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+      width: 100%;
+    }
+    .cart-item .product-line-grid-right > .row > .col-xs-4.hidden-md-up {
+      display: none !important;
+    }
+    .cart-item .product-line-grid-right > .row > .col-md-10 {
+      flex: 1 1 auto;
+      max-width: none !important;
+      width: auto !important;
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+    }
+    .cart-item .product-line-grid-right > .row > .col-md-10 > .row {
+      display: flex !important;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: nowrap;
+      margin: 0 !important;
+      width: 100%;
+    }
+    .cart-item .product-line-grid-right > .row > .col-md-10 > .row > .qty,
+    .cart-item .product-line-grid-right > .row > .col-md-10 > .row > .price {
+      flex: 0 0 auto;
+      max-width: none !important;
+      width: auto !important;
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+    }
+    .cart-item .product-line-grid-right > .row > .col-md-2 {
+      flex: 0 0 auto;
+      max-width: none !important;
+      width: auto !important;
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+      text-align: right;
+    }
     @media (max-width: 767px) {
       .cart-item .product-line-grid {
         grid-template-columns: 33% 1fr;

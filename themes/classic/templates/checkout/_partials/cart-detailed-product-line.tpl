@@ -90,7 +90,6 @@
     {/foreach}
 
     {if is_array($product.customizations) && $product.customizations|count}
-      <br>
       {block name='cart_detailed_product_line_customization'}
         {foreach from=$product.customizations item="customization"}
           <a href="#" class="mpe-preview-trigger" data-target="#mpe-preview-modal-{$customization.id_customization}" style="color:#004774;font-weight:700;text-decoration:none;">Aperçu de la création</a>
