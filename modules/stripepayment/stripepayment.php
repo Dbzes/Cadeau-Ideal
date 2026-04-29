@@ -268,6 +268,7 @@ class Stripepayment extends PaymentModule
         $currency = new Currency((int) $cart->id_currency);
         $total = (float) $cart->getOrderTotal(true, Cart::BOTH);
         $method = !empty($intent['payment_method_types'][0]) ? $intent['payment_method_types'][0] : 'card';
+        $paymentLabel = $method === 'paypal' ? 'Paypal via Stripe' : 'Carte Bancaire via Stripe';
 
         $idOrder = 0;
         try {
@@ -275,7 +276,7 @@ class Stripepayment extends PaymentModule
                 (int) $cart->id,
                 (int) Configuration::get('PS_OS_PAYMENT'),
                 $total,
-                'Stripe — ' . strtoupper($method),
+                $paymentLabel,
                 null,
                 ['transaction_id' => $intent['id']],
                 (int) $currency->id,

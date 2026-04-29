@@ -29,7 +29,15 @@
 			<table width="100%" border="0">
 				{foreach from=$order_invoice->getOrderPaymentCollection() item=payment}
 					<tr>
-						<td class="right small">{$payment->payment_method}</td>
+						<td class="right small">
+							{if $payment->payment_method|upper|strstr:'PAYPAL'}
+								Paypal via Stripe
+							{elseif $payment->payment_method|upper|strstr:'CARD' || $payment->payment_method|upper|strstr:'STRIPE'}
+								Carte Bancaire via Stripe
+							{else}
+								{$payment->payment_method}
+							{/if}
+						</td>
 						<td class="right small">{displayPrice currency=$payment->id_currency price=$payment->amount}</td>
 					</tr>
 				{/foreach}
