@@ -135,20 +135,33 @@
     .product-flags .product-flag.on-sale {
       display: none !important;
     }
-    /* Liens hypertexte dans les descriptions produit : orange + gras */
-    .product-description-block a,
-    .product-description-block a *,
-    .product-description a,
-    .product-description a *,
-    [id^="product-description-short"] a,
-    [id^="product-description-short"] a * {
+    /* Liens hypertexte dans les descriptions produit : orange + gras, sans soulignement */
+    body#product .product-description-block a,
+    body#product .product-description-block a:link,
+    body#product .product-description-block a:visited,
+    body#product .product-description-block a:hover,
+    body#product .product-description-block a:active,
+    body#product .product-description-block a *,
+    body#product .product-description a,
+    body#product .product-description a:link,
+    body#product .product-description a:visited,
+    body#product .product-description a:hover,
+    body#product .product-description a:active,
+    body#product .product-description a *,
+    body#product [id^="product-description-short"] a,
+    body#product [id^="product-description-short"] a:link,
+    body#product [id^="product-description-short"] a:visited,
+    body#product [id^="product-description-short"] a:hover,
+    body#product [id^="product-description-short"] a:active,
+    body#product [id^="product-description-short"] a * {
       color: #ee7a03 !important;
       font-weight: 700 !important;
       text-decoration: none !important;
+      border-bottom: 0 !important;
     }
-    .product-description-block a:hover,
-    .product-description a:hover,
-    [id^="product-description-short"] a:hover {
+    body#product .product-description-block a:hover,
+    body#product .product-description a:hover,
+    body#product [id^="product-description-short"] a:hover {
       color: #c66400 !important;
     }
   </style>
