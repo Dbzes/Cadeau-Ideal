@@ -87,6 +87,22 @@
       animation: none;
     }
   }
+
+  /* Titre produit forcé sur 1 ligne avec ellipsis dans toutes les vignettes */
+  .product-miniature .product-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 6px;
+  }
+  .product-miniature .product-title a {
+    display: inline-block;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: bottom;
+  }
 </style>
 {/literal}
 <div class="js-product product{if !empty($productClasses)} {$productClasses}{/if}">
