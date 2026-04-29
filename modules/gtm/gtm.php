@@ -146,6 +146,17 @@ class Gtm extends Module
     public function hookDisplayAfterBodyOpeningTag($params)
     {
         $snippet = (string) Configuration::get(self::CFG_BODY);
-        return trim($snippet) === '' ? '' : $snippet;
+        if (trim($snippet) === '') {
+            return '';
+        }
+
+        // Robustesse : si l'utilisateur a oublié/perdu le <noscript> autour de l'<iframe>,
+        // on enrobe automatiquement pour éviter que l'iframe s'affiche visiblement
+        // (sinon ligne blanche en haut du site car JS est activé chez tous les visiteurs).
+        if (stripos($snippet, '<noscript') === false) {
+            $snippet = '<noscript>' . $snippet . '</noscript>';
+        }
+
+        return $snippet;
     }
 }
