@@ -145,13 +145,57 @@
       function formatFr(date) {
         return date.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
       }
+      function easterDate(year) {
+        var a = year % 19;
+        var b = Math.floor(year / 100);
+        var c = year % 100;
+        var d = Math.floor(b / 4);
+        var e = b % 4;
+        var f = Math.floor((b + 8) / 25);
+        var g = Math.floor((b - f + 1) / 3);
+        var h = (19 * a + b - d - g + 15) % 30;
+        var i = Math.floor(c / 4);
+        var k = c % 4;
+        var l = (32 + 2 * e + 2 * i - h - k) % 7;
+        var m = Math.floor((a + 11 * h + 22 * l) / 451);
+        var month = Math.floor((h + l - 7 * m + 114) / 31);
+        var day = ((h + l - 7 * m + 114) % 31) + 1;
+        return new Date(year, month - 1, day);
+      }
+      function holidaysFr(year) {
+        var set = {};
+        function add(d) { set[d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate()] = true; }
+        add(new Date(year, 0, 1));   // Jour de l'an
+        add(new Date(year, 4, 1));   // Fête du travail
+        add(new Date(year, 4, 8));   // Victoire 1945
+        add(new Date(year, 6, 14));  // Fête nationale
+        add(new Date(year, 7, 15));  // Assomption
+        add(new Date(year, 10, 1));  // Toussaint
+        add(new Date(year, 10, 11)); // Armistice
+        add(new Date(year, 11, 25)); // Noël
+        var easter = easterDate(year);
+        var lundiPaques = new Date(easter); lundiPaques.setDate(easter.getDate() + 1);
+        var ascension = new Date(easter); ascension.setDate(easter.getDate() + 39);
+        var lundiPentecote = new Date(easter); lundiPentecote.setDate(easter.getDate() + 50);
+        add(lundiPaques);
+        add(ascension);
+        add(lundiPentecote);
+        return set;
+      }
+      var holidaysCache = {};
+      function isHoliday(date) {
+        var y = date.getFullYear();
+        if (!holidaysCache[y]) holidaysCache[y] = holidaysFr(y);
+        var key = y + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+        return holidaysCache[y][key] === true;
+      }
       function addBusinessDays(date, days) {
         var d = new Date(date.getTime());
         var added = 0;
         while (added < days) {
           d.setDate(d.getDate() + 1);
           var dow = d.getDay();
-          if (dow !== 0 && dow !== 6) added++;
+          if (dow !== 0 && dow !== 6 && !isHoliday(d)) added++;
         }
         return d;
       }
