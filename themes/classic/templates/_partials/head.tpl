@@ -631,6 +631,36 @@
         font-size: 0.92rem !important;
       }
     }
+    /* Footer mobile : liens légaux (CGV, RGPD, Contact, Plan) — 2 par ligne, sans séparateur ni césure */
+    @media (max-width: 767px) {
+      .footer-container .cms-footer-links p {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        justify-content: center;
+        align-items: center;
+        margin: 0 !important;
+        padding: 0 !important;
+        font-size: 0 !important;
+        line-height: 0;
+        hyphens: none !important;
+        -webkit-hyphens: none !important;
+        overflow-wrap: normal !important;
+        word-break: normal !important;
+      }
+      .footer-container .cms-footer-links p a {
+        flex: 0 0 50% !important;
+        box-sizing: border-box;
+        padding: 6px 8px;
+        font-size: 0.78rem !important;
+        line-height: 1.4;
+        text-align: center;
+        white-space: normal;
+        hyphens: none !important;
+        -webkit-hyphens: none !important;
+        overflow-wrap: normal !important;
+        word-break: normal !important;
+      }
+    }
   </style>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
