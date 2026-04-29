@@ -571,9 +571,13 @@
     }
     @media (min-width: 768px) {
       .cart-item .product-line-grid {
-        grid-template-columns: 25% 1fr 1fr;
-        grid-template-areas: "image body right";
+        grid-template-columns: 25% 1fr;
+        grid-template-rows: 1fr auto;
+        grid-template-areas:
+          "image body"
+          "image right";
         column-gap: 12px;
+        row-gap: 0;
       }
     }
     .cart-item .product-line-grid > .product-line-grid-left {
