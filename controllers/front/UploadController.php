@@ -63,7 +63,7 @@ class UploadControllerCore extends GetFileController
             AND c.id_guest = ' . (int) $this->context->cart->id_guest . '
             OR o.reference = "' . pSQL(Tools::getValue('reference')) . '")
             AND cd.type = ' . Product::CUSTOMIZE_FILE . '
-            AND (cd.value = "' . $this->filename . '" OR CONCAT(cd.value, "_small") = "' . $this->filename . '")');
+            AND (cd.value = "' . $this->filename . '" OR CONCAT(cd.value, "_small") = "' . $this->filename . '" OR CONCAT(cd.value, "_preview") = "' . $this->filename . '")');
 
         return (bool) $isCustomization;
     }

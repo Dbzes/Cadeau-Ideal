@@ -34,11 +34,9 @@
           {foreach from=$mpeCust.fields item="mpeField"}
             {if $mpeField.type == 'image' && $mpeField.image.small.url}
               {assign var='mpeCustomImg' value=$mpeField.image.small.url}
-              {if isset($mpeField.image.large.url) && $mpeField.image.large.url}
-                {assign var='mpeCustomImgLarge' value=$mpeField.image.large.url}
-              {else}
-                {assign var='mpeCustomImgLarge' value=$mpeField.image.small.url}
-              {/if}
+              {* L'aperçu modal doit pointer sur le fichier _preview (bande 3-vues mug / mockup mousepad) *}
+              {* et NON sur image.large.url qui pointe sur le fichier principal écrasé par la planche HD au compose. *}
+              {assign var='mpeCustomImgLarge' value=$mpeField.image.small.url|replace:'_small':'_preview'}
               {assign var='mpeCustomId' value=$mpeCust.id_customization}
             {/if}
           {/foreach}

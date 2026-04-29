@@ -60,9 +60,12 @@
               {if $product.customizations}
                 {foreach from=$product.customizations item="customization"}
                   {assign var='mpeImgR' value=''}
+                  {assign var='mpeImgRLarge' value=''}
                   {foreach from=$customization.fields item="f"}
                     {if $f.type == 'image' && $f.image.small.url}
                       {assign var='mpeImgR' value=$f.image.small.url}
+                      {* Modal aperçu = fichier _preview (bande 3-vues mug / mockup mousepad) *}
+                      {assign var='mpeImgRLarge' value=$f.image.small.url|replace:'_small':'_preview'}
                     {/if}
                   {/foreach}
                   {if $mpeImgR}
@@ -72,7 +75,7 @@
                     <div id="mpe-od-preview-r-{$customization.id_customization}" class="mpe-preview-modal" style="display:none;">
                       <div class="mpe-preview-backdrop"></div>
                       <button type="button" class="mpe-preview-close" aria-label="Fermer">&times;</button>
-                      <img src="{$mpeImgR}" alt="Aperçu de la personnalisation" class="mpe-preview-img" />
+                      <img src="{$mpeImgRLarge}" alt="Aperçu de la personnalisation" class="mpe-preview-img" />
                     </div>
                   {else}
                     <div class="customization">
@@ -173,9 +176,12 @@
                   {if $product.customizations}
                     {foreach $product.customizations as $customization}
                       {assign var='mpeImgRM' value=''}
+                      {assign var='mpeImgRMLarge' value=''}
                       {foreach from=$customization.fields item="f"}
                         {if $f.type == 'image' && $f.image.small.url}
                           {assign var='mpeImgRM' value=$f.image.small.url}
+                          {* Modal aperçu = fichier _preview *}
+                          {assign var='mpeImgRMLarge' value=$f.image.small.url|replace:'_small':'_preview'}
                         {/if}
                       {/foreach}
                       {if $mpeImgRM}
@@ -185,7 +191,7 @@
                         <div id="mpe-od-preview-rm-{$customization.id_customization}" class="mpe-preview-modal" style="display:none;">
                           <div class="mpe-preview-backdrop"></div>
                           <button type="button" class="mpe-preview-close" aria-label="Fermer">&times;</button>
-                          <img src="{$mpeImgRM}" alt="Aperçu de la personnalisation" class="mpe-preview-img" />
+                          <img src="{$mpeImgRMLarge}" alt="Aperçu de la personnalisation" class="mpe-preview-img" />
                         </div>
                       {else}
                         <div class="customization">

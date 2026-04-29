@@ -68,11 +68,8 @@
                 {foreach from=$customization.fields item="f"}
                   {if $f.type == 'image' && $f.image.small.url}
                     {assign var='mpeImg' value=$f.image.small.url}
-                    {if isset($f.image.large.url) && $f.image.large.url}
-                      {assign var='mpeImgLarge' value=$f.image.large.url}
-                    {else}
-                      {assign var='mpeImgLarge' value=$f.image.small.url}
-                    {/if}
+                    {* Modal aperçu = fichier _preview, pas large.url qui pointe sur la planche HD *}
+                    {assign var='mpeImgLarge' value=$f.image.small.url|replace:'_small':'_preview'}
                   {/if}
                 {/foreach}
                 {if $mpeImg}
@@ -137,11 +134,8 @@
                 {foreach from=$customization.fields item="f"}
                   {if $f.type == 'image' && $f.image.small.url}
                     {assign var='mpeImgM' value=$f.image.small.url}
-                    {if isset($f.image.large.url) && $f.image.large.url}
-                      {assign var='mpeImgMLarge' value=$f.image.large.url}
-                    {else}
-                      {assign var='mpeImgMLarge' value=$f.image.small.url}
-                    {/if}
+                    {* Modal aperçu = fichier _preview, pas large.url qui pointe sur la planche HD *}
+                    {assign var='mpeImgMLarge' value=$f.image.small.url|replace:'_small':'_preview'}
                   {/if}
                 {/foreach}
                 {if $mpeImgM}
