@@ -150,6 +150,14 @@ class DbPDOCore extends Db
         try {
             return $this->link->query($sql);
         } catch (PDOException $exception) {
+            // [DEBUG TEMP] Log the failing SQL to track the recurring "near 'LIMIT 1'" syntax error.
+            // To remove once the offending query is identified.
+            @file_put_contents(
+                _PS_ROOT_DIR_ . '/var/logs/sql_errors.log',
+                '[' . date('Y-m-d H:i:s') . '] ' . $exception->getMessage() . "\nSQL: " . $sql
+                    . "\nTRACE:\n" . (new Exception())->getTraceAsString() . "\n---\n",
+                FILE_APPEND
+            );
             throw new PrestaShopException($exception->getMessage(), (int) $exception->getCode(), $exception);
         }
     }
