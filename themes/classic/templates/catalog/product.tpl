@@ -135,6 +135,22 @@
     .product-flags .product-flag.on-sale {
       display: none !important;
     }
+    /* Liens hypertexte dans les descriptions produit : orange + gras */
+    .product-description-block a,
+    .product-description-block a *,
+    .product-description a,
+    .product-description a *,
+    [id^="product-description-short"] a,
+    [id^="product-description-short"] a * {
+      color: #ee7a03 !important;
+      font-weight: 700 !important;
+      text-decoration: underline;
+    }
+    .product-description-block a:hover,
+    .product-description a:hover,
+    [id^="product-description-short"] a:hover {
+      color: #c66400 !important;
+    }
   </style>
 
   <section id="main">
