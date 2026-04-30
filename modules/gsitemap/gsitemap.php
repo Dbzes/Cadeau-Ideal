@@ -241,6 +241,7 @@ class Gsitemap extends Module
             'gsitemap_frequency' => Configuration::get('GSITEMAP_FREQUENCY'),
             'gsitemap_store_url' => $store_url,
             'gsitemap_links' => Db::getInstance()->ExecuteS('SELECT * FROM `' . _DB_PREFIX_ . 'gsitemap_sitemap` WHERE id_shop = ' . (int) $this->context->shop->id),
+            'gsitemap_preview' => $this->getSitemapPreview((int) $this->context->shop->id),
             'store_metas' => $store_metas,
             'gsitemap_disable_metas' => explode(',', Configuration::get('GSITEMAP_DISABLE_LINKS')),
             'gsitemap_customer_limit' => [
@@ -252,6 +253,64 @@ class Gsitemap extends Module
         ]);
 
         return $this->display(__FILE__, 'views/templates/admin/configuration.tpl');
+    }
+
+    /**
+     * Read the generated sitemap XML files for the given shop and return a preview
+     * (total URL count + first N URLs with lastmod/priority) for display in the BO.
+     *
+     * @param int $id_shop
+     * @param int $limit max URLs returned in the preview list
+     *
+     * @return array{total:int, urls:array, files:int, error:?string}
+     */
+    protected function getSitemapPreview($id_shop = 0, $limit = 100)
+    {
+        $result = ['total' => 0, 'urls' => [], 'files' => 0, 'error' => null];
+
+        $rows = Db::getInstance()->ExecuteS(
+            'SELECT `link` FROM `' . _DB_PREFIX_ . 'gsitemap_sitemap` WHERE id_shop = ' . (int) $id_shop
+        );
+        if (!$rows) {
+            return $result;
+        }
+
+        $rootDir = $this->normalizeDirectory(_PS_ROOT_DIR_);
+        libxml_use_internal_errors(true);
+
+        foreach ($rows as $row) {
+            $path = $rootDir . $row['link'];
+            if (!is_readable($path)) {
+                continue;
+            }
+            // Skip the index sitemap (it only references sub-sitemaps, not real URLs)
+            if (strpos($row['link'], 'index_sitemap.xml') !== false) {
+                continue;
+            }
+
+            $xml = simplexml_load_file($path);
+            if ($xml === false) {
+                $result['error'] = 'XML parsing failed for ' . basename($row['link']);
+                continue;
+            }
+            $result['files']++;
+
+            foreach ($xml->url as $url) {
+                $result['total']++;
+                if (count($result['urls']) < $limit) {
+                    $result['urls'][] = [
+                        'loc' => (string) $url->loc,
+                        'lastmod' => (string) $url->lastmod,
+                        'changefreq' => (string) $url->changefreq,
+                        'priority' => (string) $url->priority,
+                    ];
+                }
+            }
+        }
+
+        libxml_clear_errors();
+
+        return $result;
     }
 
     /**
@@ -400,7 +459,16 @@ class Gsitemap extends Module
 
             $url = '';
             if (!in_array($meta['id_meta'], explode(',', Configuration::get('GSITEMAP_DISABLE_LINKS')))) {
-                $url = $link->getPageLink($meta['page'], null, $lang['id_lang']);
+                try {
+                    $url = $link->getPageLink($meta['page'], null, $lang['id_lang']);
+                } catch (PrestaShopException $e) {
+                    // Skip routes requiring dynamic params (e.g. module-colissimo-tracking with order_reference)
+                    continue;
+                }
+
+                if (!$url) {
+                    continue;
+                }
 
                 if (!$this->addLinkToSitemap($link_sitemap, [
                     'type' => 'meta',
