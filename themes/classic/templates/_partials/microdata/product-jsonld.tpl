@@ -77,6 +77,7 @@
       "@type": "Offer",
       "priceCurrency": "{$currency.iso_code}",
       "name": "{$product.name|strip_tags:false}",
+      "description": "{$product.description_short|strip_tags|replace:'"':"'"|regex_replace:"/[\r\n]/" : " "|truncate:5000:'...':true}",
       "price": "{$product.price_amount}",
       "url": "{$product.url}",
       "priceValidUntil": "{($smarty.now + (int) (60*60*24*15))|date_format:"%Y-%m-%d"}",
@@ -96,6 +97,43 @@
         {if $product.condition == 'refurbished'}"itemCondition": "https://schema.org/RefurbishedCondition",{/if}
       {/if}
       "availability": "{$product.seo_availability}",
+      "shippingDetails": {
+        "@type": "OfferShippingDetails",
+        "shippingRate": {
+          "@type": "MonetaryAmount",
+          "value": "3.50",
+          "currency": "{$currency.iso_code}"
+        },
+        "shippingDestination": {
+          "@type": "DefinedRegion",
+          "addressCountry": "FR"
+        },
+        "deliveryTime": {
+          "@type": "ShippingDeliveryTime",
+          "handlingTime": {
+            "@type": "QuantitativeValue",
+            "minValue": 1,
+            "maxValue": 2,
+            "unitCode": "DAY"
+          },
+          "transitTime": {
+            "@type": "QuantitativeValue",
+            "minValue": 2,
+            "maxValue": 4,
+            "unitCode": "DAY"
+          }
+        }
+      },
+      {if !$product.customizable}
+      "hasMerchantReturnPolicy": {
+        "@type": "MerchantReturnPolicy",
+        "applicableCountry": "FR",
+        "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+        "merchantReturnDays": 14,
+        "returnMethod": "https://schema.org/ReturnByMail",
+        "returnFees": "https://schema.org/ReturnFeesCustomerResponsibility"
+      },
+      {/if}
       "seller": {
         "@type": "Organization",
         "name": "{$shop.name}"
