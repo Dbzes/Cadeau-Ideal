@@ -38,12 +38,21 @@
     {assign var=hasWeight value=true}
 {/if}
 {assign var=hasOffers value=$product.show_price}
+{if !empty($page.meta.description)}
+    {assign var=jsonLdDescription value=$page.meta.description|strip_tags|replace:'"':"'"|regex_replace:"/[\r\n]/" : " "|truncate:5000:'...':true}
+{elseif !empty($product.description_short)}
+    {assign var=jsonLdDescription value=$product.description_short|strip_tags|replace:'"':"'"|regex_replace:"/[\r\n]/" : " "|truncate:5000:'...':true}
+{elseif !empty($product.description)}
+    {assign var=jsonLdDescription value=$product.description|strip_tags|replace:'"':"'"|regex_replace:"/[\r\n]/" : " "|truncate:5000:'...':true}
+{else}
+    {assign var=jsonLdDescription value=$product.name|strip_tags|replace:'"':"'"}
+{/if}
 <script type="application/ld+json">
   {
     "@context": "https://schema.org/",
     "@type": "Product",
     "name": "{$product.name}",
-    "description": "{$page.meta.description|regex_replace:"/[\r\n]/" : " "}",
+    "description": "{$jsonLdDescription}",
     "category": "{$product.category_name}",
     {if !empty($product.cover)}"image" :"{$product.cover.bySize.home_default.url}",{/if}
     "sku": "{if $product.reference}{$product.reference}{else}{$product.id}{/if}",
@@ -77,7 +86,7 @@
       "@type": "Offer",
       "priceCurrency": "{$currency.iso_code}",
       "name": "{$product.name|strip_tags:false}",
-      "description": "{$product.description_short|strip_tags|replace:'"':"'"|regex_replace:"/[\r\n]/" : " "|truncate:5000:'...':true}",
+      "description": "{$jsonLdDescription}",
       "price": "{$product.price_amount}",
       "url": "{$product.url}",
       "priceValidUntil": "{($smarty.now + (int) (60*60*24*15))|date_format:"%Y-%m-%d"}",
