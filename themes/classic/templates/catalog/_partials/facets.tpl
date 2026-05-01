@@ -43,6 +43,9 @@
       {if !$facet.displayed}
         {continue}
       {/if}
+      {if isset($facet.type) && $facet.type === 'weight'}
+        {continue}
+      {/if}
 
       <section class="facet clearfix">
         <p class="h6 facet-title hidden-sm-down">{$facet.label}</p>
