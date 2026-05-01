@@ -28,6 +28,15 @@
   {$cms.meta_title}
 {/block}
 
+{block name='stylesheets' append}
+  {literal}
+  <style>
+    body.page-cms .page-header h1,
+    body.page-cms .page-header .h1 { font-size: 1.875rem; }
+  </style>
+  {/literal}
+{/block}
+
 {block name='page_content_container'}
   <section id="content" class="page-content page-cms page-cms-{$cms.id}">
 
