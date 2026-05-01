@@ -23,6 +23,17 @@
  * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License 3.0 (AFL-3.0)
  *}
 {if isset($listing.rendered_facets)}
+{literal}
+<style>
+  #search_filters_wrapper #search_filters,
+  #search_filters_wrapper #search_filters .facet,
+  #search_filters_wrapper #search_filters .facet .facet-title,
+  #search_filters_wrapper #search_filters .facet .h6,
+  #search_filters_wrapper #search_filters .facet .facet-label,
+  #search_filters_wrapper #search_filters .facet .facet-label a,
+  #search_filters_wrapper #search_filters .magnitude { font-size: 0.875rem; }
+</style>
+{/literal}
 <div id="search_filters_wrapper" class="hidden-sm-down">
   <div id="search_filter_controls" class="hidden-md-up">
       <span id="_mobile_search_filters_clear_all"></span>
