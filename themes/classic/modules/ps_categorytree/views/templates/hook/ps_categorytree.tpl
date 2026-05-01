@@ -59,7 +59,9 @@
   {/strip}
 {/function}
 
-{if $focusedCategory}
+{if isset($page.page_name) && $page.page_name === 'new-products'}
+  {* Bloc des catégories masqué sur la page nouveaux-produits *}
+{elseif $focusedCategory}
   <div class="block-categories">
     <ul class="category-top-menu">
       <li>
