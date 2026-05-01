@@ -62,6 +62,9 @@
                 {if !$filter.displayed}
                   {continue}
                 {/if}
+                {if isset($page.page_name) && $page.page_name === 'new-products' && isset($facet.type) && $facet.type === 'category' && ($filter.label|trim) === 'Accueil'}
+                  {continue}
+                {/if}
 
                 <li>
                   <label class="facet-label{if $filter.active} active {/if}" for="facet_input_{$_expand_id}_{$filter_key}">
