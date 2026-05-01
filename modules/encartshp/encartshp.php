@@ -22,7 +22,7 @@ class Encartshp extends Module
     {
         $this->name = 'encartshp';
         $this->tab = 'front_office_features';
-        $this->version = '1.3.0';
+        $this->version = '1.3.1';
         $this->author = 'Claude';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -46,6 +46,17 @@ class Encartshp extends Module
 
     private function getOrder()
     {
+        // Migration v1.2 → v1.3.1 : convertit l'ancien switch "Désactiver" (encarts 6/7)
+        // en slot "Masqué" dans l'ordre, une seule fois, pour préserver le visuel existant.
+        if (Configuration::get('ENCARTSHP_ORDER_1') === false) {
+            for ($pos = 1; $pos <= 4; $pos++) {
+                $i = $this->orderDefaults[$pos - 1];
+                $wasDisabled = in_array($i, $this->grands2, true)
+                    && (int) Configuration::get('ENCARTSHP_DISABLED_' . $i) === 1;
+                Configuration::updateValue('ENCARTSHP_ORDER_' . $pos, $wasDisabled ? 0 : $i);
+            }
+        }
+
         $order = [];
         for ($pos = 1; $pos <= 4; $pos++) {
             $val = Configuration::get('ENCARTSHP_ORDER_' . $pos);
@@ -87,13 +98,11 @@ class Encartshp extends Module
             Configuration::updateValue('ENCARTSHP_NEWTAB_' . $i, 0);
         }
 
-        foreach ($this->grands2 as $i) {
-            Configuration::updateValue('ENCARTSHP_DISABLED_' . $i, 1);
-        }
-
-        for ($pos = 1; $pos <= 4; $pos++) {
-            Configuration::updateValue('ENCARTSHP_ORDER_' . $pos, $this->orderDefaults[$pos - 1]);
-        }
+        // Defaults : encarts 1 & 2 visibles, 6 & 7 masqués (peuvent être activés via l'ordre).
+        Configuration::updateValue('ENCARTSHP_ORDER_1', 1);
+        Configuration::updateValue('ENCARTSHP_ORDER_2', 2);
+        Configuration::updateValue('ENCARTSHP_ORDER_3', 0);
+        Configuration::updateValue('ENCARTSHP_ORDER_4', 0);
 
         $imgDir = _PS_MODULE_DIR_ . $this->name . '/img/';
         if (!is_dir($imgDir)) {
@@ -155,10 +164,6 @@ class Encartshp extends Module
                 $value = $this->orderDefaults[$pos - 1];
             }
             Configuration::updateValue('ENCARTSHP_ORDER_' . $pos, $value);
-        }
-
-        foreach ($this->grands2 as $i) {
-            Configuration::updateValue('ENCARTSHP_DISABLED_' . $i, (int) Tools::getValue('ENCARTSHP_DISABLED_' . $i));
         }
 
         foreach ($this->getAllPositions() as $i) {
@@ -236,12 +241,8 @@ class Encartshp extends Module
             5 => $this->l('Petit encart — Droite'),
         ];
 
-        foreach ($this->grands as $i) {
+        foreach (array_merge($this->grands, $this->grands2) as $i) {
             $forms[] = $this->buildEncartForm($i, $this->getGrandLabel($i), '545x340');
-        }
-
-        foreach ($this->grands2 as $i) {
-            $forms[] = $this->buildEncartForm($i, $this->getGrandLabel($i), '545x340', true);
         }
 
         foreach ($this->petits as $i) {
@@ -268,7 +269,6 @@ class Encartshp extends Module
             $helper->fields_value['ENCARTSHP_ALT_' . $i] = Configuration::get('ENCARTSHP_ALT_' . $i);
             $helper->fields_value['ENCARTSHP_TITLE_' . $i] = Configuration::get('ENCARTSHP_TITLE_' . $i);
             $helper->fields_value['ENCARTSHP_NEWTAB_' . $i] = Configuration::get('ENCARTSHP_NEWTAB_' . $i);
-            $helper->fields_value['ENCARTSHP_DISABLED_' . $i] = Configuration::get('ENCARTSHP_DISABLED_' . $i);
             $helper->fields_value['ENCARTSHP_DELETE_IMG_' . $i] = 0;
         }
 
@@ -303,7 +303,7 @@ class Encartshp extends Module
                     'name' => 'name',
                 ],
                 'desc' => $pos === 1
-                    ? $this->l('Choisissez l\'encart à afficher dans chaque position. « Masqué » laisse le slot vide. Les positions 1-2 forment la 1re ligne, 3-4 la 2e ligne. Les encarts désactivés dans leur bloc ne s\'affichent pas même s\'ils sont sélectionnés ici.')
+                    ? $this->l('Choisissez l\'encart à afficher dans chaque position. « Masqué » laisse le slot vide. Les positions 1-2 forment la 1re ligne, 3-4 la 2e ligne.')
                     : '',
             ];
         }
@@ -322,24 +322,9 @@ class Encartshp extends Module
         ];
     }
 
-    protected function buildEncartForm($i, $label, $size, $hasDisable = false)
+    protected function buildEncartForm($i, $label, $size)
     {
-        $encartInputs = [];
-
-        if ($hasDisable) {
-            $encartInputs[] = [
-                'type' => 'switch',
-                'label' => $this->l('Désactiver cet encart'),
-                'name' => 'ENCARTSHP_DISABLED_' . $i,
-                'is_bool' => true,
-                'values' => [
-                    ['id' => 'disabled_' . $i . '_on', 'value' => 1, 'label' => $this->l('Oui')],
-                    ['id' => 'disabled_' . $i . '_off', 'value' => 0, 'label' => $this->l('Non')],
-                ],
-            ];
-        }
-
-        $encartInputs = array_merge($encartInputs, [
+        $encartInputs = [
             [
                 'type' => 'file',
                 'label' => $this->l('Image') . ' (' . $size . ')',
@@ -374,7 +359,7 @@ class Encartshp extends Module
                     ['id' => 'newtab_' . $i . '_off', 'value' => 0, 'label' => $this->l('Non')],
                 ],
             ],
-        ]);
+        ];
 
         $imgPath = _PS_MODULE_DIR_ . $this->name . '/img/encart_' . $i . '.jpg';
         if (file_exists($imgPath)) {
@@ -433,9 +418,6 @@ class Encartshp extends Module
         $grandsFlat = [];
         foreach ($order as $i) {
             if ($i === 0 || !in_array($i, $allowed, true)) {
-                continue;
-            }
-            if (in_array($i, $this->grands2, true) && (int) Configuration::get('ENCARTSHP_DISABLED_' . $i)) {
                 continue;
             }
             $imgPath = _PS_MODULE_DIR_ . $this->name . '/img/encart_' . $i . '.jpg';
