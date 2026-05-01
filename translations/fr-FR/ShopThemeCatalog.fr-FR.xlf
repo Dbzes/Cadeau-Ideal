@@ -135,12 +135,12 @@
       </trans-unit>
       <trans-unit id="900a70008b0ed52ee5f6907f7b61f0e8" approved="yes">
         <source>Date added, newest to oldest</source>
-        <target state="final">Date d'ajout, du plus récent au plus ancien</target>
+        <target state="final">Ajout Récent à Ancien</target>
         <note>Line: 136</note>
       </trans-unit>
       <trans-unit id="c2718c816e7ebf8495e3c9ce20061317" approved="yes">
         <source>Date added, oldest to newest</source>
-        <target state="final">Date d'ajout, du plus ancien au plus récent</target>
+        <target state="final">Ajout Ancien à Récent</target>
         <note>Line: 133</note>
       </trans-unit>
       <trans-unit id="05d61847840bcddb5d37374de3be0ccc" approved="yes">
