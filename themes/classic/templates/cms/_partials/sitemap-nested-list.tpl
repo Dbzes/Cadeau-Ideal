@@ -25,6 +25,7 @@
 {block name='sitemap_item'}
   <ul{if !empty($is_nested)} class="nested"{/if}>
     {foreach $links as $link}
+      {if $link.id !== 'stores-page'}
       <li>
         <a id="{$link.id}" href="{$link.url}" title="{$link.label}">
           {$link.label}
@@ -33,6 +34,7 @@
           {include file='cms/_partials/sitemap-nested-list.tpl' links=$link.children is_nested=true}
         {/if}
       </li>
+      {/if}
     {/foreach}
   </ul>
 {/block}
