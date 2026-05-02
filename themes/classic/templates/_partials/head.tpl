@@ -95,8 +95,11 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
   <style>
-    body, body * {
-      font-family: 'Montserrat', sans-serif !important;
+    body {
+      font-family: 'Montserrat', sans-serif;
+    }
+    button, input, select, textarea {
+      font-family: inherit;
     }
     h1, h2, .h1, .h2 {
       font-family: 'Bebas Neue', sans-serif !important;
