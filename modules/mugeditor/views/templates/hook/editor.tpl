@@ -219,6 +219,19 @@ function mueInit() {
     });
   });
 
+  // Hash routing : #editor-images ouvre la section Importer des images + scroll
+  if (window.location.hash === '#editor-images') {
+    var imagesHead = document.querySelector('.mug-editor .mue-head[data-target="mue-images"]');
+    var editor = document.querySelector('.mug-editor');
+    if (imagesHead && editor) {
+      document.querySelectorAll('.mug-editor .mue-item').forEach(function(i) { i.classList.remove('mue-open'); });
+      imagesHead.parentElement.classList.add('mue-open');
+      setTimeout(function() {
+        editor.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+  }
+
   // Font dropdown custom
   (function(){
     var dd = document.getElementById('mue-font-dropdown');
