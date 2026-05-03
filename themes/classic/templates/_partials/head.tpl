@@ -127,7 +127,10 @@
     .product-miniature .highlighted-informations {
       display: none !important;
     }
+    .product-miniature .product-title,
     .product-miniature .product-title a {
+      font-family: 'Bebas Neue', sans-serif !important;
+      letter-spacing: 1px;
       color: #000 !important;
     }
     /* Titre produit sur 1 ligne avec ellipsis dans toutes les vignettes */
