@@ -26,19 +26,16 @@
 
 {block name='page_header_container'}{/block}
 
-{if $layout === 'layouts/layout-left-column.tpl'}
-  {block name="left_column"}
-    <div id="left-column" class="col-xs-12 col-md-4 col-lg-3">
-      {hook h='displayContactLeftColumn'}
-    </div>
-  {/block}
-{else if $layout === 'layouts/layout-right-column.tpl'}
-  {block name="right_column"}
-    <div id="right-column" class="col-xs-12 col-md-4 col-lg-3">
-      {hook h='displayContactRightColumn'}
-    </div>
-  {/block}
-{/if}
+{block name="left_column"}{/block}
+{block name="right_column"}{/block}
+
+{block name='content_wrapper'}
+  <div id="content-wrapper" class="js-content-wrapper col-xs-12">
+    {hook h="displayContentWrapperTop"}
+    {block name='content'}{/block}
+    {hook h="displayContentWrapperBottom"}
+  </div>
+{/block}
 
 {block name='page_content'}
   {hook h='displayContactContent'}
