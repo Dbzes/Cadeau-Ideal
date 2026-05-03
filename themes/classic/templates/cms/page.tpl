@@ -34,8 +34,10 @@
     body.page-cms .page-header h1,
     body.page-cms .page-header .h1 { font-size: 1.875rem; }
     body.page-cms .page-content.page-cms { color: #000; }
-    body.page-cms .page-content.page-cms h2 { color: #000; margin-top: 1rem; }
-    body.page-cms .page-content.page-cms h3 { color: #000; }
+    body.page-cms .page-content.page-cms h2 { color: #000 !important; margin-top: 1rem !important; }
+    body.page-cms .page-content.page-cms h3 { color: #000 !important; }
+    body.page-cms .page-content.page-cms h2 strong,
+    body.page-cms .page-content.page-cms h3 strong { color: inherit !important; }
     body.page-cms .page-content.page-cms strong { color: #004774; font-weight: 700; }
     body.page-cms .page-content.page-cms a { color: #ee7a03; font-weight: 700; }
   </style>
