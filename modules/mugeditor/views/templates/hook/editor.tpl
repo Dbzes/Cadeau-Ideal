@@ -41,6 +41,10 @@
 </div>
 {literal}<style>
 @keyframes mue-spin { to { transform: rotate(360deg); } }
+.mue-toast{display:none;margin-top:8px;padding:10px 12px;font-size:13px;line-height:1.4;border-left:4px solid #ccc;background:#f5f5f5;color:#333;}
+.mue-toast.mue-toast-error{background:#fdecea;border-left-color:#e74c3c;color:#922;}
+.mue-toast.mue-toast-success{background:#eafaf1;border-left-color:#27ae60;color:#1e6e3c;}
+.mue-toast.mue-toast-info{background:#eaf2fb;border-left-color:#004774;color:#004774;}
 </style>{/literal}
 
 <div id="mue-confirm-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:99998;align-items:center;justify-content:center;padding:20px;">
@@ -118,6 +122,7 @@
           <input type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif" id="mue-img-input" />
           <span>+ Ajouter une image</span>
         </label>
+        <div id="mue-img-toast" class="mue-toast" role="status" aria-live="polite"></div>
         <p class="mue-hint" id="mue-img-counter">0 / 50 images</p>
         <div id="mue-img-list" style="display:flex;flex-direction:column;gap:6px;margin-top:10px;"></div>
       </div>
@@ -908,18 +913,36 @@ function mueInit() {
 
   var imgList = document.getElementById('mue-img-list');
 
+  var imgToast = document.getElementById('mue-img-toast');
+  var imgToastTimer = null;
+  function showImgToast(msg, type){
+    if (!imgToast) return;
+    imgToast.classList.remove('mue-toast-error','mue-toast-success','mue-toast-info');
+    imgToast.classList.add('mue-toast-' + (type || 'info'));
+    imgToast.textContent = msg;
+    imgToast.style.display = 'block';
+    if (imgToastTimer) clearTimeout(imgToastTimer);
+    imgToastTimer = setTimeout(function(){ imgToast.style.display = 'none'; }, 5000);
+  }
+  function hideImgToast(){
+    if (imgToast) imgToast.style.display = 'none';
+    if (imgToastTimer) { clearTimeout(imgToastTimer); imgToastTimer = null; }
+  }
+
   imgInput.addEventListener('change', function(e){
-    if (!fabricReady || !canvas) { alert('Éditeur non chargé.'); return; }
-    if (imageCount >= MAX_IMAGES) { alert('Maximum ' + MAX_IMAGES + ' images.'); return; }
+    if (!fabricReady || !canvas) { showImgToast('Éditeur non chargé.', 'error'); return; }
+    if (imageCount >= MAX_IMAGES) { showImgToast('Maximum ' + MAX_IMAGES + ' images.', 'error'); return; }
     var file = e.target.files[0];
     if (!file) return;
-    if (file.size > 10485760) { alert('Fichier trop volumineux (max 10 Mo)'); imgInput.value = ''; return; }
+    if (file.size > 10485760) { showImgToast('Fichier trop volumineux (max 10 Mo)', 'error'); imgInput.value = ''; return; }
+    hideImgToast();
+    showImgToast('Upload en cours…', 'info');
     var ufd = new FormData();
     ufd.append('file', file);
     fetch(window.MUE_UPLOADIMAGE_URL, { method: 'POST', body: ufd, credentials: 'same-origin' })
       .then(function(r){ return r.json(); })
       .then(function(d){
-        if (!d || !d.success) { alert((d && d.error) ? d.error : 'Échec upload image'); return; }
+        if (!d || !d.success) { showImgToast((d && d.error) ? d.error : 'Échec upload image', 'error'); return; }
         var serverUrl = d.url;
         var fileName = d.name || file.name;
         var tmpImg = new Image();
@@ -955,12 +978,13 @@ function mueInit() {
             addImgThumb(img, cleanUrl, fileName);
             var imgSection = document.querySelector('[data-target="mue-images"]');
             if (imgSection) imgSection.parentElement.classList.add('mue-open');
+            hideImgToast();
           });
         };
-        tmpImg.onerror = function(){ alert('Image illisible'); };
+        tmpImg.onerror = function(){ showImgToast('Image illisible', 'error'); };
         tmpImg.src = serverUrl;
       })
-      .catch(function(){ alert('Erreur réseau lors de l\'upload'); });
+      .catch(function(){ showImgToast('Erreur réseau lors de l\'upload', 'error'); });
     imgInput.value = '';
   });
 
