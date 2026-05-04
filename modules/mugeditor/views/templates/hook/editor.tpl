@@ -115,7 +115,7 @@
         {/if}
         <p class="mue-hint">Ajoutez des images sur votre mug :</p>
         <label class="mue-upload" id="mue-img-upload-label">
-          <input type="file" accept="image/*" id="mue-img-input" />
+          <input type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif" id="mue-img-input" />
           <span>+ Ajouter une image</span>
         </label>
         <p class="mue-hint" id="mue-img-counter">0 / 50 images</p>
@@ -913,53 +913,54 @@ function mueInit() {
     if (imageCount >= MAX_IMAGES) { alert('Maximum ' + MAX_IMAGES + ' images.'); return; }
     var file = e.target.files[0];
     if (!file) return;
-    try {
-      var ufd = new FormData();
-      ufd.append('file', file);
-      fetch(window.MUE_UPLOADIMAGE_URL, { method: 'POST', body: ufd, credentials: 'same-origin' });
-    } catch(e) {}
-    var dataUrl = null;
-    var reader = new FileReader();
-    reader.onload = function(ev) {
-      dataUrl = ev.target.result;
-      // Convertir blanc → transparent avant d'ajouter au canvas
-      var tmpImg = new Image();
-      tmpImg.onload = function(){
-        var tc = document.createElement('canvas');
-        tc.width = tmpImg.width; tc.height = tmpImg.height;
-        var tctx = tc.getContext('2d');
-        tctx.drawImage(tmpImg, 0, 0);
-        var id = tctx.getImageData(0, 0, tc.width, tc.height);
-        var px = id.data;
-        for (var i = 0; i < px.length; i += 4) {
-          if (px[i] > 240 && px[i+1] > 240 && px[i+2] > 240) { px[i+3] = 0; }
-        }
-        tctx.putImageData(id, 0, 0);
-        var cleanUrl = tc.toDataURL('image/png');
-        fabric.Image.fromURL(cleanUrl, function(img){
-          var maxDim = W / 3;
-          var scale = Math.min(maxDim / img.width, maxDim / img.height);
-          img.set({
-            left: W / 2, top: H / 2,
-            originX: 'center', originY: 'center',
-            scaleX: scale, scaleY: scale,
-            cornerColor: '#ee7a03', borderColor: '#ee7a03', cornerSize: 10, transparentCorners: false
+    if (file.size > 10485760) { alert('Fichier trop volumineux (max 10 Mo)'); imgInput.value = ''; return; }
+    var ufd = new FormData();
+    ufd.append('file', file);
+    fetch(window.MUE_UPLOADIMAGE_URL, { method: 'POST', body: ufd, credentials: 'same-origin' })
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        if (!d || !d.success) { alert((d && d.error) ? d.error : 'Échec upload image'); return; }
+        var serverUrl = d.url;
+        var fileName = d.name || file.name;
+        var tmpImg = new Image();
+        tmpImg.crossOrigin = 'anonymous';
+        tmpImg.onload = function(){
+          var tc = document.createElement('canvas');
+          tc.width = tmpImg.width; tc.height = tmpImg.height;
+          var tctx = tc.getContext('2d');
+          tctx.drawImage(tmpImg, 0, 0);
+          var id = tctx.getImageData(0, 0, tc.width, tc.height);
+          var px = id.data;
+          for (var i = 0; i < px.length; i += 4) {
+            if (px[i] > 240 && px[i+1] > 240 && px[i+2] > 240) { px[i+3] = 0; }
+          }
+          tctx.putImageData(id, 0, 0);
+          var cleanUrl = tc.toDataURL('image/png');
+          fabric.Image.fromURL(cleanUrl, function(img){
+            var maxDim = W / 3;
+            var scale = Math.min(maxDim / img.width, maxDim / img.height);
+            img.set({
+              left: W / 2, top: H / 2,
+              originX: 'center', originY: 'center',
+              scaleX: scale, scaleY: scale,
+              cornerColor: '#ee7a03', borderColor: '#ee7a03', cornerSize: 10, transparentCorners: false
+            });
+            img.__mueFileName = fileName;
+            canvas.add(img);
+            canvas.setActiveObject(img);
+            bringTemplateToFront();
+            canvas.renderAll();
+            imageCount++;
+            updateImgCounter();
+            addImgThumb(img, cleanUrl, fileName);
+            var imgSection = document.querySelector('[data-target="mue-images"]');
+            if (imgSection) imgSection.parentElement.classList.add('mue-open');
           });
-          img.__mueFileName = file.name;
-          canvas.add(img);
-          canvas.setActiveObject(img);
-          bringTemplateToFront();
-          canvas.renderAll();
-          imageCount++;
-          updateImgCounter();
-          addImgThumb(img, cleanUrl, file.name);
-          var imgSection = document.querySelector('[data-target="mue-images"]');
-          if (imgSection) imgSection.parentElement.classList.add('mue-open');
-        });
-      };
-      tmpImg.src = dataUrl;
-    };
-    reader.readAsDataURL(file);
+        };
+        tmpImg.onerror = function(){ alert('Image illisible'); };
+        tmpImg.src = serverUrl;
+      })
+      .catch(function(){ alert('Erreur réseau lors de l\'upload'); });
     imgInput.value = '';
   });
 

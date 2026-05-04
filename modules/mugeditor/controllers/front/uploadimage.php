@@ -4,8 +4,8 @@
  */
 class MugeditorUploadimageModuleFrontController extends ModuleFrontController
 {
-    const MAX_SIZE = 5242880; // 5 Mo
-    const ALLOWED = ['jpg', 'jpeg', 'png', 'webp'];
+    const MAX_SIZE = 10485760; // 10 Mo
+    const ALLOWED = ['jpg', 'jpeg', 'png', 'webp', 'heic', 'heif'];
 
     public $ajax = true;
 
@@ -21,10 +21,9 @@ class MugeditorUploadimageModuleFrontController extends ModuleFrontController
                 throw new Exception('Erreur upload (' . $f['error'] . ')');
             }
             if ($f['size'] > self::MAX_SIZE) {
-                throw new Exception('Fichier trop volumineux (max 5 Mo)');
+                throw new Exception('Fichier trop volumineux (max 10 Mo)');
             }
             $ext = strtolower(pathinfo($f['name'], PATHINFO_EXTENSION));
-            if ($ext === 'jpeg') $ext = 'jpg';
             if (!in_array($ext, self::ALLOWED)) {
                 throw new Exception('Format non autorisé');
             }
@@ -33,10 +32,29 @@ class MugeditorUploadimageModuleFrontController extends ModuleFrontController
             $dir = _PS_MODULE_DIR_ . 'mugeditor/uploads/customer/' . $key . '/images/';
             if (!is_dir($dir)) @mkdir($dir, 0755, true);
 
-            $name = uniqid('img_', true) . '.' . $ext;
-            $dest = $dir . $name;
-            if (!move_uploaded_file($f['tmp_name'], $dest)) {
-                throw new Exception('Échec écriture fichier');
+            if (in_array($ext, ['heic', 'heif'])) {
+                if (!extension_loaded('imagick')) {
+                    throw new Exception('Conversion HEIC indisponible');
+                }
+                $finalExt = 'jpg';
+                $name = uniqid('img_', true) . '.' . $finalExt;
+                $dest = $dir . $name;
+                try {
+                    $im = new Imagick($f['tmp_name']);
+                    $im->setImageFormat('jpeg');
+                    $im->setImageCompressionQuality(92);
+                    $im->writeImage($dest);
+                    $im->clear();
+                } catch (Exception $e) {
+                    throw new Exception('Conversion HEIC échouée : ' . $e->getMessage());
+                }
+            } else {
+                $finalExt = $ext === 'jpeg' ? 'jpg' : $ext;
+                $name = uniqid('img_', true) . '.' . $finalExt;
+                $dest = $dir . $name;
+                if (!move_uploaded_file($f['tmp_name'], $dest)) {
+                    throw new Exception('Échec écriture fichier');
+                }
             }
 
             if (extension_loaded('imagick')) {
