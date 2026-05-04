@@ -132,7 +132,7 @@
       font-family: 'Bebas Neue', sans-serif !important;
       letter-spacing: 1px;
       color: #000 !important;
-      font-size: 1.5rem !important;
+      font-size: 1.0rem !important;
     }
     /* Titre produit sur 1 ligne avec ellipsis dans toutes les vignettes */
     .product-miniature .product-title {
