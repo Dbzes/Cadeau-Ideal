@@ -127,8 +127,12 @@
     .product-miniature .highlighted-informations {
       display: none !important;
     }
+    .product-miniature h2.product-title,
+    .product-miniature h3.product-title,
     .product-miniature .product-title,
-    .product-miniature .product-title a {
+    .product-miniature .product-title a,
+    .featured-products .product-miniature .product-title,
+    .featured-products .product-miniature .product-title a {
       font-family: 'Bebas Neue', sans-serif !important;
       letter-spacing: 1px;
       color: #000 !important;
