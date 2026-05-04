@@ -117,7 +117,7 @@
                 {if !empty($product.cover.bySize.home_default.sources.webp)}<source srcset="{$product.cover.bySize.home_default.sources.webp}" type="image/webp">{/if}
                 <img
                   src="{$product.cover.bySize.home_default.url}"
-                  alt="{if !empty($product.cover.legend)}{$product.cover.legend}{else}{$product.name|truncate:35:'...'}{/if}"
+                  alt="{if !empty($product.cover.legend)}{$product.cover.legend}{else}{$product.name|truncate:37:'...'}{/if}"
                   loading="lazy"
                   data-full-size-image-url="{$product.cover.large.url}"
                   width="{$product.cover.bySize.home_default.width}"
@@ -155,9 +155,9 @@
       <div class="product-description">
         {block name='product_name'}
           {if $page.page_name == 'index'}
-            <h3 class="h3 product-title"><a href="{$product.url}" content="{$product.url}">{$product.name|truncate:35:'...'}</a></h3>
+            <h3 class="h3 product-title"><a href="{$product.url}" content="{$product.url}">{$product.name|truncate:37:'...'}</a></h3>
           {else}
-            <h2 class="h3 product-title"><a href="{$product.url}" content="{$product.url}">{$product.name|truncate:35:'...'}</a></h2>
+            <h2 class="h3 product-title"><a href="{$product.url}" content="{$product.url}">{$product.name|truncate:37:'...'}</a></h2>
           {/if}
         {/block}
 
