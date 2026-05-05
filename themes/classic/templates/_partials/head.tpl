@@ -63,8 +63,22 @@
     <meta property="og:description" content="{$page.meta.description}" />
     <meta property="og:url" content="{$urls.current_url}" />
     <meta property="og:site_name" content="{$shop.name}" />
-    {if !isset($product) && $page.page_name != 'product'}<meta property="og:type" content="website" />{/if}
-  {/block}  
+    {if isset($product) && $product.cover}
+      <meta property="og:type" content="product" />
+      <meta property="og:image" content="{$product.cover.large.url}" />
+      <meta property="og:image:secure_url" content="{$product.cover.large.url}" />
+    {else}
+      <meta property="og:type" content="website" />
+      <meta property="og:image" content="{$urls.base_url}img/template/le-cadeau-ideal.png" />
+      <meta property="og:image:secure_url" content="{$urls.base_url}img/template/le-cadeau-ideal.png" />
+      <meta property="og:image:width" content="968" />
+      <meta property="og:image:height" content="543" />
+    {/if}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="{$page.meta.title}" />
+    <meta name="twitter:description" content="{$page.meta.description}" />
+    <meta name="twitter:image" content="{if isset($product) && $product.cover}{$product.cover.large.url}{else}{$urls.base_url}img/template/le-cadeau-ideal.png{/if}" />
+  {/block}
 {/block}
 
 {block name='head_viewport'}
