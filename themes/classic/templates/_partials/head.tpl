@@ -63,6 +63,7 @@
     <meta property="og:description" content="{$page.meta.description}" />
     <meta property="og:url" content="{$urls.current_url}" />
     <meta property="og:site_name" content="{$shop.name}" />
+    <meta property="og:ttl" content="86400" />
     {if isset($product) && $product.cover}
       <meta property="og:type" content="product" />
       <meta property="og:image" content="{$product.cover.large.url}" />
