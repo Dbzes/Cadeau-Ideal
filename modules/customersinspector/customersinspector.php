@@ -112,11 +112,11 @@ class CustomersInspector extends Module
             $ua = isset($_SERVER['HTTP_USER_AGENT']) ? (string) $_SERVER['HTTP_USER_AGENT'] : '';
             $device = self::detectDevice($ua);
 
-            $idGuest = isset($this->context->cookie->id_guest)
-                ? (int) $this->context->cookie->id_guest
-                : (int) Guest::getFromCustomer((int) $this->context->customer->id);
-            if (!$idGuest) {
-                return;
+            $idGuest = 0;
+            if (isset($this->context->cookie) && $this->context->cookie->id_guest) {
+                $idGuest = (int) $this->context->cookie->id_guest;
+            } elseif (isset($this->context->customer) && $this->context->customer->id) {
+                $idGuest = (int) Guest::getFromCustomer((int) $this->context->customer->id);
             }
 
             $ip = Tools::getRemoteAddr();
