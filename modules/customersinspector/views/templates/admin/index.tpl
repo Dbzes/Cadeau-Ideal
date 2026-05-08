@@ -6,6 +6,7 @@
 .ci-wrapper { padding: 16px 0; }
 .ci-card { background: #fff; border: 1px solid #e0e0e0; padding: 20px; margin-bottom: 20px; }
 .ci-card h3 { margin: 0 0 16px; color: #004774; font-size: 16px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+.ci-card h3 small { display: block; margin-top: 4px; color: #888; font-size: 11px; font-weight: 400; text-transform: none; letter-spacing: 0; }
 .ci-presets { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
 .ci-presets a { display: inline-block; padding: 6px 14px; background: #f4f4f4; color: #333; text-decoration: none; border: 1px solid #ddd; font-size: 13px; }
 .ci-presets a:hover { background: #004774; color: #fff; border-color: #004774; }
@@ -26,8 +27,15 @@
 .ci-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
 .ci-table th, .ci-table td { padding: 8px 12px; text-align: left; border-bottom: 1px solid #eee; font-size: 13px; }
 .ci-table th { background: #f8f8f8; color: #666; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
+.ci-table td.right, .ci-table th.right { text-align: right; }
+.ci-table td.muted { color: #999; font-style: italic; }
 .ci-warn { padding: 12px 16px; background: #fff3cd; border: 1px solid #ffe69c; color: #664d03; margin-bottom: 16px; }
-.ci-pill { display: inline-block; padding: 2px 8px; background: #004774; color: #fff; font-size: 11px; margin-left: 6px; }
+.ci-info { padding: 10px 14px; background: #e7f1f9; border: 1px solid #b6d4ed; color: #004774; margin-bottom: 12px; font-size: 12px; }
+.ci-pill { display: inline-block; padding: 2px 8px; background: #004774; color: #fff; font-size: 11px; margin-left: 6px; vertical-align: middle; }
+.ci-bar { display: inline-block; height: 8px; background: #ee7a03; vertical-align: middle; margin-left: 8px; }
+.ci-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media (max-width: 1100px) { .ci-grid-2 { grid-template-columns: 1fr; } }
+.ci-empty { padding: 32px; text-align: center; color: #999; font-style: italic; }
 </style>
 
 <div class="ci-wrapper">
@@ -51,7 +59,6 @@
     </div>
 
     <form method="get" action="index.php">
-      {* On reconstruit les paramètres tech BO *}
       {foreach from=$smarty.get key=k item=v}
         {if $k === 'controller' || $k === 'token'}
           <input type="hidden" name="{$k|escape:'html':'UTF-8'}" value="{$v|escape:'html':'UTF-8'}">
@@ -111,24 +118,114 @@
     </div>
   </div>
 
-  {if $ci_country_list|@count > 0}
+  <div class="ci-grid-2">
+
     <div class="ci-card">
-      <h3>Répartition par pays</h3>
+      <h3>
+        Pages d'entrée
+        <small>1ère page de chaque session — données rétroactives complètes</small>
+      </h3>
+      {if $ci_entry_pages|@count > 0}
+        <table class="ci-table">
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Nom</th>
+              <th class="right">Visites</th>
+            </tr>
+          </thead>
+          <tbody>
+            {foreach from=$ci_entry_pages item=p}
+              <tr>
+                <td>{$p.page_type_label|escape:'html':'UTF-8'}</td>
+                <td {if !$p.object_name}class="muted"{/if}>
+                  {if $p.object_name}{$p.object_name|escape:'html':'UTF-8'}{else}—{/if}
+                </td>
+                <td class="right"><strong>{$p.count|number_format:0:',':' '}</strong></td>
+              </tr>
+            {/foreach}
+          </tbody>
+        </table>
+      {else}
+        <div class="ci-empty">Aucune donnée sur la période.</div>
+      {/if}
+    </div>
+
+    <div class="ci-card">
+      <h3>
+        Pages vues (toutes pages)
+        <small>Tracking activé le 2026-05-08 — total période : {$ci_viewed_pages_total|number_format:0:',':' '}</small>
+      </h3>
+      {if $ci_viewed_pages|@count > 0}
+        <table class="ci-table">
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Nom</th>
+              <th class="right">Vues</th>
+            </tr>
+          </thead>
+          <tbody>
+            {foreach from=$ci_viewed_pages item=p}
+              <tr>
+                <td>{$p.page_type_label|escape:'html':'UTF-8'}</td>
+                <td {if !$p.object_name}class="muted"{/if}>
+                  {if $p.object_name}{$p.object_name|escape:'html':'UTF-8'}{else}—{/if}
+                </td>
+                <td class="right"><strong>{$p.count|number_format:0:',':' '}</strong></td>
+              </tr>
+            {/foreach}
+          </tbody>
+        </table>
+      {else}
+        <div class="ci-info">
+          Aucune page vue enregistrée sur la période. Le tracking <code>ps_connections_page</code> a été activé le 2026-05-08, les données arriveront avec les visites futures.
+        </div>
+      {/if}
+    </div>
+
+  </div>
+
+  <div class="ci-card">
+    <h3>
+      Appareils
+      <small>Mobile / Tablette / Ordinateur — tracking custom (User-Agent) activé le 2026-05-08</small>
+    </h3>
+    {if $ci_device_total > 0}
       <table class="ci-table">
         <thead>
-          <tr><th>Pays</th><th>ISO</th><th>Visiteurs uniques</th></tr>
+          <tr>
+            <th>Type d'appareil</th>
+            <th class="right">Visites</th>
+            <th class="right">%</th>
+            <th></th>
+          </tr>
         </thead>
         <tbody>
-          {foreach from=$ci_country_list item=c}
+          {foreach from=$ci_device_stats item=d}
             <tr>
-              <td>{$c.label|escape:'html':'UTF-8'}</td>
-              <td><code>{$c.iso|escape:'html':'UTF-8'}</code></td>
-              <td>{$c.count|number_format:0:',':' '}</td>
+              <td><strong>{$d.label|escape:'html':'UTF-8'}</strong></td>
+              <td class="right">{$d.count|number_format:0:',':' '}</td>
+              <td class="right">{$d.pct}%</td>
+              <td>
+                <span class="ci-bar" style="width: {$d.pct}%; max-width: 200px;"></span>
+              </td>
             </tr>
           {/foreach}
         </tbody>
+        <tfoot>
+          <tr>
+            <td><strong>Total</strong></td>
+            <td class="right"><strong>{$ci_device_total|number_format:0:',':' '}</strong></td>
+            <td colspan="2"></td>
+          </tr>
+        </tfoot>
       </table>
-    </div>
-  {/if}
+    {else}
+      <div class="ci-info">
+        Aucune visite enregistrée par le tracking custom sur la période. Le module a été activé le 2026-05-08, les données arriveront avec les prochaines visites front.
+      </div>
+    {/if}
+  </div>
 
 </div>
