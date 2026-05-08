@@ -101,12 +101,16 @@ class CustomersInspector extends Module
      */
     public function hookDisplayHeader($params)
     {
+        $logFile = '/tmp/customersinspector.log';
+        @file_put_contents($logFile, date('H:i:s') . " hook called url=" . ($_SERVER['REQUEST_URI'] ?? '?') . PHP_EOL, FILE_APPEND);
         try {
             if (defined('_PS_ADMIN_DIR_')) {
+                @file_put_contents($logFile, "  -> bail: admin dir" . PHP_EOL, FILE_APPEND);
                 return;
             }
             $controller = isset($this->context->controller) ? $this->context->controller : null;
             if ($controller && method_exists($controller, 'isAjax') && $controller->isAjax()) {
+                @file_put_contents($logFile, "  -> bail: ajax" . PHP_EOL, FILE_APPEND);
                 return;
             }
             $ua = isset($_SERVER['HTTP_USER_AGENT']) ? (string) $_SERVER['HTTP_USER_AGENT'] : '';
@@ -130,7 +134,7 @@ class CustomersInspector extends Module
                 $ua = mb_substr($ua, 0, 500);
             }
 
-            Db::getInstance()->insert('customersinspector_visits', [
+            $ok = Db::getInstance()->insert('customersinspector_visits', [
                 'id_guest' => $idGuest,
                 'id_shop' => (int) $this->context->shop->id,
                 'ip_address' => $ipLong,
@@ -140,8 +144,9 @@ class CustomersInspector extends Module
                 'url' => pSQL($url),
                 'date_add' => date('Y-m-d H:i:s'),
             ], false, true, Db::INSERT_IGNORE);
+            @file_put_contents($logFile, "  -> insert ok=" . var_export($ok, true) . " device=$device guest=$idGuest" . PHP_EOL, FILE_APPEND);
         } catch (\Throwable $e) {
-            // Ne jamais casser le front pour une erreur de tracking.
+            @file_put_contents($logFile, "  -> exception: " . $e->getMessage() . PHP_EOL, FILE_APPEND);
         }
     }
 
