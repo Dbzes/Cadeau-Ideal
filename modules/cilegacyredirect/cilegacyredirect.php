@@ -35,7 +35,7 @@ class CILegacyRedirect extends Module
     public function install()
     {
         return parent::install()
-            && $this->registerHook('actionPageNotFoundControllerInit');
+            && $this->registerHook('actionDispatcherBefore');
     }
 
     public function uninstall()
@@ -44,11 +44,17 @@ class CILegacyRedirect extends Module
     }
 
     /**
-     * Hook déclenché par PrestaShop quand une 404 est sur le point d'être servie.
-     * On y intercepte les URLs en forme de slug nu pour les rediriger.
+     * Hook déclenché en début de dispatch (avant que PS ne route la requête).
+     * On y intercepte les URLs en forme de slug nu pour les rediriger en 301
+     * vers leur URL canonique si elles correspondent à une entité active.
      */
-    public function hookActionPageNotFoundControllerInit($params)
+    public function hookActionDispatcherBefore($params)
     {
+        // Skip back-office, AJAX, webservice, admin
+        if (defined('_PS_ADMIN_DIR_')) {
+            return;
+        }
+
         $uri = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
         if ($uri === '') {
             return;
@@ -57,6 +63,7 @@ class CILegacyRedirect extends Module
         $path = parse_url($uri, PHP_URL_PATH);
         $slug = trim((string) $path, '/');
 
+        // Skip racine, sous-chemins, requêtes avec query/params
         if ($slug === '' || strpos($slug, '/') !== false) {
             return;
         }
