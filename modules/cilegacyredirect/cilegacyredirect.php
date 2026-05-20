@@ -68,27 +68,48 @@ class CILegacyRedirect extends Module
 
         @file_put_contents('/tmp/cilegacy.log', date('H:i:s') . '   slug=' . $slug . "\n", FILE_APPEND);
 
+        // Skip extensions et préfixe ID (déjà canoniques)
+        if (preg_match('#^\d+-#', $slug)) {
+            @file_put_contents('/tmp/cilegacy.log', "   skip: prefix id\n", FILE_APPEND);
+            return;
+        }
+        if (preg_match('#\.[a-z0-9]{2,5}$#i', $slug)) {
+            @file_put_contents('/tmp/cilegacy.log', "   skip: extension\n", FILE_APPEND);
+            return;
+        }
+
+        try {
+            $ctx = Context::getContext();
+            $idLang = $ctx && $ctx->language ? (int) $ctx->language->id : 0;
+            $idShop = $ctx && $ctx->shop ? (int) $ctx->shop->id : 0;
+            @file_put_contents('/tmp/cilegacy.log', "   ctx idLang=$idLang idShop=$idShop\n", FILE_APPEND);
+
+            if ($idLang === 0) {
+                $idLang = (int) Configuration::get('PS_LANG_DEFAULT');
+                @file_put_contents('/tmp/cilegacy.log', "   fallback idLang=$idLang\n", FILE_APPEND);
+            }
+            if ($idShop === 0) {
+                $idShop = (int) Configuration::get('PS_SHOP_DEFAULT');
+                @file_put_contents('/tmp/cilegacy.log', "   fallback idShop=$idShop\n", FILE_APPEND);
+            }
+        } catch (\Throwable $e) {
+            @file_put_contents('/tmp/cilegacy.log', "   ERR ctx: " . $e->getMessage() . "\n", FILE_APPEND);
+            return;
+        }
+
         // Skip racine, sous-chemins, requêtes avec query/params
         if ($slug === '' || strpos($slug, '/') !== false) {
             return;
         }
 
-        // Ignorer les URLs qui ont déjà un préfixe ID (123-slug) — c'est déjà la forme canonique
-        if (preg_match('#^\d+-#', $slug)) {
+        try {
+            $target = $this->findCategoryUrl($slug, $idLang, $idShop)
+                ?: $this->findProductUrl($slug, $idLang, $idShop)
+                ?: $this->findCmsUrl($slug, $idLang, $idShop);
+        } catch (\Throwable $e) {
+            @file_put_contents('/tmp/cilegacy.log', "   ERR find: " . $e->getMessage() . "\n", FILE_APPEND);
             return;
         }
-
-        // Ignorer les extensions de fichier (xml, txt, php, ico, etc.)
-        if (preg_match('#\.[a-z0-9]{2,5}$#i', $slug)) {
-            return;
-        }
-
-        $idLang = (int) Context::getContext()->language->id;
-        $idShop = (int) Context::getContext()->shop->id;
-
-        $target = $this->findCategoryUrl($slug, $idLang, $idShop)
-            ?: $this->findProductUrl($slug, $idLang, $idShop)
-            ?: $this->findCmsUrl($slug, $idLang, $idShop);
 
         @file_put_contents('/tmp/cilegacy.log', date('H:i:s') . '   target=' . var_export($target, true) . "\n", FILE_APPEND);
 
