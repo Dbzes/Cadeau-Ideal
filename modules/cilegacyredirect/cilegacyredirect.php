@@ -45,15 +45,11 @@ class CILegacyRedirect extends Module
 
     /**
      * Hook déclenché en début de dispatch (avant que PS ne route la requête).
-     * On y intercepte les URLs en forme de slug nu pour les rediriger en 301
-     * vers leur URL canonique si elles correspondent à une entité active.
+     * Si l'URL est un slug nu correspondant à une catégorie/produit/CMS actif,
+     * redirige en 301 vers son URL canonique.
      */
     public function hookActionDispatcherBefore($params)
     {
-        // DEBUG TEMP
-        @file_put_contents('/tmp/cilegacy.log', date('H:i:s') . ' HOOK called uri=' . ($_SERVER['REQUEST_URI'] ?? 'NULL') . "\n", FILE_APPEND);
-
-        // Skip back-office, AJAX, webservice, admin
         if (defined('_PS_ADMIN_DIR_')) {
             return;
         }
@@ -66,52 +62,29 @@ class CILegacyRedirect extends Module
         $path = parse_url($uri, PHP_URL_PATH);
         $slug = trim((string) $path, '/');
 
-        @file_put_contents('/tmp/cilegacy.log', date('H:i:s') . '   slug=' . $slug . "\n", FILE_APPEND);
-
-        // Skip extensions et préfixe ID (déjà canoniques)
+        // Skip racine, sous-chemins, URLs déjà canoniques (préfixe ID), extensions
+        if ($slug === '' || strpos($slug, '/') !== false) {
+            return;
+        }
         if (preg_match('#^\d+-#', $slug)) {
-            @file_put_contents('/tmp/cilegacy.log', "   skip: prefix id\n", FILE_APPEND);
             return;
         }
         if (preg_match('#\.[a-z0-9]{2,5}$#i', $slug)) {
-            @file_put_contents('/tmp/cilegacy.log', "   skip: extension\n", FILE_APPEND);
             return;
         }
 
         try {
             $ctx = Context::getContext();
-            $idLang = $ctx && $ctx->language ? (int) $ctx->language->id : 0;
-            $idShop = $ctx && $ctx->shop ? (int) $ctx->shop->id : 0;
-            @file_put_contents('/tmp/cilegacy.log', "   ctx idLang=$idLang idShop=$idShop\n", FILE_APPEND);
+            $idLang = $ctx && $ctx->language ? (int) $ctx->language->id : (int) Configuration::get('PS_LANG_DEFAULT');
+            $idShop = $ctx && $ctx->shop ? (int) $ctx->shop->id : (int) Configuration::get('PS_SHOP_DEFAULT');
 
-            if ($idLang === 0) {
-                $idLang = (int) Configuration::get('PS_LANG_DEFAULT');
-                @file_put_contents('/tmp/cilegacy.log', "   fallback idLang=$idLang\n", FILE_APPEND);
-            }
-            if ($idShop === 0) {
-                $idShop = (int) Configuration::get('PS_SHOP_DEFAULT');
-                @file_put_contents('/tmp/cilegacy.log', "   fallback idShop=$idShop\n", FILE_APPEND);
-            }
-        } catch (\Throwable $e) {
-            @file_put_contents('/tmp/cilegacy.log', "   ERR ctx: " . $e->getMessage() . "\n", FILE_APPEND);
-            return;
-        }
-
-        // Skip racine, sous-chemins, requêtes avec query/params
-        if ($slug === '' || strpos($slug, '/') !== false) {
-            return;
-        }
-
-        try {
             $target = $this->findCategoryUrl($slug, $idLang, $idShop)
                 ?: $this->findProductUrl($slug, $idLang, $idShop)
                 ?: $this->findCmsUrl($slug, $idLang, $idShop);
         } catch (\Throwable $e) {
-            @file_put_contents('/tmp/cilegacy.log', "   ERR find: " . $e->getMessage() . "\n", FILE_APPEND);
+            // En cas d'erreur, on laisse PrestaShop servir sa 404 normalement
             return;
         }
-
-        @file_put_contents('/tmp/cilegacy.log', date('H:i:s') . '   target=' . var_export($target, true) . "\n", FILE_APPEND);
 
         if ($target !== null) {
             header('HTTP/1.1 301 Moved Permanently');
@@ -133,10 +106,8 @@ class CILegacyRedirect extends Module
                     ON c.id_category = cs.id_category
                    AND cs.id_shop = ' . (int) $idShop . '
                 WHERE cl.link_rewrite = "' . pSQL($slug) . '"
-                  AND c.active = 1
-                LIMIT 1';
+                  AND c.active = 1';
 
-        @file_put_contents('/tmp/cilegacy.log', "   SQL: $sql\n", FILE_APPEND);
         $row = Db::getInstance()->getRow($sql);
         if (!$row) {
             return null;
@@ -162,8 +133,7 @@ class CILegacyRedirect extends Module
                    AND ps.id_shop = ' . (int) $idShop . '
                 WHERE pl.link_rewrite = "' . pSQL($slug) . '"
                   AND ps.active = 1
-                  AND ps.visibility IN ("both", "catalog", "search")
-                LIMIT 1';
+                  AND ps.visibility IN ("both", "catalog", "search")';
 
         $row = Db::getInstance()->getRow($sql);
         if (!$row) {
@@ -191,8 +161,7 @@ class CILegacyRedirect extends Module
                     ON c.id_cms = cs.id_cms
                    AND cs.id_shop = ' . (int) $idShop . '
                 WHERE cl.link_rewrite = "' . pSQL($slug) . '"
-                  AND c.active = 1
-                LIMIT 1';
+                  AND c.active = 1';
 
         $row = Db::getInstance()->getRow($sql);
         if (!$row) {
