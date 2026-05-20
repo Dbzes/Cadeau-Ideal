@@ -50,6 +50,9 @@ class CILegacyRedirect extends Module
      */
     public function hookActionDispatcherBefore($params)
     {
+        // DEBUG TEMP
+        @file_put_contents('/tmp/cilegacy.log', date('H:i:s') . ' HOOK called uri=' . ($_SERVER['REQUEST_URI'] ?? 'NULL') . "\n", FILE_APPEND);
+
         // Skip back-office, AJAX, webservice, admin
         if (defined('_PS_ADMIN_DIR_')) {
             return;
@@ -62,6 +65,8 @@ class CILegacyRedirect extends Module
 
         $path = parse_url($uri, PHP_URL_PATH);
         $slug = trim((string) $path, '/');
+
+        @file_put_contents('/tmp/cilegacy.log', date('H:i:s') . '   slug=' . $slug . "\n", FILE_APPEND);
 
         // Skip racine, sous-chemins, requêtes avec query/params
         if ($slug === '' || strpos($slug, '/') !== false) {
@@ -84,6 +89,8 @@ class CILegacyRedirect extends Module
         $target = $this->findCategoryUrl($slug, $idLang, $idShop)
             ?: $this->findProductUrl($slug, $idLang, $idShop)
             ?: $this->findCmsUrl($slug, $idLang, $idShop);
+
+        @file_put_contents('/tmp/cilegacy.log', date('H:i:s') . '   target=' . var_export($target, true) . "\n", FILE_APPEND);
 
         if ($target !== null) {
             header('HTTP/1.1 301 Moved Permanently');
