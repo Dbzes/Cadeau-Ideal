@@ -136,6 +136,7 @@ class CILegacyRedirect extends Module
                   AND c.active = 1
                 LIMIT 1';
 
+        @file_put_contents('/tmp/cilegacy.log', "   SQL: $sql\n", FILE_APPEND);
         $row = Db::getInstance()->getRow($sql);
         if (!$row) {
             return null;
