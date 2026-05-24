@@ -17,8 +17,10 @@
  * International Registered Trademark & Property of PrestaShop SA
  *}
 
-<script async src="https://www.googletagmanager.com/gtag/js?id={$gaAccountId|escape:'htmlall':'UTF-8'}"></script>
 <script>
+  // [CadeauIdeal perf] gtag.js charge en defere apres le LCP pour liberer la bande passante.
+  // Les appels gtag() sont mis en queue dans dataLayer et flushes quand gtag.js arrive (zero perte de tracking).
+  // Si tu mets a jour le module ps_googleanalytics, repropage cette modif (cf. memoire projet feedback_gtag_deferred.md).
   window.dataLayer = window.dataLayer || [];
   {literal}function gtag(){dataLayer.push(arguments);}{/literal}
   gtag('js', new Date());
@@ -32,5 +34,20 @@
       {if $backOffice && !$trackBackOffice}, 'non_interaction': true, 'send_page_view': false{/if}
     {rdelim}
   );
+  {literal}
+  (function() {
+    function loadGtag() {
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtag/js?id={/literal}{$gaAccountId|escape:'htmlall':'UTF-8'}{literal}';
+      document.head.appendChild(s);
+    }
+    if (document.readyState === 'complete') {
+      setTimeout(loadGtag, 1500);
+    } else {
+      window.addEventListener('load', function() { setTimeout(loadGtag, 1500); });
+    }
+  })();
+  {/literal}
 </script>
 
