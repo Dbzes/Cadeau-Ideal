@@ -747,6 +747,16 @@
       display: none !important;
     }
 
+    /* Plan du site : liens en bleu site, hover orange site */
+    .sitemap a,
+    .sitemap a:visited {
+      color: #004774 !important;
+    }
+    .sitemap a:hover,
+    .sitemap a:focus {
+      color: #ee7a03 !important;
+    }
+
     .cat-focused-title {
       font-size: 1rem;
       font-weight: 600;
