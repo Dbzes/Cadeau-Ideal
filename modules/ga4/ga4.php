@@ -121,6 +121,45 @@ class Ga4 extends Module
     public function hookDisplayHeader($params)
     {
         $snippet = (string) Configuration::get(self::CFG_SNIPPET);
-        return trim($snippet) === '' ? '' : $snippet;
+        if (trim($snippet) === '') {
+            return '';
+        }
+
+        // [Perf LCP] Differer l'injection du snippet GA4 apres window.load + 1.5s
+        // pour ne pas bloquer le rendu (gtag.js = 158 KiB synchrone = ~2s render-blocking).
+        // Le snippet stocke en BDD reste tel quel (admin peut continuer a coller le code
+        // standard fourni par Google) ; seul son TIMING d'injection est differe.
+        // Les appels gtag('config') et gtag('event') declenches avant chargement sont
+        // empiles dans dataLayer puis flushes des l'arrivee de gtag.js -> zero perte de tracking.
+        $encoded = base64_encode($snippet);
+
+        return <<<HTML
+<script>
+(function() {
+  function injectGa4Snippet() {
+    var container = document.createElement('div');
+    container.innerHTML = atob('{$encoded}');
+    var scripts = container.querySelectorAll('script');
+    scripts.forEach(function(oldScript) {
+      var newScript = document.createElement('script');
+      Array.from(oldScript.attributes).forEach(function(attr) {
+        newScript.setAttribute(attr.name, attr.value);
+      });
+      if (oldScript.src) {
+        newScript.async = true;
+      } else {
+        newScript.text = oldScript.text;
+      }
+      document.head.appendChild(newScript);
+    });
+  }
+  if (document.readyState === 'complete') {
+    setTimeout(injectGa4Snippet, 1500);
+  } else {
+    window.addEventListener('load', function() { setTimeout(injectGa4Snippet, 1500); });
+  }
+})();
+</script>
+HTML;
     }
 }
