@@ -30,11 +30,48 @@
 {/block}
 
 {block name='head_seo'}
-  <title>{block name='head_seo_title'}{$page.meta.title}{/block}</title>
+  {* === Fallback SEO automatique : title + description toujours remplis ===
+     Si meta_title / meta_description sont vides en BO, on génère un fallback
+     intelligent (produit / catégorie / CMS) pour éviter le "Détectée non indexée". *}
+  {assign var=_seo_title value=$page.meta.title|default:''|trim}
+  {if !$_seo_title}
+    {if isset($product) && $product.name}
+      {assign var=_seo_title value="`$product.name` - `$shop.name`"}
+    {elseif isset($category) && $category.name}
+      {assign var=_seo_title value="`$category.name` - `$shop.name`"}
+    {elseif isset($cms) && $cms.meta_title}
+      {assign var=_seo_title value="`$cms.meta_title` - `$shop.name`"}
+    {elseif isset($cms) && $cms.title}
+      {assign var=_seo_title value="`$cms.title` - `$shop.name`"}
+    {else}
+      {assign var=_seo_title value=$shop.name}
+    {/if}
+  {/if}
+
+  {assign var=_seo_desc value=$page.meta.description|default:''|trim}
+  {if !$_seo_desc}
+    {if isset($product) && $product.description_short}
+      {assign var=_seo_desc value=$product.description_short|strip_tags:false|trim|truncate:160:"…"}
+    {elseif isset($product) && $product.description}
+      {assign var=_seo_desc value=$product.description|strip_tags:false|trim|truncate:160:"…"}
+    {elseif isset($category) && $category.description}
+      {assign var=_seo_desc value=$category.description|strip_tags:false|trim|truncate:160:"…"}
+    {elseif isset($cms) && $cms.content}
+      {assign var=_seo_desc value=$cms.content|strip_tags:false|trim|truncate:160:"…"}
+    {elseif isset($product) && $product.name}
+      {assign var=_seo_desc value="Découvrez `$product.name` sur `$shop.name`. Cadeau personnalisé original, fabrication française, livraison rapide."}
+    {elseif isset($category) && $category.name}
+      {assign var=_seo_desc value="Découvrez notre sélection `$category.name` sur `$shop.name`. Cadeaux personnalisables, mugs originaux et idées cadeaux uniques."}
+    {else}
+      {assign var=_seo_desc value="`$shop.name` - Cadeaux personnalisables, mugs originaux et idées cadeaux uniques. Livraison rapide en France."}
+    {/if}
+  {/if}
+
+  <title>{block name='head_seo_title'}{$_seo_title}{/block}</title>
   {block name='hook_after_title_tag'}
     {hook h='displayAfterTitleTag'}
   {/block}
-  <meta name="description" content="{block name='head_seo_description'}{$page.meta.description}{/block}">
+  <meta name="description" content="{block name='head_seo_description'}{$_seo_desc}{/block}">
   <meta name="keywords" content="{block name='head_seo_keywords'}{$page.meta.keywords}{/block}">
   {if $page.meta.robots !== 'index'}
     <meta name="robots" content="{$page.meta.robots}">
@@ -59,8 +96,8 @@
   {/block}
 
   {block name='head_open_graph'}
-    <meta property="og:title" content="{$page.meta.title}" />
-    <meta property="og:description" content="{$page.meta.description}" />
+    <meta property="og:title" content="{$_seo_title}" />
+    <meta property="og:description" content="{$_seo_desc}" />
     <meta property="og:url" content="{$urls.current_url}" />
     <meta property="og:site_name" content="{$shop.name}" />
     <meta property="og:ttl" content="86400" />
@@ -76,8 +113,8 @@
       <meta property="og:image:height" content="543" />
     {/if}
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="{$page.meta.title}" />
-    <meta name="twitter:description" content="{$page.meta.description}" />
+    <meta name="twitter:title" content="{$_seo_title}" />
+    <meta name="twitter:description" content="{$_seo_desc}" />
     <meta name="twitter:image" content="{if isset($product) && $product.cover}{$product.cover.large.url}{else}{$urls.base_url}img/template/le-cadeau-ideal.png{/if}" />
   {/block}
 {/block}
