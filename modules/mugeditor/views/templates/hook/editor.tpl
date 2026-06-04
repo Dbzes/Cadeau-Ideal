@@ -301,7 +301,7 @@ function mueInit() {
     if (fabric.IText && fabric.IText.prototype) fabric.IText.prototype.textBaseline = 'alphabetic';
     if (fabric.Textbox && fabric.Textbox.prototype) fabric.Textbox.prototype.textBaseline = 'alphabetic';
     canvas = new fabric.Canvas('mue-canvas', {
-      backgroundColor: '#f0f0f0',
+      backgroundColor: '#ffffff',
       preserveObjectStacking: true
     });
     canvas.setDimensions({ width: W, height: H });
@@ -485,7 +485,7 @@ function mueInit() {
       canvas.remove(bgImage);
       bgImage = null;
     }
-    canvas.backgroundColor = '#f0f0f0';
+    canvas.backgroundColor = '#ffffff';
   }
 
   function finishBgSetup(obj) {
@@ -859,7 +859,7 @@ function mueInit() {
               bgImage = null;
               bgValue = null;
               saveState();
-              canvas.backgroundColor = '#f0f0f0';
+              canvas.backgroundColor = '#ffffff';
               document.getElementById('mue-bg-controls').style.display = 'none';
               canvas.requestRenderAll();
             }
@@ -1178,7 +1178,7 @@ function mueInit() {
     document.getElementById('mue-confirm-modal').style.display = 'none';
     if (!canvas) return;
     canvas.clear();
-    canvas.backgroundColor = '#f0f0f0';
+    canvas.backgroundColor = '#ffffff';
     bgImage = null;
     bgValue = null;
     templateOverlay = null;
