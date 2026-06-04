@@ -268,7 +268,11 @@ function mueInit() {
   var TEMPLATE_URL = window.MUE_TEMPLATE_URL;
   var TEMPLATE_W = window.MUE_TEMPLATE_W;
   var TEMPLATE_H = window.MUE_TEMPLATE_H;
-  var RATIO = TEMPLATE_W / TEMPLATE_H;
+  // Réduction largeur zone imprimée : 24 cm -> 21 cm sur le MEME mug (hauteur inchangée).
+  // Facteur appliqué a la largeur du patron : ratio canvas, fichier HD (targetW) et
+  // couverture cylindrique de l'apercu (COVERAGE_DEG) -> voir bloc apercu plus bas.
+  var MUE_WIDTH_FACTOR = 21 / 24; // 0.875
+  var RATIO = (TEMPLATE_W * MUE_WIDTH_FACTOR) / TEMPLATE_H;
   var canvasEl = document.getElementById('mue-canvas');
   var wrap = document.querySelector('.mue-canvas-wrap');
   // -2px pour compenser le border 1px de .canvas-container (gauche + droite)
@@ -617,7 +621,9 @@ function mueInit() {
       var BASE_W = 1461, BASE_H = 453;
 
       // Couverture du patron sur le cylindre (en degrés)
-      var COVERAGE_DEG = 362;
+      // Patron 24->21 cm sur le meme mug : 362 * 21/24 = 316.75 -> le visuel ne fait
+      // plus tout le tour (~315°), il reste une bande nue cote anse. (cf MUE_WIDTH_FACTOR)
+      var COVERAGE_DEG = 317;
       var HALF_COV = (COVERAGE_DEG / 2) * Math.PI / 180;
       var TOTAL_COV = COVERAGE_DEG * Math.PI / 180;
 
@@ -1189,7 +1195,7 @@ function mueInit() {
     var state = {
       canvasW: W,
       canvasH: H,
-      targetW: TEMPLATE_W,
+      targetW: Math.round(TEMPLATE_W * MUE_WIDTH_FACTOR), // 24->21 cm (cf MUE_WIDTH_FACTOR)
       targetH: TEMPLATE_H,
       bg: null,
       images: [],
