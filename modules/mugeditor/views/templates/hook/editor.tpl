@@ -1,4 +1,4 @@
-{literal}<style>@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');.product-customization{display:none!important}#mue-preview-container{box-sizing:border-box}#mue-canvas-border{border:1px solid #ddd;display:inline-block;line-height:0}
+{literal}<style>@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');.product-customization{display:none!important}#mue-preview-container{box-sizing:border-box}#mue-canvas-border{border:1px solid #ddd;display:block;width:-moz-fit-content;width:fit-content;margin:0 auto;line-height:0}
 .mue-font-dropdown{position:relative;width:100%}
 .mue-font-selected{border:1px solid #ddd;padding:8px 12px;cursor:pointer;background:#fff;font-size:14px;display:flex;justify-content:space-between;align-items:center}
 .mue-font-selected:hover{border-color:#004774}
@@ -272,12 +272,16 @@ function mueInit() {
   // Facteur appliqué a la largeur du patron : ratio canvas, fichier HD (targetW) et
   // couverture cylindrique de l'apercu (COVERAGE_DEG) -> voir bloc apercu plus bas.
   var MUE_WIDTH_FACTOR = 21 / 24; // 0.875
-  var RATIO = (TEMPLATE_W * MUE_WIDTH_FACTOR) / TEMPLATE_H;
+  var FULL_RATIO = TEMPLATE_W / TEMPLATE_H;        // ratio patron pleine largeur (ancre la HAUTEUR)
+  var RATIO = FULL_RATIO * MUE_WIDTH_FACTOR;       // ratio patron reduit 24->21 (2.61 -> 2.29)
   var canvasEl = document.getElementById('mue-canvas');
   var wrap = document.querySelector('.mue-canvas-wrap');
   // -2px pour compenser le border 1px de .canvas-container (gauche + droite)
-  var W = wrap.clientWidth - 2;
-  var H = Math.round(W / RATIO);
+  // On ancre la HAUTEUR (inchangee) et on reduit la LARGEUR -> la zone se retrecit
+  // horizontalement (on coupe de la longueur) au lieu de grandir en hauteur.
+  var AVAIL = wrap.clientWidth - 2;
+  var H = Math.round(AVAIL / FULL_RATIO);
+  var W = Math.round(H * RATIO);
   canvasEl.width = W;
   canvasEl.height = H;
 
@@ -1342,8 +1346,8 @@ function mueInit() {
   // Resize responsive
   window.addEventListener('resize', function(){
     if (!canvas) return;
-    var newW = wrap.clientWidth - 2;
-    var newH = Math.round(newW / RATIO);
+    var newH = Math.round((wrap.clientWidth - 2) / FULL_RATIO);
+    var newW = Math.round(newH * RATIO);
     var ratio = newW / W;
     canvas.setDimensions({ width: newW, height: newH });
     canvas.getObjects().forEach(function(o){
