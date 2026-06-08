@@ -26,4 +26,7 @@ jobs:
             echo 'mmauhlea' | sudo -S chown -R davidmahe:davidmahe /home/davidmahe/prestashop/data/prestashop/.git
             docker exec --user www-data prestashop_app php bin/console cache:clear --env=prod --no-warmup
             docker exec prestashop_app chown -R www-data:www-data /var/www/html/var/cache /var/www/html/var/logs
+            # Garde-fou : le warmup Symfony peut generer des fichiers en mode 000 (ex: appParameters.php)
+            # -> www-data ne peut plus les lire -> fatal bootstrap.php -> site KO. On force des droits lisibles.
+            docker exec prestashop_app chmod -R u+rwX,g+rX /var/www/html/var/cache
             echo "Deploiement OK - $(date)"
