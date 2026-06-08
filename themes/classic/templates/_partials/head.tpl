@@ -37,7 +37,7 @@
   {if !$_seo_title}
     {if isset($product) && $product.name}
       {assign var=_seo_title value="`$product.name` - `$shop.name`"}
-    {elseif isset($category) && $category.name}
+    {elseif $page.page_name == 'category' && isset($category) && $category.name}
       {assign var=_seo_title value="`$category.name` - `$shop.name`"}
     {elseif isset($cms) && $cms.meta_title}
       {assign var=_seo_title value="`$cms.meta_title` - `$shop.name`"}
@@ -54,13 +54,13 @@
       {assign var=_seo_desc value=$product.description_short|strip_tags:false|trim|truncate:160:"…"}
     {elseif isset($product) && $product.description}
       {assign var=_seo_desc value=$product.description|strip_tags:false|trim|truncate:160:"…"}
-    {elseif isset($category) && $category.description}
+    {elseif $page.page_name == 'category' && isset($category) && $category.description}
       {assign var=_seo_desc value=$category.description|strip_tags:false|trim|truncate:160:"…"}
     {elseif isset($cms) && $cms.content}
       {assign var=_seo_desc value=$cms.content|strip_tags:false|trim|truncate:160:"…"}
     {elseif isset($product) && $product.name}
       {assign var=_seo_desc value="Découvrez `$product.name` sur `$shop.name`. Cadeau personnalisé original, fabrication française, livraison rapide."}
-    {elseif isset($category) && $category.name}
+    {elseif $page.page_name == 'category' && isset($category) && $category.name}
       {assign var=_seo_desc value="Découvrez notre sélection `$category.name` sur `$shop.name`. Cadeaux personnalisables, mugs originaux et idées cadeaux uniques."}
     {else}
       {assign var=_seo_desc value="`$shop.name` - Cadeaux personnalisables, mugs originaux et idées cadeaux uniques. Livraison rapide en France."}
