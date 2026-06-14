@@ -107,32 +107,32 @@ class Ps_Categoryproducts extends Module implements WidgetInterface
         return $this->html;
     }
 
-    public function hookAddProduct($params)
+    public function hookActionProductAdd($params)
     {
-        return $this->clearCache($params);
+        $this->clearCache();
     }
 
-    public function hookUpdateProduct($params)
+    public function hookActionProductUpdate($params)
     {
-        return $this->clearCache($params);
+        $this->clearCache();
     }
 
-    public function hookDeleteProduct($params)
+    public function hookActionProductDelete($params)
     {
-        return $this->clearCache($params);
+        $this->clearCache();
     }
 
-    private function clearCache($params)
+    /**
+     * Vide l'intégralité du cache fragment du bloc.
+     *
+     * À chaque ajout / modification / suppression d'un produit, TOUTES les fiches
+     * de la catégorie doivent régénérer leur liste « Produits de la même catégorie »
+     * (pas seulement la fiche du produit modifié). On invalide donc tout le template,
+     * sans cache_id ciblé.
+     */
+    private function clearCache()
     {
-        $params = $this->getInformationFromConfiguration($params);
-
-        if ($params) {
-            $this->_clearCache($this->templateFile, $params['cache_id']);
-        } else {
-            $this->_clearCache($this->templateFile);
-        }
-
-        return;
+        $this->_clearCache($this->templateFile);
     }
 
     public function renderForm()
