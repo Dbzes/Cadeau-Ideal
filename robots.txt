@@ -97,3 +97,5 @@ Disallow: /order
 Disallow: /search
 Disallow: /guest-tracking
 Disallow: /order-confirmation
+# Sitemap
+Sitemap: https://www.le-cadeau-ideal.fr/1_index_sitemap.xml
